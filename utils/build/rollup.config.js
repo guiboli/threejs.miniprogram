@@ -1,5 +1,6 @@
 import buble from 'rollup-plugin-buble';
-
+import inject from 'rollup-plugin-inject';
+import resolve from 'rollup-plugin-node-resolve';
 function glconstants() {
 
 	var constants = {
@@ -142,15 +143,15 @@ function glconstants() {
 
 	return {
 
-		transform( code ) {
+		transform(code) {
 
-			code = code.replace( /_?gl\.([A-Z0-9_]+)/g, function ( match, p1 ) {
+			code = code.replace(/_?gl\.([A-Z0-9_]+)/g, function (match, p1) {
 
-				if ( p1 in constants ) return constants[ p1 ];
-				console.log( '* Unhandled GL Constant:', p1 );
+				if (p1 in constants) return constants[p1];
+				console.log('* Unhandled GL Constant:', p1);
 				return match;
 
-			} );
+			});
 
 			return {
 				code: code,
@@ -167,22 +168,22 @@ function glsl() {
 
 	return {
 
-		transform( code, id ) {
+		transform(code, id) {
 
-			if ( /\.glsl.js$/.test( id ) === false ) return;
+			if (/\.glsl.js$/.test(id) === false) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
+			code = code.replace(/\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function (match, p1) {
 
 				return JSON.stringify(
 					p1
 						.trim()
-						.replace( /\r/g, '' )
-						.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
-						.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
-						.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
+						.replace(/\r/g, '')
+						.replace(/[ \t]*\/\/.*\n/g, '') // remove //
+						.replace(/[ \t]*\/\*[\s\S]*?\*\//g, '') // remove /* */
+						.replace(/\n{2,}/g, '\n') // # \n+ to \n
 				);
 
-			} );
+			});
 
 			return {
 				code: code,
@@ -201,12 +202,12 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
+			buble({
 				transforms: {
 					arrow: false,
 					classes: true
 				}
-			} )
+			})
 		],
 		output: [
 			{
@@ -230,5 +231,32 @@ export default [
 				indent: '\t'
 			}
 		]
-	}
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl(),
+			buble({
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			}),
+			inject({
+				document: ['miniapp-adapter', 'document'],
+				window: ['miniapp-adapter', '*'],
+				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			}),
+			resolve()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.weapp.js',
+				indent: '\t'
+			}
+		]
+	},
 ];
