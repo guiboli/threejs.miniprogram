@@ -4,45 +4,6 @@
 	(global = global || self, factory(global.THREE = {}));
 }(this, function (exports) { 'use strict';
 
-	var window = /*#__PURE__*/Object.freeze({
-		__proto__: null,
-		get AudioContext () { return AudioContext; },
-		get Element () { return Element; },
-		get HTMLElement () { return HTMLElement; },
-		get Image () { return Image; },
-		get TouchEvent () { return TouchEvent; },
-		get VRFrameData () { return noop; },
-		get XMLHttpRequest () { return XMLHttpRequest; },
-		get _canvasMap () { return _canvasMap; },
-		get addEventListener () { return addEventListener; },
-		get alert () { return alert; },
-		get blur () { return blur; },
-		get canvas () { return _canvas; },
-		get clearCanvas () { return clearCanvas; },
-		get devicePixelRatio () { return devicePixelRatio; },
-		get document () { return document$1; },
-		get focus () { return focus; },
-		get getComputedStyle () { return getComputedStyle; },
-		get innerHeight () { return innerHeight; },
-		get innerWidth () { return innerWidth; },
-		get location () { return location; },
-		get navigator () { return navigator$1; },
-		get ontouchend () { return ontouchend; },
-		get ontouchmove () { return ontouchmove; },
-		get ontouchstart () { return ontouchstart; },
-		get performance () { return performance$1$1; },
-		get registerCanvas () { return registerCanvas; },
-		get removeEventListener () { return removeEventListener; },
-		get screen () { return screen; },
-		get scrollBy () { return scrollBy; },
-		get scrollTo () { return scrollTo; },
-		get scrollX () { return scrollX; },
-		get scrollY () { return scrollY; },
-		get touchEventHandlerFactory () { return touchEventHandlerFactory; },
-		get unregisterCanvas () { return unregisterCanvas; },
-		get webkitAudioContext () { return webkitAudioContext; }
-	});
-
 	function noop() {}
 
 	function _classCallCheck(instance, Constructor) {
@@ -1867,7 +1828,7 @@
 	if (wx.onWindowResize) {
 	  wx.onWindowResize(function (res) {
 	    var event = new Event('resize');
-	    event.target = window;
+	    event.target = document$1;
 	    event.timeStamp = Date.now();
 	    event.res = res;
 	    event.windowWidth = res.windowWidth;
@@ -1920,6 +1881,45 @@
 	function removeEventListener(type, listener) {
 	  document$1.removeEventListener(type, listener);
 	}
+
+	var window = /*#__PURE__*/Object.freeze({
+		__proto__: null,
+		AudioContext: AudioContext,
+		Element: Element,
+		HTMLElement: HTMLElement,
+		Image: Image,
+		TouchEvent: TouchEvent,
+		VRFrameData: noop,
+		XMLHttpRequest: XMLHttpRequest,
+		_canvasMap: _canvasMap,
+		addEventListener: addEventListener,
+		alert: alert,
+		blur: blur,
+		get canvas () { return _canvas; },
+		clearCanvas: clearCanvas,
+		devicePixelRatio: devicePixelRatio,
+		document: document$1,
+		focus: focus,
+		getComputedStyle: getComputedStyle,
+		innerHeight: innerHeight,
+		innerWidth: innerWidth,
+		location: location,
+		navigator: navigator$1,
+		ontouchend: ontouchend,
+		ontouchmove: ontouchmove,
+		ontouchstart: ontouchstart,
+		performance: performance$1$1,
+		registerCanvas: registerCanvas,
+		removeEventListener: removeEventListener,
+		screen: screen,
+		scrollBy: scrollBy,
+		scrollTo: scrollTo,
+		scrollX: scrollX,
+		scrollY: scrollY,
+		touchEventHandlerFactory: touchEventHandlerFactory,
+		unregisterCanvas: unregisterCanvas,
+		webkitAudioContext: webkitAudioContext
+	});
 
 	// Polyfills
 
