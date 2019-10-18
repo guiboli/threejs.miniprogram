@@ -49372,7 +49372,6 @@
 
 	}
 
-	var Canvas = window.Canvas;
 	var global = window;
 
 	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
@@ -49429,7 +49428,6 @@
 	exports.Cache = Cache;
 	exports.Camera = Camera;
 	exports.CameraHelper = CameraHelper;
-	exports.Canvas = Canvas;
 	exports.CanvasRenderer = CanvasRenderer;
 	exports.CanvasTexture = CanvasTexture;
 	exports.CatmullRomCurve3 = CatmullRomCurve3;

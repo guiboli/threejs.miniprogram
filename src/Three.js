@@ -160,10 +160,9 @@ export { ShapeUtils } from './extras/ShapeUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
-let Canvas = window.Canvas
+
 let global = window
-export {Canvas}
-export {global}
+export { global }
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
