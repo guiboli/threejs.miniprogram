@@ -1198,6 +1198,14 @@
 	  this.timeStamp = Date.now();
 	};
 
+	var location = {
+	  href: 'app.js',
+	  reload: function reload() {},
+	  replace: function replace(href) {
+	    this.href = href;
+	  }
+	};
+
 	function Image() {
 	  var canvas = _canvas;
 
@@ -1751,14 +1759,6 @@
 	XMLHttpRequest.HEADERS_RECEIVED = 2;
 	XMLHttpRequest.LOADING = 3;
 	XMLHttpRequest.DONE = 4;
-
-	var location = {
-	  href: 'app.js',
-	  reload: function reload() {},
-	  replace: function replace(href) {
-	    this.href = href;
-	  }
-	};
 
 	var _wx$getSystemInfoSync$2 = wx.getSystemInfoSync(),
 	    platform$2 = _wx$getSystemInfoSync$2.platform; // export { default as HTMLImageElement } from './HTMLImageElement'
