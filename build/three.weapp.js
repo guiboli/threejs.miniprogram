@@ -555,11 +555,14 @@
 	    return _canvasMap["delete"](argu._canvasId);
 	  }
 
+	  _canvas = null;
 	  return false;
 	}
 
 	function clearCanvas() {
 	  _canvasMap.clear();
+
+	  _canvas = null;
 	}
 
 	var style$1 = {
@@ -1866,9 +1869,11 @@
 	// const _clearTimeout = clearTimeout;
 	// const _setInterval = setInterval;
 	// const _clearInterval = clearInterval;
-	// const _requestAnimationFrame = requestAnimationFrame;
-	// const _cancelAnimationFrame = cancelAnimationFrame;
-	//TODO
+
+
+	var _requestAnimationFrame = _canvas ? _canvas.requestAnimationFrame : noop;
+
+	var _cancelAnimationFrame = _canvas ? _canvas.cancelAnimationFrame : noop; //TODO
 
 
 	var AudioContext = null;
@@ -1882,6 +1887,9 @@
 	  document$1.removeEventListener(type, listener);
 	}
 
+	var arrayBufferToBase64 = wx.arrayBufferToBase64 || noop;
+	var base64ToArrayBuffer = wx.base64ToArrayBuffer || noop;
+
 	var window = /*#__PURE__*/Object.freeze({
 		__proto__: null,
 		AudioContext: AudioContext,
@@ -1894,7 +1902,10 @@
 		_canvasMap: _canvasMap,
 		addEventListener: addEventListener,
 		alert: alert,
+		arrayBufferToBase64: arrayBufferToBase64,
+		base64ToArrayBuffer: base64ToArrayBuffer,
 		blur: blur,
+		cancelAnimationFrame: _cancelAnimationFrame,
 		get canvas () { return _canvas; },
 		clearCanvas: clearCanvas,
 		devicePixelRatio: devicePixelRatio,
@@ -1911,6 +1922,7 @@
 		performance: performance$1$1,
 		registerCanvas: registerCanvas,
 		removeEventListener: removeEventListener,
+		requestAnimationFrame: _requestAnimationFrame,
 		screen: screen,
 		scrollBy: scrollBy,
 		scrollTo: scrollTo,
