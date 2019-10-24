@@ -308,7 +308,7 @@ Object.assign( Path.prototype, {
 	fromPoints: function ( points ) {
 
 		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
-		this.setFromPoints( points );
+		return this.setFromPoints( points );
 
 	}
 
@@ -1214,6 +1214,30 @@ Object.assign( BufferGeometry.prototype, {
 		this.setIndex( index );
 
 	},
+	addAttribute: function ( name, attribute ) {
+
+		console.warn( 'THREE.BufferGeometry: .addAttribute() has been renamed to .setAttribute().' );
+
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
+
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+
+			return this.setAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
+
+		}
+
+		if ( name === 'index' ) {
+
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
+			this.setIndex( attribute );
+
+			return this;
+
+		}
+
+		return this.setAttribute( name, attribute );
+
+	},
 	addDrawCall: function ( start, count, indexOffset ) {
 
 		if ( indexOffset !== undefined ) {
@@ -1240,8 +1264,14 @@ Object.assign( BufferGeometry.prototype, {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
-	}
+	},
+	removeAttribute: function ( name ) {
 
+		console.warn( 'THREE.BufferGeometry: .removeAttribute() has been renamed to .deleteAttribute().' );
+
+		return this.deleteAttribute( name );
+
+	}
 } );
 
 Object.defineProperties( BufferGeometry.prototype, {
@@ -1888,19 +1918,32 @@ Object.defineProperties( WebVRManager.prototype, {
 
 //
 
-Audio.prototype.load = function ( file ) {
+Object.defineProperties( Audio.prototype, {
 
-	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-	var scope = this;
-	var audioLoader = new AudioLoader();
-	audioLoader.load( file, function ( buffer ) {
+	load: {
+		value: function ( file ) {
 
-		scope.setBuffer( buffer );
+			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+			var scope = this;
+			var audioLoader = new AudioLoader();
+			audioLoader.load( file, function ( buffer ) {
 
-	} );
-	return this;
+				scope.setBuffer( buffer );
 
-};
+			} );
+			return this;
+
+		}
+	},
+	startTime: {
+		set: function () {
+
+			console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
+
+		}
+	}
+
+} );
 
 AudioAnalyser.prototype.getData = function () {
 
