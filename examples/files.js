@@ -61,6 +61,7 @@ var files = {
 		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lightprobe",
+		"webgl_lightprobe_cubecamera",
 		"webgl_lights_hemisphere",
 		"webgl_lights_physical",
 		"webgl_lights_pointlights",
@@ -377,11 +378,6 @@ var files = {
 	],
 	"raytracing": [
 		"raytracing_sandbox"
-	],
-	"software": [
-		"software_geometry_earth",
-		"software_lines_splines",
-		"software_sandbox"
 	],
 	"svg": [
 		"svg_lines",

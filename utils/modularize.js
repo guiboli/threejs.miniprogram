@@ -79,7 +79,7 @@ var files = [
 	{ path: 'loaders/ColladaLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/DDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/DRACOLoader.js', dependencies: [], ignoreList: [ 'LoadingManager' ] },
-	{ path: 'loaders/EXRLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/EXRLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/FBXLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' }, { name: 'NURBSCurve', path: 'curves/NURBSCurve.js' } ], ignoreList: [] },
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
@@ -175,7 +175,6 @@ var files = [
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/RaytracingRenderer.js', dependencies: [], ignoreList: [] },
-	{ path: 'renderers/SoftwareRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 	{ path: 'renderers/WebGLDeferredRenderer.js', dependencies: [ { name: 'EffectComposer', path: 'postprocessing/EffectComposer.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'RenderPass', path: 'postprocessing/RenderPass.js' }, { name: 'FXAAShader', path: 'shaders/FXAAShader.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
 
