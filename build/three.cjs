@@ -36489,6 +36489,8 @@ function DataTexture3D(data, width, height, depth) {
 	return new Data3DTexture(data, width, height, depth);
 }
 
+const global = window;
+
 if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 	__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register', {
 		detail: {
@@ -36945,4 +36947,5 @@ exports.ZeroFactor = ZeroFactor;
 exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
+exports.global = global;
 exports.sRGBEncoding = sRGBEncoding;

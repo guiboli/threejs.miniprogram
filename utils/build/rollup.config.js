@@ -1,15 +1,14 @@
-import buble from 'rollup-plugin-buble';
-import inject from 'rollup-plugin-inject';
-import resolve from 'rollup-plugin-node-resolve';
-import babel from '@rollup/plugin-babel';
-import { terser } from 'rollup-plugin-terser';
-import babelrc from './.babelrc.json';
+import babel from "@rollup/plugin-babel";
+import { terser } from "rollup-plugin-terser";
+import babelrc from "./.babelrc.json";
 
 export function glconstants() {
-
 	var constants = {
-		POINTS: 0, ZERO: 0, NONE: 0,
-		LINES: 1, ONE: 1,
+		POINTS: 0,
+		ZERO: 0,
+		NONE: 0,
+		LINES: 1,
+		ONE: 1,
 		LINE_LOOP: 2,
 		LINE_STRIP: 3,
 		TRIANGLES: 4,
@@ -167,227 +166,159 @@ export function glconstants() {
 		DRAW_FRAMEBUFFER: 36009,
 		SAMPLE_ALPHA_TO_COVERAGE: 32926,
 		SRGB8: 35905,
-		SRGB8_ALPHA8: 35907
+		SRGB8_ALPHA8: 35907,
 	};
 
 	return {
-
-		transform( code ) {
-
-			code = code.replace( /_?gl\.([A-Z0-9_]+)/g, function ( match, p1 ) {
-
-				if ( p1 in constants ) return constants[ p1 ];
-				console.log( '* Unhandled GL Constant:', p1 );
+		transform(code) {
+			code = code.replace(/_?gl\.([A-Z0-9_]+)/g, function (match, p1) {
+				if (p1 in constants) return constants[p1];
+				console.log("* Unhandled GL Constant:", p1);
 				return match;
-
-			} );
+			});
 
 			return {
 				code: code,
-				map: null
+				map: null,
 			};
-
-		}
-
+		},
 	};
-
 }
 
 function addons() {
-
 	return {
+		transform(code, id) {
+			if (/\/examples\/jsm\//.test(id) === false) return;
 
-		transform( code, id ) {
-
-			if ( /\/examples\/jsm\//.test( id ) === false ) return;
-
-			code = code.replace( 'build/three.module.js', 'src/Three.js' );
+			code = code.replace("build/three.module.js", "src/Three.js");
 
 			return {
 				code: code,
-				map: null
+				map: null,
 			};
-
-		}
-
+		},
 	};
-
 }
 
 export function glsl() {
-
 	return {
+		transform(code, id) {
+			if (/\.glsl.js$/.test(id) === false) return;
 
-		transform( code, id ) {
-
-			if ( /\.glsl.js$/.test( id ) === false ) return;
-
-			code = code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
-
+			code = code.replace(/\/\* glsl \*\/\`(.*?)\`/gs, function (match, p1) {
 				return JSON.stringify(
 					p1
 						.trim()
-						.replace( /\r/g, '' )
-						.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
-						.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
-						.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
+						.replace(/\r/g, "")
+						.replace(/[ \t]*\/\/.*\n/g, "") // remove //
+						.replace(/[ \t]*\/\*[\s\S]*?\*\//g, "") // remove /* */
+						.replace(/\n{2,}/g, "\n") // # \n+ to \n
 				);
-
-			} );
+			});
 
 			return {
 				code: code,
-				map: null
+				map: null,
 			};
-
-		}
-
+		},
 	};
-
 }
 
 function babelCleanup() {
-
 	const doubleSpaces = / {2}/g;
 
 	return {
-
-		transform( code ) {
-
-			code = code.replace( doubleSpaces, '\t' );
+		transform(code) {
+			code = code.replace(doubleSpaces, "\t");
 
 			return {
 				code: code,
-				map: null
+				map: null,
 			};
-
-		}
-
+		},
 	};
-
 }
 
 function header() {
-
 	return {
-
-		renderChunk( code ) {
-
+		renderChunk(code) {
 			return `/**
  * @license
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-${ code }`;
-
-		}
-
+${code}`;
+		},
 	};
-
 }
 
 let builds = [
 	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			header()
-		],
+		input: "src/Three.js",
+		plugins: [addons(), glconstants(), glsl(), header()],
 		output: [
 			{
-				format: 'esm',
-				file: 'build/three.module.js'
-			}
-		]
+				format: "esm",
+				file: "build/three.module.js",
+			},
+		],
 	},
 	{
-		input: 'src/Three.js',
+		input: "src/Three.js",
 		plugins: [
 			addons(),
 			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
+			babel({
+				babelHelpers: "bundled",
 				compact: false,
 				babelrc: false,
-				...babelrc
-			} ),
+				...babelrc,
+			}),
 			babelCleanup(),
-			header()
+			header(),
 		],
 		output: [
 			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
+				format: "umd",
+				name: "THREE",
+				file: "build/three.js",
+				indent: "\t",
 			},
 			{
-				format: 'cjs',
-				name: 'THREE',
-				file: 'build/three.cjs',
-				indent: '\t'
-			}
-		]
+				format: "cjs",
+				name: "THREE",
+				file: "build/three.cjs",
+				indent: "\t",
+			},
+		],
 	},
 	{
-		input: 'src/Three.js',
+		input: "src/Three.js",
 		plugins: [
 			addons(),
 			glconstants(),
 			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
+			babel({
+				babelHelpers: "bundled",
 				babelrc: false,
-				...babelrc
-			} ),
+				...babelrc,
+			}),
 			babelCleanup(),
 			terser(),
-			header()
+			header(),
 		],
 		output: [
 			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			glconstants(),
-			glsl(),
-			buble({
-				transforms: {
-					arrow: false,
-					classes: true
-				}
-			}),
-			inject({
-				document: ['miniapp-adapter', 'document'],
-				window: ['miniapp-adapter', '*'],
-				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
-			}),
-			resolve()
+				format: "umd",
+				name: "THREE",
+				file: "build/three.min.js",
+			},
 		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.weapp.js',
-				indent: '\t'
-			}
-		]
 	},
 ];
 
-
-if ( process.env.ONLY_MODULE === 'true' ) {
-
-	builds = builds[ 0 ];
-
+if (process.env.ONLY_MODULE === "true") {
+	builds = builds[0];
 }
 
 export default builds;
