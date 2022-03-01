@@ -1,27 +1,15 @@
-/**
- * Generated from 'examples/jsm/loaders/EXRLoader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function () {
 
 	/**
-	 * @author Richard M. / https://github.com/richardmonette
-	 *
-	 * OpenEXR loader which, currently, supports reading 16 bit half data, in either
-	 * uncompressed or PIZ wavelet compressed form.
-	 *
-	 * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
-	 * implementation, so I have preserved their copyright notices.
-	 */
-
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+ *
+ * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
+ * implementation, so I have preserved their copyright notices.
+ */
 	// /*
 	// Copyright (c) 2014 - 2017, Syoyo Fujita
 	// All rights reserved.
-
 	// Redistribution and use in source and binary forms, with or without
 	// modification, are permitted provided that the following conditions are met:
 	//     * Redistributions of source code must retain the above copyright
@@ -32,7 +20,6 @@
 	//     * Neither the name of the Syoyo Fujita nor the
 	//       names of its contributors may be used to endorse or promote products
 	//       derived from this software without specific prior written permission.
-
 	// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 	// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 	// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -44,9 +31,7 @@
 	// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 	// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	// */
-
 	// // TinyEXR contains some OpenEXR code, which is licensed under ------------
-
 	// ///////////////////////////////////////////////////////////////////////////
 	// //
 	// // Copyright (c) 2002, Industrial Light & Magic, a division of Lucas
@@ -80,52 +65,55 @@
 	// // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	// //
 	// ///////////////////////////////////////////////////////////////////////////
-
 	// // End of OpenEXR license -------------------------------------------------
 
-	var EXRLoader = function ( manager ) {
+	class EXRLoader extends THREE.DataTextureLoader {
 
-		THREE.DataTextureLoader.call( this, manager );
+		constructor( manager ) {
 
-		this.type = THREE.FloatType;
+			super( manager );
+			this.type = THREE.HalfFloatType;
 
-	};
+		}
 
-	EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
+		parse( buffer ) {
 
-		constructor: EXRLoader,
-
-		parse: function ( buffer ) {
-
-			const USHORT_RANGE = ( 1 << 16 );
-			const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
-
+			const USHORT_RANGE = 1 << 16;
+			const BITMAP_SIZE = USHORT_RANGE >> 3;
 			const HUF_ENCBITS = 16; // literal (value) bit length
+
 			const HUF_DECBITS = 14; // decoding bit size (>= 8)
 
 			const HUF_ENCSIZE = ( 1 << HUF_ENCBITS ) + 1; // encoding table size
-			const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
-			const HUF_DECMASK = HUF_DECSIZE - 1;
 
+			const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
+
+			const HUF_DECMASK = HUF_DECSIZE - 1;
+			const NBITS = 16;
+			const A_OFFSET = 1 << NBITS - 1;
+			const MOD_MASK = ( 1 << NBITS ) - 1;
 			const SHORT_ZEROCODE_RUN = 59;
 			const LONG_ZEROCODE_RUN = 63;
 			const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
-
-			const BYTES_PER_HALF = 2;
-
 			const ULONG_SIZE = 8;
 			const FLOAT32_SIZE = 4;
 			const INT32_SIZE = 4;
 			const INT16_SIZE = 2;
 			const INT8_SIZE = 1;
+			const STATIC_HUFFMAN = 0;
+			const DEFLATE = 1;
+			const UNKNOWN = 0;
+			const LOSSY_DCT = 1;
+			const RLE = 2;
+			const logBase = Math.pow( 2.7182818, 2.2 );
 
 			function reverseLutFromBitmap( bitmap, lut ) {
 
-				var k = 0;
+				let k = 0;
 
-				for ( var i = 0; i < USHORT_RANGE; ++ i ) {
+				for ( let i = 0; i < USHORT_RANGE; ++ i ) {
 
-					if ( ( i == 0 ) || ( bitmap[ i >> 3 ] & ( 1 << ( i & 7 ) ) ) ) {
+					if ( i == 0 || bitmap[ i >> 3 ] & 1 << ( i & 7 ) ) {
 
 						lut[ k ++ ] = i;
 
@@ -133,7 +121,7 @@
 
 				}
 
-				var n = k - 1;
+				const n = k - 1;
 
 				while ( k < USHORT_RANGE ) lut[ k ++ ] = 0;
 
@@ -143,7 +131,7 @@
 
 			function hufClearDecTable( hdec ) {
 
-				for ( var i = 0; i < HUF_DECSIZE; i ++ ) {
+				for ( let i = 0; i < HUF_DECSIZE; i ++ ) {
 
 					hdec[ i ] = {};
 					hdec[ i ].len = 0;
@@ -154,20 +142,23 @@
 
 			}
 
-			const getBitsReturn = { l: 0, c: 0, lc: 0 };
+			const getBitsReturn = {
+				l: 0,
+				c: 0,
+				lc: 0
+			};
 
 			function getBits( nBits, c, lc, uInt8Array, inOffset ) {
 
 				while ( lc < nBits ) {
 
-					c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+					c = c << 8 | parseUint8Array( uInt8Array, inOffset );
 					lc += 8;
 
 				}
 
 				lc -= nBits;
-
-				getBitsReturn.l = ( c >> lc ) & ( ( 1 << nBits ) - 1 );
+				getBitsReturn.l = c >> lc & ( 1 << nBits ) - 1;
 				getBitsReturn.c = c;
 				getBitsReturn.lc = lc;
 
@@ -177,63 +168,60 @@
 
 			function hufCanonicalCodeTable( hcode ) {
 
-				for ( var i = 0; i <= 58; ++ i ) hufTableBuffer[ i ] = 0;
-				for ( var i = 0; i < HUF_ENCSIZE; ++ i ) hufTableBuffer[ hcode[ i ] ] += 1;
+				for ( let i = 0; i <= 58; ++ i ) hufTableBuffer[ i ] = 0;
 
-				var c = 0;
+				for ( let i = 0; i < HUF_ENCSIZE; ++ i ) hufTableBuffer[ hcode[ i ] ] += 1;
 
-				for ( var i = 58; i > 0; -- i ) {
+				let c = 0;
 
-					var nc = ( ( c + hufTableBuffer[ i ] ) >> 1 );
+				for ( let i = 58; i > 0; -- i ) {
+
+					const nc = c + hufTableBuffer[ i ] >> 1;
 					hufTableBuffer[ i ] = c;
 					c = nc;
 
 				}
 
-				for ( var i = 0; i < HUF_ENCSIZE; ++ i ) {
+				for ( let i = 0; i < HUF_ENCSIZE; ++ i ) {
 
-					var l = hcode[ i ];
-					if ( l > 0 ) hcode[ i ] = l | ( hufTableBuffer[ l ] ++ << 6 );
+					const l = hcode[ i ];
+					if ( l > 0 ) hcode[ i ] = l | hufTableBuffer[ l ] ++ << 6;
 
 				}
 
 			}
 
-			function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
+			function hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, hcode ) {
 
-				var p = inOffset;
-				var c = 0;
-				var lc = 0;
+				const p = inOffset;
+				let c = 0;
+				let lc = 0;
 
 				for ( ; im <= iM; im ++ ) {
 
 					if ( p.value - inOffset.value > ni ) return false;
-
 					getBits( 6, c, lc, uInt8Array, p );
-
-					var l = getBitsReturn.l;
+					const l = getBitsReturn.l;
 					c = getBitsReturn.c;
 					lc = getBitsReturn.lc;
-
 					hcode[ im ] = l;
 
 					if ( l == LONG_ZEROCODE_RUN ) {
 
 						if ( p.value - inOffset.value > ni ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
 						getBits( 8, c, lc, uInt8Array, p );
-
-						var zerun = getBitsReturn.l + SHORTEST_LONG_RUN;
+						let zerun = getBitsReturn.l + SHORTEST_LONG_RUN;
 						c = getBitsReturn.c;
 						lc = getBitsReturn.lc;
 
 						if ( im + zerun > iM + 1 ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
@@ -243,11 +231,11 @@
 
 					} else if ( l >= SHORT_ZEROCODE_RUN ) {
 
-						var zerun = l - SHORT_ZEROCODE_RUN + 2;
+						let zerun = l - SHORT_ZEROCODE_RUN + 2;
 
 						if ( im + zerun > iM + 1 ) {
 
-							throw 'Something wrong with hufUnpackEncTable';
+							throw new Error( 'Something wrong with hufUnpackEncTable' );
 
 						}
 
@@ -279,22 +267,22 @@
 
 				for ( ; im <= iM; im ++ ) {
 
-					var c = hufCode( hcode[ im ] );
-					var l = hufLength( hcode[ im ] );
+					const c = hufCode( hcode[ im ] );
+					const l = hufLength( hcode[ im ] );
 
 					if ( c >> l ) {
 
-						throw 'Invalid table entry';
+						throw new Error( 'Invalid table entry' );
 
 					}
 
 					if ( l > HUF_DECBITS ) {
 
-						var pl = hdecod[ ( c >> ( l - HUF_DECBITS ) ) ];
+						const pl = hdecod[ c >> l - HUF_DECBITS ];
 
 						if ( pl.len ) {
 
-							throw 'Invalid table entry';
+							throw new Error( 'Invalid table entry' );
 
 						}
 
@@ -302,10 +290,10 @@
 
 						if ( pl.p ) {
 
-							var p = pl.p;
+							const p = pl.p;
 							pl.p = new Array( pl.lit );
 
-							for ( var i = 0; i < pl.lit - 1; ++ i ) {
+							for ( let i = 0; i < pl.lit - 1; ++ i ) {
 
 								pl.p[ i ] = p[ i ];
 
@@ -321,21 +309,20 @@
 
 					} else if ( l ) {
 
-						var plOffset = 0;
+						let plOffset = 0;
 
-						for ( var i = 1 << ( HUF_DECBITS - l ); i > 0; i -- ) {
+						for ( let i = 1 << HUF_DECBITS - l; i > 0; i -- ) {
 
-							var pl = hdecod[ ( c << ( HUF_DECBITS - l ) ) + plOffset ];
+							const pl = hdecod[ ( c << HUF_DECBITS - l ) + plOffset ];
 
 							if ( pl.len || pl.p ) {
 
-								throw 'Invalid table entry';
+								throw new Error( 'Invalid table entry' );
 
 							}
 
 							pl.len = l;
 							pl.lit = im;
-
 							plOffset ++;
 
 						}
@@ -348,21 +335,26 @@
 
 			}
 
-			const getCharReturn = { c: 0, lc: 0 };
+			const getCharReturn = {
+				c: 0,
+				lc: 0
+			};
 
 			function getChar( c, lc, uInt8Array, inOffset ) {
 
-				c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+				c = c << 8 | parseUint8Array( uInt8Array, inOffset );
 				lc += 8;
-
 				getCharReturn.c = c;
 				getCharReturn.lc = lc;
 
 			}
 
-			const getCodeReturn = { c: 0, lc: 0 };
+			const getCodeReturn = {
+				c: 0,
+				lc: 0
+			};
 
-			function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
+			function getCode( po, rlc, c, lc, uInt8Array, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
 				if ( po == rlc ) {
 
@@ -375,9 +367,8 @@
 					}
 
 					lc -= 8;
-
-					var cs = ( c >> lc );
-					var cs = new Uint8Array( [ cs ] )[ 0 ];
+					let cs = c >> lc;
+					cs = new Uint8Array( [ cs ] )[ 0 ];
 
 					if ( outBufferOffset.value + cs > outBufferEndOffset ) {
 
@@ -385,7 +376,7 @@
 
 					}
 
-					var s = outBuffer[ outBufferOffset.value - 1 ];
+					const s = outBuffer[ outBufferOffset.value - 1 ];
 
 					while ( cs -- > 0 ) {
 
@@ -410,40 +401,53 @@
 
 			function UInt16( value ) {
 
-				return ( value & 0xFFFF );
+				return value & 0xFFFF;
 
 			}
 
 			function Int16( value ) {
 
-				var ref = UInt16( value );
-				return ( ref > 0x7FFF ) ? ref - 0x10000 : ref;
+				const ref = UInt16( value );
+				return ref > 0x7FFF ? ref - 0x10000 : ref;
 
 			}
 
-			const wdec14Return = { a: 0, b: 0 };
+			const wdec14Return = {
+				a: 0,
+				b: 0
+			};
 
 			function wdec14( l, h ) {
 
-				var ls = Int16( l );
-				var hs = Int16( h );
-
-				var hi = hs;
-				var ai = ls + ( hi & 1 ) + ( hi >> 1 );
-
-				var as = ai;
-				var bs = ai - hi;
-
+				const ls = Int16( l );
+				const hs = Int16( h );
+				const hi = hs;
+				const ai = ls + ( hi & 1 ) + ( hi >> 1 );
+				const as = ai;
+				const bs = ai - hi;
 				wdec14Return.a = as;
 				wdec14Return.b = bs;
 
 			}
 
-			function wav2Decode( j, buffer, nx, ox, ny, oy ) {
+			function wdec16( l, h ) {
 
-				var n = ( nx > ny ) ? ny : nx;
-				var p = 1;
-				var p2;
+				const m = UInt16( l );
+				const d = UInt16( h );
+				const bb = m - ( d >> 1 ) & MOD_MASK;
+				const aa = d + bb - A_OFFSET & MOD_MASK;
+				wdec14Return.a = aa;
+				wdec14Return.b = bb;
+
+			}
+
+			function wav2Decode( buffer, j, nx, ox, ny, oy, mx ) {
+
+				const w14 = mx < 1 << 14;
+				const n = nx > ny ? ny : nx;
+				let p = 1;
+				let p2;
+				let py;
 
 				while ( p <= n ) p <<= 1;
 
@@ -453,56 +457,65 @@
 
 				while ( p >= 1 ) {
 
-					var py = 0;
-					var ey = py + oy * ( ny - p2 );
-					var oy1 = oy * p;
-					var oy2 = oy * p2;
-					var ox1 = ox * p;
-					var ox2 = ox * p2;
-					var i00, i01, i10, i11;
+					py = 0;
+					const ey = py + oy * ( ny - p2 );
+					const oy1 = oy * p;
+					const oy2 = oy * p2;
+					const ox1 = ox * p;
+					const ox2 = ox * p2;
+					let i00, i01, i10, i11;
 
 					for ( ; py <= ey; py += oy2 ) {
 
-						var px = py;
-						var ex = py + ox * ( nx - p2 );
+						let px = py;
+						const ex = py + ox * ( nx - p2 );
 
 						for ( ; px <= ex; px += ox2 ) {
 
-							var p01 = px + ox1;
-							var p10 = px + oy1;
-							var p11 = p10 + ox1;
+							const p01 = px + ox1;
+							const p10 = px + oy1;
+							const p11 = p10 + ox1;
 
-							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+							if ( w14 ) {
 
-							i00 = wdec14Return.a;
-							i10 = wdec14Return.b;
+								wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+								i00 = wdec14Return.a;
+								i10 = wdec14Return.b;
+								wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
+								i01 = wdec14Return.a;
+								i11 = wdec14Return.b;
+								wdec14( i00, i01 );
+								buffer[ px + j ] = wdec14Return.a;
+								buffer[ p01 + j ] = wdec14Return.b;
+								wdec14( i10, i11 );
+								buffer[ p10 + j ] = wdec14Return.a;
+								buffer[ p11 + j ] = wdec14Return.b;
 
-							wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
+							} else {
 
-							i01 = wdec14Return.a;
-							i11 = wdec14Return.b;
+								wdec16( buffer[ px + j ], buffer[ p10 + j ] );
+								i00 = wdec14Return.a;
+								i10 = wdec14Return.b;
+								wdec16( buffer[ p01 + j ], buffer[ p11 + j ] );
+								i01 = wdec14Return.a;
+								i11 = wdec14Return.b;
+								wdec16( i00, i01 );
+								buffer[ px + j ] = wdec14Return.a;
+								buffer[ p01 + j ] = wdec14Return.b;
+								wdec16( i10, i11 );
+								buffer[ p10 + j ] = wdec14Return.a;
+								buffer[ p11 + j ] = wdec14Return.b;
 
-							wdec14( i00, i01 );
-
-							buffer[ px + j ] = wdec14Return.a;
-							buffer[ p01 + j ] = wdec14Return.b;
-
-							wdec14( i10, i11 );
-
-							buffer[ p10 + j ] = wdec14Return.a;
-							buffer[ p11 + j ] = wdec14Return.b;
+							}
 
 						}
 
 						if ( nx & p ) {
 
-							var p10 = px + oy1;
-
-							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
-
+							const p10 = px + oy1;
+							if ( w14 ) wdec14( buffer[ px + j ], buffer[ p10 + j ] ); else wdec16( buffer[ px + j ], buffer[ p10 + j ] );
 							i00 = wdec14Return.a;
 							buffer[ p10 + j ] = wdec14Return.b;
-
 							buffer[ px + j ] = i00;
 
 						}
@@ -511,18 +524,15 @@
 
 					if ( ny & p ) {
 
-						var px = py;
-						var ex = py + ox * ( nx - p2 );
+						let px = py;
+						const ex = py + ox * ( nx - p2 );
 
 						for ( ; px <= ex; px += ox2 ) {
 
-							var p01 = px + ox1;
-
-							wdec14( buffer[ px + j ], buffer[ p01 + j ] );
-
+							const p01 = px + ox1;
+							if ( w14 ) wdec14( buffer[ px + j ], buffer[ p01 + j ] ); else wdec16( buffer[ px + j ], buffer[ p01 + j ] );
 							i00 = wdec14Return.a;
 							buffer[ p01 + j ] = wdec14Return.b;
-
 							buffer[ px + j ] = i00;
 
 						}
@@ -538,31 +548,28 @@
 
 			}
 
-			function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
+			function hufDecode( encodingTable, decodingTable, uInt8Array, inOffset, ni, rlc, no, outBuffer, outOffset ) {
 
-				var c = 0;
-				var lc = 0;
-				var outBufferEndOffset = no;
-				var inOffsetEnd = Math.trunc( inOffset.value + ( ni + 7 ) / 8 );
+				let c = 0;
+				let lc = 0;
+				const outBufferEndOffset = no;
+				const inOffsetEnd = Math.trunc( inOffset.value + ( ni + 7 ) / 8 );
 
 				while ( inOffset.value < inOffsetEnd ) {
 
 					getChar( c, lc, uInt8Array, inOffset );
-
 					c = getCharReturn.c;
 					lc = getCharReturn.lc;
 
 					while ( lc >= HUF_DECBITS ) {
 
-						var index = ( c >> ( lc - HUF_DECBITS ) ) & HUF_DECMASK;
-						var pl = decodingTable[ index ];
+						const index = c >> lc - HUF_DECBITS & HUF_DECMASK;
+						const pl = decodingTable[ index ];
 
 						if ( pl.len ) {
 
 							lc -= pl.len;
-
-							getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
-
+							getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 							c = getCodeReturn.c;
 							lc = getCodeReturn.lc;
 
@@ -570,20 +577,19 @@
 
 							if ( ! pl.p ) {
 
-								throw 'hufDecode issues';
+								throw new Error( 'hufDecode issues' );
 
 							}
 
-							var j;
+							let j;
 
 							for ( j = 0; j < pl.lit; j ++ ) {
 
-								var l = hufLength( encodingTable[ pl.p[ j ] ] );
+								const l = hufLength( encodingTable[ pl.p[ j ] ] );
 
 								while ( lc < l && inOffset.value < inOffsetEnd ) {
 
 									getChar( c, lc, uInt8Array, inOffset );
-
 									c = getCharReturn.c;
 									lc = getCharReturn.lc;
 
@@ -591,15 +597,12 @@
 
 								if ( lc >= l ) {
 
-									if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( ( c >> ( lc - l ) ) & ( ( 1 << l ) - 1 ) ) ) {
+									if ( hufCode( encodingTable[ pl.p[ j ] ] ) == ( c >> lc - l & ( 1 << l ) - 1 ) ) {
 
 										lc -= l;
-
-										getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
-
+										getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 										c = getCodeReturn.c;
 										lc = getCodeReturn.lc;
-
 										break;
 
 									}
@@ -610,7 +613,7 @@
 
 							if ( j == pl.lit ) {
 
-								throw 'hufDecode issues';
+								throw new Error( 'hufDecode issues' );
 
 							}
 
@@ -620,27 +623,24 @@
 
 				}
 
-				var i = ( 8 - ni ) & 7;
-
+				const i = 8 - ni & 7;
 				c >>= i;
 				lc -= i;
 
 				while ( lc > 0 ) {
 
-					var pl = decodingTable[ ( c << ( HUF_DECBITS - lc ) ) & HUF_DECMASK ];
+					const pl = decodingTable[ c << HUF_DECBITS - lc & HUF_DECMASK ];
 
 					if ( pl.len ) {
 
 						lc -= pl.len;
-
-						getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
-
+						getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 						c = getCodeReturn.c;
 						lc = getCodeReturn.lc;
 
 					} else {
 
-						throw 'hufDecode issues';
+						throw new Error( 'hufDecode issues' );
 
 					}
 
@@ -650,49 +650,44 @@
 
 			}
 
-			function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw ) {
+			function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, nRaw ) {
 
-				var initialInOffset = inOffset.value;
-
-				var im = parseUint32( inDataView, inOffset );
-				var iM = parseUint32( inDataView, inOffset );
-
+				const outOffset = {
+					value: 0
+				};
+				const initialInOffset = inOffset.value;
+				const im = parseUint32( inDataView, inOffset );
+				const iM = parseUint32( inDataView, inOffset );
 				inOffset.value += 4;
-
-				var nBits = parseUint32( inDataView, inOffset );
-
+				const nBits = parseUint32( inDataView, inOffset );
 				inOffset.value += 4;
 
 				if ( im < 0 || im >= HUF_ENCSIZE || iM < 0 || iM >= HUF_ENCSIZE ) {
 
-					throw 'Something wrong with HUF_ENCSIZE';
+					throw new Error( 'Something wrong with HUF_ENCSIZE' );
 
 				}
 
-				var freq = new Array( HUF_ENCSIZE );
-				var hdec = new Array( HUF_DECSIZE );
-
+				const freq = new Array( HUF_ENCSIZE );
+				const hdec = new Array( HUF_DECSIZE );
 				hufClearDecTable( hdec );
-
-				var ni = nCompressed - ( inOffset.value - initialInOffset );
-
-				hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
+				const ni = nCompressed - ( inOffset.value - initialInOffset );
+				hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, freq );
 
 				if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
-					throw 'Something wrong with hufUncompress';
+					throw new Error( 'Something wrong with hufUncompress' );
 
 				}
 
 				hufBuildDecTable( freq, im, iM, hdec );
-
-				hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
+				hufDecode( freq, hdec, uInt8Array, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
 
 			}
 
 			function applyLut( lut, data, nData ) {
 
-				for ( var i = 0; i < nData; ++ i ) {
+				for ( let i = 0; i < nData; ++ i ) {
 
 					data[ i ] = lut[ data[ i ] ];
 
@@ -700,82 +695,850 @@
 
 			}
 
-			function decompressPIZ( outBuffer, outOffset, uInt8Array, inDataView, inOffset, tmpBufSize, num_channels, exrChannelInfos, dataWidth, num_lines ) {
+			function predictor( source ) {
 
-				var bitmap = new Uint8Array( BITMAP_SIZE );
+				for ( let t = 1; t < source.length; t ++ ) {
 
-				var minNonZero = parseUint16( inDataView, inOffset );
-				var maxNonZero = parseUint16( inDataView, inOffset );
+					const d = source[ t - 1 ] + source[ t ] - 128;
+					source[ t ] = d;
+
+				}
+
+			}
+
+			function interleaveScalar( source, out ) {
+
+				let t1 = 0;
+				let t2 = Math.floor( ( source.length + 1 ) / 2 );
+				let s = 0;
+				const stop = source.length - 1;
+
+				while ( true ) {
+
+					if ( s > stop ) break;
+					out[ s ++ ] = source[ t1 ++ ];
+					if ( s > stop ) break;
+					out[ s ++ ] = source[ t2 ++ ];
+
+				}
+
+			}
+
+			function decodeRunLength( source ) {
+
+				let size = source.byteLength;
+				const out = new Array();
+				let p = 0;
+				const reader = new DataView( source );
+
+				while ( size > 0 ) {
+
+					const l = reader.getInt8( p ++ );
+
+					if ( l < 0 ) {
+
+						const count = - l;
+						size -= count + 1;
+
+						for ( let i = 0; i < count; i ++ ) {
+
+							out.push( reader.getUint8( p ++ ) );
+
+						}
+
+					} else {
+
+						const count = l;
+						size -= 2;
+						const value = reader.getUint8( p ++ );
+
+						for ( let i = 0; i < count + 1; i ++ ) {
+
+							out.push( value );
+
+						}
+
+					}
+
+				}
+
+				return out;
+
+			}
+
+			function lossyDctDecode( cscSet, rowPtrs, channelData, acBuffer, dcBuffer, outBuffer ) {
+
+				let dataView = new DataView( outBuffer.buffer );
+				const width = channelData[ cscSet.idx[ 0 ] ].width;
+				const height = channelData[ cscSet.idx[ 0 ] ].height;
+				const numComp = 3;
+				const numFullBlocksX = Math.floor( width / 8.0 );
+				const numBlocksX = Math.ceil( width / 8.0 );
+				const numBlocksY = Math.ceil( height / 8.0 );
+				const leftoverX = width - ( numBlocksX - 1 ) * 8;
+				const leftoverY = height - ( numBlocksY - 1 ) * 8;
+				const currAcComp = {
+					value: 0
+				};
+				const currDcComp = new Array( numComp );
+				const dctData = new Array( numComp );
+				const halfZigBlock = new Array( numComp );
+				const rowBlock = new Array( numComp );
+				const rowOffsets = new Array( numComp );
+
+				for ( let comp = 0; comp < numComp; ++ comp ) {
+
+					rowOffsets[ comp ] = rowPtrs[ cscSet.idx[ comp ] ];
+					currDcComp[ comp ] = comp < 1 ? 0 : currDcComp[ comp - 1 ] + numBlocksX * numBlocksY;
+					dctData[ comp ] = new Float32Array( 64 );
+					halfZigBlock[ comp ] = new Uint16Array( 64 );
+					rowBlock[ comp ] = new Uint16Array( numBlocksX * 64 );
+
+				}
+
+				for ( let blocky = 0; blocky < numBlocksY; ++ blocky ) {
+
+					let maxY = 8;
+					if ( blocky == numBlocksY - 1 ) maxY = leftoverY;
+					let maxX = 8;
+
+					for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
+
+						if ( blockx == numBlocksX - 1 ) maxX = leftoverX;
+
+						for ( let comp = 0; comp < numComp; ++ comp ) {
+
+							halfZigBlock[ comp ].fill( 0 ); // set block DC component
+
+							halfZigBlock[ comp ][ 0 ] = dcBuffer[ currDcComp[ comp ] ++ ]; // set block AC components
+
+							unRleAC( currAcComp, acBuffer, halfZigBlock[ comp ] ); // UnZigZag block to float
+
+							unZigZag( halfZigBlock[ comp ], dctData[ comp ] ); // decode float dct
+
+							dctInverse( dctData[ comp ] );
+
+						}
+
+						if ( numComp == 3 ) {
+
+							csc709Inverse( dctData );
+
+						}
+
+						for ( let comp = 0; comp < numComp; ++ comp ) {
+
+							convertToHalf( dctData[ comp ], rowBlock[ comp ], blockx * 64 );
+
+						}
+
+					} // blockx
+
+
+					let offset = 0;
+
+					for ( let comp = 0; comp < numComp; ++ comp ) {
+
+						const type = channelData[ cscSet.idx[ comp ] ].type;
+
+						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
+
+							offset = rowOffsets[ comp ][ y ];
+
+							for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
+
+								const src = blockx * 64 + ( y & 0x7 ) * 8;
+								dataView.setUint16( offset + 0 * INT16_SIZE * type, rowBlock[ comp ][ src + 0 ], true );
+								dataView.setUint16( offset + 1 * INT16_SIZE * type, rowBlock[ comp ][ src + 1 ], true );
+								dataView.setUint16( offset + 2 * INT16_SIZE * type, rowBlock[ comp ][ src + 2 ], true );
+								dataView.setUint16( offset + 3 * INT16_SIZE * type, rowBlock[ comp ][ src + 3 ], true );
+								dataView.setUint16( offset + 4 * INT16_SIZE * type, rowBlock[ comp ][ src + 4 ], true );
+								dataView.setUint16( offset + 5 * INT16_SIZE * type, rowBlock[ comp ][ src + 5 ], true );
+								dataView.setUint16( offset + 6 * INT16_SIZE * type, rowBlock[ comp ][ src + 6 ], true );
+								dataView.setUint16( offset + 7 * INT16_SIZE * type, rowBlock[ comp ][ src + 7 ], true );
+								offset += 8 * INT16_SIZE * type;
+
+							}
+
+						} // handle partial X blocks
+
+
+						if ( numFullBlocksX != numBlocksX ) {
+
+							for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
+
+								const offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
+								const src = numFullBlocksX * 64 + ( y & 0x7 ) * 8;
+
+								for ( let x = 0; x < maxX; ++ x ) {
+
+									dataView.setUint16( offset + x * INT16_SIZE * type, rowBlock[ comp ][ src + x ], true );
+
+								}
+
+							}
+
+						}
+
+					} // comp
+
+				} // blocky
+
+
+				const halfRow = new Uint16Array( width );
+				dataView = new DataView( outBuffer.buffer ); // convert channels back to float, if needed
+
+				for ( let comp = 0; comp < numComp; ++ comp ) {
+
+					channelData[ cscSet.idx[ comp ] ].decoded = true;
+					const type = channelData[ cscSet.idx[ comp ] ].type;
+					if ( channelData[ comp ].type != 2 ) continue;
+
+					for ( let y = 0; y < height; ++ y ) {
+
+						const offset = rowOffsets[ comp ][ y ];
+
+						for ( let x = 0; x < width; ++ x ) {
+
+							halfRow[ x ] = dataView.getUint16( offset + x * INT16_SIZE * type, true );
+
+						}
+
+						for ( let x = 0; x < width; ++ x ) {
+
+							dataView.setFloat32( offset + x * INT16_SIZE * type, decodeFloat16( halfRow[ x ] ), true );
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function unRleAC( currAcComp, acBuffer, halfZigBlock ) {
+
+				let acValue;
+				let dctComp = 1;
+
+				while ( dctComp < 64 ) {
+
+					acValue = acBuffer[ currAcComp.value ];
+
+					if ( acValue == 0xff00 ) {
+
+						dctComp = 64;
+
+					} else if ( acValue >> 8 == 0xff ) {
+
+						dctComp += acValue & 0xff;
+
+					} else {
+
+						halfZigBlock[ dctComp ] = acValue;
+						dctComp ++;
+
+					}
+
+					currAcComp.value ++;
+
+				}
+
+			}
+
+			function unZigZag( src, dst ) {
+
+				dst[ 0 ] = decodeFloat16( src[ 0 ] );
+				dst[ 1 ] = decodeFloat16( src[ 1 ] );
+				dst[ 2 ] = decodeFloat16( src[ 5 ] );
+				dst[ 3 ] = decodeFloat16( src[ 6 ] );
+				dst[ 4 ] = decodeFloat16( src[ 14 ] );
+				dst[ 5 ] = decodeFloat16( src[ 15 ] );
+				dst[ 6 ] = decodeFloat16( src[ 27 ] );
+				dst[ 7 ] = decodeFloat16( src[ 28 ] );
+				dst[ 8 ] = decodeFloat16( src[ 2 ] );
+				dst[ 9 ] = decodeFloat16( src[ 4 ] );
+				dst[ 10 ] = decodeFloat16( src[ 7 ] );
+				dst[ 11 ] = decodeFloat16( src[ 13 ] );
+				dst[ 12 ] = decodeFloat16( src[ 16 ] );
+				dst[ 13 ] = decodeFloat16( src[ 26 ] );
+				dst[ 14 ] = decodeFloat16( src[ 29 ] );
+				dst[ 15 ] = decodeFloat16( src[ 42 ] );
+				dst[ 16 ] = decodeFloat16( src[ 3 ] );
+				dst[ 17 ] = decodeFloat16( src[ 8 ] );
+				dst[ 18 ] = decodeFloat16( src[ 12 ] );
+				dst[ 19 ] = decodeFloat16( src[ 17 ] );
+				dst[ 20 ] = decodeFloat16( src[ 25 ] );
+				dst[ 21 ] = decodeFloat16( src[ 30 ] );
+				dst[ 22 ] = decodeFloat16( src[ 41 ] );
+				dst[ 23 ] = decodeFloat16( src[ 43 ] );
+				dst[ 24 ] = decodeFloat16( src[ 9 ] );
+				dst[ 25 ] = decodeFloat16( src[ 11 ] );
+				dst[ 26 ] = decodeFloat16( src[ 18 ] );
+				dst[ 27 ] = decodeFloat16( src[ 24 ] );
+				dst[ 28 ] = decodeFloat16( src[ 31 ] );
+				dst[ 29 ] = decodeFloat16( src[ 40 ] );
+				dst[ 30 ] = decodeFloat16( src[ 44 ] );
+				dst[ 31 ] = decodeFloat16( src[ 53 ] );
+				dst[ 32 ] = decodeFloat16( src[ 10 ] );
+				dst[ 33 ] = decodeFloat16( src[ 19 ] );
+				dst[ 34 ] = decodeFloat16( src[ 23 ] );
+				dst[ 35 ] = decodeFloat16( src[ 32 ] );
+				dst[ 36 ] = decodeFloat16( src[ 39 ] );
+				dst[ 37 ] = decodeFloat16( src[ 45 ] );
+				dst[ 38 ] = decodeFloat16( src[ 52 ] );
+				dst[ 39 ] = decodeFloat16( src[ 54 ] );
+				dst[ 40 ] = decodeFloat16( src[ 20 ] );
+				dst[ 41 ] = decodeFloat16( src[ 22 ] );
+				dst[ 42 ] = decodeFloat16( src[ 33 ] );
+				dst[ 43 ] = decodeFloat16( src[ 38 ] );
+				dst[ 44 ] = decodeFloat16( src[ 46 ] );
+				dst[ 45 ] = decodeFloat16( src[ 51 ] );
+				dst[ 46 ] = decodeFloat16( src[ 55 ] );
+				dst[ 47 ] = decodeFloat16( src[ 60 ] );
+				dst[ 48 ] = decodeFloat16( src[ 21 ] );
+				dst[ 49 ] = decodeFloat16( src[ 34 ] );
+				dst[ 50 ] = decodeFloat16( src[ 37 ] );
+				dst[ 51 ] = decodeFloat16( src[ 47 ] );
+				dst[ 52 ] = decodeFloat16( src[ 50 ] );
+				dst[ 53 ] = decodeFloat16( src[ 56 ] );
+				dst[ 54 ] = decodeFloat16( src[ 59 ] );
+				dst[ 55 ] = decodeFloat16( src[ 61 ] );
+				dst[ 56 ] = decodeFloat16( src[ 35 ] );
+				dst[ 57 ] = decodeFloat16( src[ 36 ] );
+				dst[ 58 ] = decodeFloat16( src[ 48 ] );
+				dst[ 59 ] = decodeFloat16( src[ 49 ] );
+				dst[ 60 ] = decodeFloat16( src[ 57 ] );
+				dst[ 61 ] = decodeFloat16( src[ 58 ] );
+				dst[ 62 ] = decodeFloat16( src[ 62 ] );
+				dst[ 63 ] = decodeFloat16( src[ 63 ] );
+
+			}
+
+			function dctInverse( data ) {
+
+				const a = 0.5 * Math.cos( 3.14159 / 4.0 );
+				const b = 0.5 * Math.cos( 3.14159 / 16.0 );
+				const c = 0.5 * Math.cos( 3.14159 / 8.0 );
+				const d = 0.5 * Math.cos( 3.0 * 3.14159 / 16.0 );
+				const e = 0.5 * Math.cos( 5.0 * 3.14159 / 16.0 );
+				const f = 0.5 * Math.cos( 3.0 * 3.14159 / 8.0 );
+				const g = 0.5 * Math.cos( 7.0 * 3.14159 / 16.0 );
+				const alpha = new Array( 4 );
+				const beta = new Array( 4 );
+				const theta = new Array( 4 );
+				const gamma = new Array( 4 );
+
+				for ( let row = 0; row < 8; ++ row ) {
+
+					const rowPtr = row * 8;
+					alpha[ 0 ] = c * data[ rowPtr + 2 ];
+					alpha[ 1 ] = f * data[ rowPtr + 2 ];
+					alpha[ 2 ] = c * data[ rowPtr + 6 ];
+					alpha[ 3 ] = f * data[ rowPtr + 6 ];
+					beta[ 0 ] = b * data[ rowPtr + 1 ] + d * data[ rowPtr + 3 ] + e * data[ rowPtr + 5 ] + g * data[ rowPtr + 7 ];
+					beta[ 1 ] = d * data[ rowPtr + 1 ] - g * data[ rowPtr + 3 ] - b * data[ rowPtr + 5 ] - e * data[ rowPtr + 7 ];
+					beta[ 2 ] = e * data[ rowPtr + 1 ] - b * data[ rowPtr + 3 ] + g * data[ rowPtr + 5 ] + d * data[ rowPtr + 7 ];
+					beta[ 3 ] = g * data[ rowPtr + 1 ] - e * data[ rowPtr + 3 ] + d * data[ rowPtr + 5 ] - b * data[ rowPtr + 7 ];
+					theta[ 0 ] = a * ( data[ rowPtr + 0 ] + data[ rowPtr + 4 ] );
+					theta[ 3 ] = a * ( data[ rowPtr + 0 ] - data[ rowPtr + 4 ] );
+					theta[ 1 ] = alpha[ 0 ] + alpha[ 3 ];
+					theta[ 2 ] = alpha[ 1 ] - alpha[ 2 ];
+					gamma[ 0 ] = theta[ 0 ] + theta[ 1 ];
+					gamma[ 1 ] = theta[ 3 ] + theta[ 2 ];
+					gamma[ 2 ] = theta[ 3 ] - theta[ 2 ];
+					gamma[ 3 ] = theta[ 0 ] - theta[ 1 ];
+					data[ rowPtr + 0 ] = gamma[ 0 ] + beta[ 0 ];
+					data[ rowPtr + 1 ] = gamma[ 1 ] + beta[ 1 ];
+					data[ rowPtr + 2 ] = gamma[ 2 ] + beta[ 2 ];
+					data[ rowPtr + 3 ] = gamma[ 3 ] + beta[ 3 ];
+					data[ rowPtr + 4 ] = gamma[ 3 ] - beta[ 3 ];
+					data[ rowPtr + 5 ] = gamma[ 2 ] - beta[ 2 ];
+					data[ rowPtr + 6 ] = gamma[ 1 ] - beta[ 1 ];
+					data[ rowPtr + 7 ] = gamma[ 0 ] - beta[ 0 ];
+
+				}
+
+				for ( let column = 0; column < 8; ++ column ) {
+
+					alpha[ 0 ] = c * data[ 16 + column ];
+					alpha[ 1 ] = f * data[ 16 + column ];
+					alpha[ 2 ] = c * data[ 48 + column ];
+					alpha[ 3 ] = f * data[ 48 + column ];
+					beta[ 0 ] = b * data[ 8 + column ] + d * data[ 24 + column ] + e * data[ 40 + column ] + g * data[ 56 + column ];
+					beta[ 1 ] = d * data[ 8 + column ] - g * data[ 24 + column ] - b * data[ 40 + column ] - e * data[ 56 + column ];
+					beta[ 2 ] = e * data[ 8 + column ] - b * data[ 24 + column ] + g * data[ 40 + column ] + d * data[ 56 + column ];
+					beta[ 3 ] = g * data[ 8 + column ] - e * data[ 24 + column ] + d * data[ 40 + column ] - b * data[ 56 + column ];
+					theta[ 0 ] = a * ( data[ column ] + data[ 32 + column ] );
+					theta[ 3 ] = a * ( data[ column ] - data[ 32 + column ] );
+					theta[ 1 ] = alpha[ 0 ] + alpha[ 3 ];
+					theta[ 2 ] = alpha[ 1 ] - alpha[ 2 ];
+					gamma[ 0 ] = theta[ 0 ] + theta[ 1 ];
+					gamma[ 1 ] = theta[ 3 ] + theta[ 2 ];
+					gamma[ 2 ] = theta[ 3 ] - theta[ 2 ];
+					gamma[ 3 ] = theta[ 0 ] - theta[ 1 ];
+					data[ 0 + column ] = gamma[ 0 ] + beta[ 0 ];
+					data[ 8 + column ] = gamma[ 1 ] + beta[ 1 ];
+					data[ 16 + column ] = gamma[ 2 ] + beta[ 2 ];
+					data[ 24 + column ] = gamma[ 3 ] + beta[ 3 ];
+					data[ 32 + column ] = gamma[ 3 ] - beta[ 3 ];
+					data[ 40 + column ] = gamma[ 2 ] - beta[ 2 ];
+					data[ 48 + column ] = gamma[ 1 ] - beta[ 1 ];
+					data[ 56 + column ] = gamma[ 0 ] - beta[ 0 ];
+
+				}
+
+			}
+
+			function csc709Inverse( data ) {
+
+				for ( let i = 0; i < 64; ++ i ) {
+
+					const y = data[ 0 ][ i ];
+					const cb = data[ 1 ][ i ];
+					const cr = data[ 2 ][ i ];
+					data[ 0 ][ i ] = y + 1.5747 * cr;
+					data[ 1 ][ i ] = y - 0.1873 * cb - 0.4682 * cr;
+					data[ 2 ][ i ] = y + 1.8556 * cb;
+
+				}
+
+			}
+
+			function convertToHalf( src, dst, idx ) {
+
+				for ( let i = 0; i < 64; ++ i ) {
+
+					dst[ idx + i ] = THREE.DataUtils.toHalfFloat( toLinear( src[ i ] ) );
+
+				}
+
+			}
+
+			function toLinear( float ) {
+
+				if ( float <= 1 ) {
+
+					return Math.sign( float ) * Math.pow( Math.abs( float ), 2.2 );
+
+				} else {
+
+					return Math.sign( float ) * Math.pow( logBase, Math.abs( float ) - 1.0 );
+
+				}
+
+			}
+
+			function uncompressRAW( info ) {
+
+				return new DataView( info.array.buffer, info.offset.value, info.size );
+
+			}
+
+			function uncompressRLE( info ) {
+
+				const compressed = info.viewer.buffer.slice( info.offset.value, info.offset.value + info.size );
+				const rawBuffer = new Uint8Array( decodeRunLength( compressed ) );
+				const tmpBuffer = new Uint8Array( rawBuffer.length );
+				predictor( rawBuffer ); // revert predictor
+
+				interleaveScalar( rawBuffer, tmpBuffer ); // interleave pixels
+
+				return new DataView( tmpBuffer.buffer );
+
+			}
+
+			function uncompressZIP( info ) {
+
+				const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
+
+				if ( typeof fflate === 'undefined' ) {
+
+					console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
+
+				}
+
+				const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+
+				const tmpBuffer = new Uint8Array( rawBuffer.length );
+				predictor( rawBuffer ); // revert predictor
+
+				interleaveScalar( rawBuffer, tmpBuffer ); // interleave pixels
+
+				return new DataView( tmpBuffer.buffer );
+
+			}
+
+			function uncompressPIZ( info ) {
+
+				const inDataView = info.viewer;
+				const inOffset = {
+					value: info.offset.value
+				};
+				const outBuffer = new Uint16Array( info.width * info.scanlineBlockSize * ( info.channels * info.type ) );
+				const bitmap = new Uint8Array( BITMAP_SIZE ); // Setup channel info
+
+				let outBufferEnd = 0;
+				const pizChannelData = new Array( info.channels );
+
+				for ( let i = 0; i < info.channels; i ++ ) {
+
+					pizChannelData[ i ] = {};
+					pizChannelData[ i ][ 'start' ] = outBufferEnd;
+					pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
+					pizChannelData[ i ][ 'nx' ] = info.width;
+					pizChannelData[ i ][ 'ny' ] = info.lines;
+					pizChannelData[ i ][ 'size' ] = info.type;
+					outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
+
+				} // Read range compression data
+
+
+				const minNonZero = parseUint16( inDataView, inOffset );
+				const maxNonZero = parseUint16( inDataView, inOffset );
 
 				if ( maxNonZero >= BITMAP_SIZE ) {
 
-					throw 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE';
+					throw new Error( 'Something is wrong with PIZ_COMPRESSION BITMAP_SIZE' );
 
 				}
 
 				if ( minNonZero <= maxNonZero ) {
 
-					for ( var i = 0; i < maxNonZero - minNonZero + 1; i ++ ) {
+					for ( let i = 0; i < maxNonZero - minNonZero + 1; i ++ ) {
 
 						bitmap[ i + minNonZero ] = parseUint8( inDataView, inOffset );
 
 					}
 
-				}
+				} // Reverse LUT
 
-				var lut = new Uint16Array( USHORT_RANGE );
-				reverseLutFromBitmap( bitmap, lut );
 
-				var length = parseUint32( inDataView, inOffset );
+				const lut = new Uint16Array( USHORT_RANGE );
+				const maxValue = reverseLutFromBitmap( bitmap, lut );
+				const length = parseUint32( inDataView, inOffset ); // Huffman decoding
 
-				hufUncompress( uInt8Array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize );
+				hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outBufferEnd ); // Wavelet decoding
 
-				var pizChannelData = new Array( num_channels );
+				for ( let i = 0; i < info.channels; ++ i ) {
 
-				var outBufferEnd = 0;
+					const cd = pizChannelData[ i ];
 
-				for ( var i = 0; i < num_channels; i ++ ) {
+					for ( let j = 0; j < pizChannelData[ i ].size; ++ j ) {
 
-					pizChannelData[ i ] = {};
-					pizChannelData[ i ][ 'start' ] = outBufferEnd;
-					pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
-					pizChannelData[ i ][ 'nx' ] = dataWidth;
-					pizChannelData[ i ][ 'ny' ] = num_lines;
-					pizChannelData[ i ][ 'size' ] = 1;
+						wav2Decode( outBuffer, cd.start + j, cd.nx, cd.size, cd.ny, cd.nx * cd.size, maxValue );
 
-					outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
+					}
 
-				}
+				} // Expand the pixel data to their original range
 
-				var fooOffset = 0;
 
-				for ( var i = 0; i < num_channels; i ++ ) {
+				applyLut( lut, outBuffer, outBufferEnd ); // Rearrange the pixel data into the format expected by the caller.
 
-					for ( var j = 0; j < pizChannelData[ i ].size; ++ j ) {
+				let tmpOffset = 0;
+				const tmpBuffer = new Uint8Array( outBuffer.buffer.byteLength );
 
-						fooOffset += wav2Decode(
-							j + fooOffset,
-							outBuffer,
-							pizChannelData[ i ].nx,
-							pizChannelData[ i ].size,
-							pizChannelData[ i ].ny,
-							pizChannelData[ i ].nx * pizChannelData[ i ].size
-						);
+				for ( let y = 0; y < info.lines; y ++ ) {
+
+					for ( let c = 0; c < info.channels; c ++ ) {
+
+						const cd = pizChannelData[ c ];
+						const n = cd.nx * cd.size;
+						const cp = new Uint8Array( outBuffer.buffer, cd.end * INT16_SIZE, n * INT16_SIZE );
+						tmpBuffer.set( cp, tmpOffset );
+						tmpOffset += n * INT16_SIZE;
+						cd.end += n;
 
 					}
 
 				}
 
-				applyLut( lut, outBuffer, outBufferEnd );
+				return new DataView( tmpBuffer.buffer );
 
-				return true;
+			}
+
+			function uncompressPXR( info ) {
+
+				const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
+
+				if ( typeof fflate === 'undefined' ) {
+
+					console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
+
+				}
+
+				const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+
+				const sz = info.lines * info.channels * info.width;
+				const tmpBuffer = info.type == 1 ? new Uint16Array( sz ) : new Uint32Array( sz );
+				let tmpBufferEnd = 0;
+				let writePtr = 0;
+				const ptr = new Array( 4 );
+
+				for ( let y = 0; y < info.lines; y ++ ) {
+
+					for ( let c = 0; c < info.channels; c ++ ) {
+
+						let pixel = 0;
+
+						switch ( info.type ) {
+
+							case 1:
+								ptr[ 0 ] = tmpBufferEnd;
+								ptr[ 1 ] = ptr[ 0 ] + info.width;
+								tmpBufferEnd = ptr[ 1 ] + info.width;
+
+								for ( let j = 0; j < info.width; ++ j ) {
+
+									const diff = rawBuffer[ ptr[ 0 ] ++ ] << 8 | rawBuffer[ ptr[ 1 ] ++ ];
+									pixel += diff;
+									tmpBuffer[ writePtr ] = pixel;
+									writePtr ++;
+
+								}
+
+								break;
+
+							case 2:
+								ptr[ 0 ] = tmpBufferEnd;
+								ptr[ 1 ] = ptr[ 0 ] + info.width;
+								ptr[ 2 ] = ptr[ 1 ] + info.width;
+								tmpBufferEnd = ptr[ 2 ] + info.width;
+
+								for ( let j = 0; j < info.width; ++ j ) {
+
+									const diff = rawBuffer[ ptr[ 0 ] ++ ] << 24 | rawBuffer[ ptr[ 1 ] ++ ] << 16 | rawBuffer[ ptr[ 2 ] ++ ] << 8;
+									pixel += diff;
+									tmpBuffer[ writePtr ] = pixel;
+									writePtr ++;
+
+								}
+
+								break;
+
+						}
+
+					}
+
+				}
+
+				return new DataView( tmpBuffer.buffer );
+
+			}
+
+			function uncompressDWA( info ) {
+
+				const inDataView = info.viewer;
+				const inOffset = {
+					value: info.offset.value
+				};
+				const outBuffer = new Uint8Array( info.width * info.lines * ( info.channels * info.type * INT16_SIZE ) ); // Read compression header information
+
+				const dwaHeader = {
+					version: parseInt64( inDataView, inOffset ),
+					unknownUncompressedSize: parseInt64( inDataView, inOffset ),
+					unknownCompressedSize: parseInt64( inDataView, inOffset ),
+					acCompressedSize: parseInt64( inDataView, inOffset ),
+					dcCompressedSize: parseInt64( inDataView, inOffset ),
+					rleCompressedSize: parseInt64( inDataView, inOffset ),
+					rleUncompressedSize: parseInt64( inDataView, inOffset ),
+					rleRawSize: parseInt64( inDataView, inOffset ),
+					totalAcUncompressedCount: parseInt64( inDataView, inOffset ),
+					totalDcUncompressedCount: parseInt64( inDataView, inOffset ),
+					acCompression: parseInt64( inDataView, inOffset )
+				};
+				if ( dwaHeader.version < 2 ) throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported' ); // Read channel ruleset information
+
+				const channelRules = new Array();
+				let ruleSize = parseUint16( inDataView, inOffset ) - INT16_SIZE;
+
+				while ( ruleSize > 0 ) {
+
+					const name = parseNullTerminatedString( inDataView.buffer, inOffset );
+					const value = parseUint8( inDataView, inOffset );
+					const compression = value >> 2 & 3;
+					const csc = ( value >> 4 ) - 1;
+					const index = new Int8Array( [ csc ] )[ 0 ];
+					const type = parseUint8( inDataView, inOffset );
+					channelRules.push( {
+						name: name,
+						index: index,
+						type: type,
+						compression: compression
+					} );
+					ruleSize -= name.length + 3;
+
+				} // Classify channels
+
+
+				const channels = EXRHeader.channels;
+				const channelData = new Array( info.channels );
+
+				for ( let i = 0; i < info.channels; ++ i ) {
+
+					const cd = channelData[ i ] = {};
+					const channel = channels[ i ];
+					cd.name = channel.name;
+					cd.compression = UNKNOWN;
+					cd.decoded = false;
+					cd.type = channel.pixelType;
+					cd.pLinear = channel.pLinear;
+					cd.width = info.width;
+					cd.height = info.lines;
+
+				}
+
+				const cscSet = {
+					idx: new Array( 3 )
+				};
+
+				for ( let offset = 0; offset < info.channels; ++ offset ) {
+
+					const cd = channelData[ offset ];
+
+					for ( let i = 0; i < channelRules.length; ++ i ) {
+
+						const rule = channelRules[ i ];
+
+						if ( cd.name == rule.name ) {
+
+							cd.compression = rule.compression;
+
+							if ( rule.index >= 0 ) {
+
+								cscSet.idx[ rule.index ] = offset;
+
+							}
+
+							cd.offset = offset;
+
+						}
+
+					}
+
+				}
+
+				let acBuffer, dcBuffer, rleBuffer; // Read DCT - AC component data
+
+				if ( dwaHeader.acCompressedSize > 0 ) {
+
+					switch ( dwaHeader.acCompression ) {
+
+						case STATIC_HUFFMAN:
+							acBuffer = new Uint16Array( dwaHeader.totalAcUncompressedCount );
+							hufUncompress( info.array, inDataView, inOffset, dwaHeader.acCompressedSize, acBuffer, dwaHeader.totalAcUncompressedCount );
+							break;
+
+						case DEFLATE:
+							const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
+							const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+
+							acBuffer = new Uint16Array( data.buffer );
+							inOffset.value += dwaHeader.totalAcUncompressedCount;
+							break;
+
+					}
+
+				} // Read DCT - DC component data
+
+
+				if ( dwaHeader.dcCompressedSize > 0 ) {
+
+					const zlibInfo = {
+						array: info.array,
+						offset: inOffset,
+						size: dwaHeader.dcCompressedSize
+					};
+					dcBuffer = new Uint16Array( uncompressZIP( zlibInfo ).buffer );
+					inOffset.value += dwaHeader.dcCompressedSize;
+
+				} // Read RLE compressed data
+
+
+				if ( dwaHeader.rleRawSize > 0 ) {
+
+					const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
+					const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+
+					rleBuffer = decodeRunLength( data.buffer );
+					inOffset.value += dwaHeader.rleCompressedSize;
+
+				} // Prepare outbuffer data offset
+
+
+				let outBufferEnd = 0;
+				const rowOffsets = new Array( channelData.length );
+
+				for ( let i = 0; i < rowOffsets.length; ++ i ) {
+
+					rowOffsets[ i ] = new Array();
+
+				}
+
+				for ( let y = 0; y < info.lines; ++ y ) {
+
+					for ( let chan = 0; chan < channelData.length; ++ chan ) {
+
+						rowOffsets[ chan ].push( outBufferEnd );
+						outBufferEnd += channelData[ chan ].width * info.type * INT16_SIZE;
+
+					}
+
+				} // Lossy DCT decode RGB channels
+
+
+				lossyDctDecode( cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer ); // Decode other channels
+
+				for ( let i = 0; i < channelData.length; ++ i ) {
+
+					const cd = channelData[ i ];
+					if ( cd.decoded ) continue;
+
+					switch ( cd.compression ) {
+
+						case RLE:
+							let row = 0;
+							let rleOffset = 0;
+
+							for ( let y = 0; y < info.lines; ++ y ) {
+
+								let rowOffsetBytes = rowOffsets[ i ][ row ];
+
+								for ( let x = 0; x < cd.width; ++ x ) {
+
+									for ( let byte = 0; byte < INT16_SIZE * cd.type; ++ byte ) {
+
+										outBuffer[ rowOffsetBytes ++ ] = rleBuffer[ rleOffset + byte * cd.width * cd.height ];
+
+									}
+
+									rleOffset ++;
+
+								}
+
+								row ++;
+
+							}
+
+							break;
+
+						case LOSSY_DCT: // skip
+
+						default:
+							throw new Error( 'EXRLoader.parse: unsupported channel compression' );
+
+					}
+
+				}
+
+				return new DataView( outBuffer.buffer );
 
 			}
 
 			function parseNullTerminatedString( buffer, offset ) {
 
-				var uintBuffer = new Uint8Array( buffer );
-				var endOffset = 0;
+				const uintBuffer = new Uint8Array( buffer );
+				let endOffset = 0;
 
 				while ( uintBuffer[ offset.value + endOffset ] != 0 ) {
 
@@ -783,102 +1546,114 @@
 
 				}
 
-				var stringValue = new TextDecoder().decode(
-					uintBuffer.slice( offset.value, offset.value + endOffset )
-				);
-
+				const stringValue = new TextDecoder().decode( uintBuffer.slice( offset.value, offset.value + endOffset ) );
 				offset.value = offset.value + endOffset + 1;
-
 				return stringValue;
 
 			}
 
 			function parseFixedLengthString( buffer, offset, size ) {
 
-				var stringValue = new TextDecoder().decode(
-					new Uint8Array( buffer ).slice( offset.value, offset.value + size )
-				);
-
+				const stringValue = new TextDecoder().decode( new Uint8Array( buffer ).slice( offset.value, offset.value + size ) );
 				offset.value = offset.value + size;
-
 				return stringValue;
 
 			}
 
-			function parseUlong( dataView, offset ) {
+			function parseRational( dataView, offset ) {
 
-				var uLong = dataView.getUint32( 0, true );
+				const x = parseInt32( dataView, offset );
+				const y = parseUint32( dataView, offset );
+				return [ x, y ];
 
-				offset.value = offset.value + ULONG_SIZE;
+			}
 
-				return uLong;
+			function parseTimecode( dataView, offset ) {
+
+				const x = parseUint32( dataView, offset );
+				const y = parseUint32( dataView, offset );
+				return [ x, y ];
+
+			}
+
+			function parseInt32( dataView, offset ) {
+
+				const Int32 = dataView.getInt32( offset.value, true );
+				offset.value = offset.value + INT32_SIZE;
+				return Int32;
 
 			}
 
 			function parseUint32( dataView, offset ) {
 
-				var Uint32 = dataView.getUint32( offset.value, true );
-
+				const Uint32 = dataView.getUint32( offset.value, true );
 				offset.value = offset.value + INT32_SIZE;
-
 				return Uint32;
 
 			}
 
 			function parseUint8Array( uInt8Array, offset ) {
 
-				var Uint8 = uInt8Array[ offset.value ];
-
+				const Uint8 = uInt8Array[ offset.value ];
 				offset.value = offset.value + INT8_SIZE;
-
 				return Uint8;
 
 			}
 
 			function parseUint8( dataView, offset ) {
 
-				var Uint8 = dataView.getUint8( offset.value );
-
+				const Uint8 = dataView.getUint8( offset.value );
 				offset.value = offset.value + INT8_SIZE;
-
 				return Uint8;
 
 			}
 
+			const parseInt64 = function ( dataView, offset ) {
+
+				let int;
+
+				if ( 'getBigInt64' in DataView.prototype ) {
+
+					int = Number( dataView.getBigInt64( offset.value, true ) );
+
+				} else {
+
+					int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
+
+				}
+
+				offset.value += ULONG_SIZE;
+				return int;
+
+			};
+
 			function parseFloat32( dataView, offset ) {
 
-				var float = dataView.getFloat32( offset.value, true );
-
+				const float = dataView.getFloat32( offset.value, true );
 				offset.value += FLOAT32_SIZE;
-
 				return float;
 
 			}
 
-			// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
+			function decodeFloat32( dataView, offset ) {
+
+				return THREE.DataUtils.toHalfFloat( parseFloat32( dataView, offset ) );
+
+			} // https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
+
+
 			function decodeFloat16( binary ) {
 
-				var exponent = ( binary & 0x7C00 ) >> 10,
+				const exponent = ( binary & 0x7C00 ) >> 10,
 					fraction = binary & 0x03FF;
-
-				return ( binary >> 15 ? - 1 : 1 ) * (
-					exponent ?
-						(
-							exponent === 0x1F ?
-								fraction ? NaN : Infinity :
-								Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
-						) :
-						6.103515625e-5 * ( fraction / 0x400 )
-				);
+				return ( binary >> 15 ? - 1 : 1 ) * ( exponent ? exponent === 0x1F ? fraction ? NaN : Infinity : Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 ) : 6.103515625e-5 * ( fraction / 0x400 ) );
 
 			}
 
 			function parseUint16( dataView, offset ) {
 
-				var Uint16 = dataView.getUint16( offset.value, true );
-
+				const Uint16 = dataView.getUint16( offset.value, true );
 				offset.value += INT16_SIZE;
-
 				return Uint16;
 
 			}
@@ -891,18 +1666,18 @@
 
 			function parseChlist( dataView, buffer, offset, size ) {
 
-				var startOffset = offset.value;
-				var channels = [];
+				const startOffset = offset.value;
+				const channels = [];
 
-				while ( offset.value < ( startOffset + size - 1 ) ) {
+				while ( offset.value < startOffset + size - 1 ) {
 
-					var name = parseNullTerminatedString( buffer, offset );
-					var pixelType = parseUint32( dataView, offset ); // TODO: Cast this to UINT, HALF or FLOAT
-					var pLinear = parseUint8( dataView, offset );
+					const name = parseNullTerminatedString( buffer, offset );
+					const pixelType = parseInt32( dataView, offset );
+					const pLinear = parseUint8( dataView, offset );
 					offset.value += 3; // reserved, three chars
-					var xSampling = parseUint32( dataView, offset );
-					var ySampling = parseUint32( dataView, offset );
 
+					const xSampling = parseInt32( dataView, offset );
+					const ySampling = parseInt32( dataView, offset );
 					channels.push( {
 						name: name,
 						pixelType: pixelType,
@@ -914,82 +1689,84 @@
 				}
 
 				offset.value += 1;
-
 				return channels;
 
 			}
 
 			function parseChromaticities( dataView, offset ) {
 
-				var redX = parseFloat32( dataView, offset );
-				var redY = parseFloat32( dataView, offset );
-				var greenX = parseFloat32( dataView, offset );
-				var greenY = parseFloat32( dataView, offset );
-				var blueX = parseFloat32( dataView, offset );
-				var blueY = parseFloat32( dataView, offset );
-				var whiteX = parseFloat32( dataView, offset );
-				var whiteY = parseFloat32( dataView, offset );
-
-				return { redX: redX, redY: redY, greenX: greenX, greenY: greenY, blueX: blueX, blueY: blueY, whiteX: whiteX, whiteY: whiteY };
+				const redX = parseFloat32( dataView, offset );
+				const redY = parseFloat32( dataView, offset );
+				const greenX = parseFloat32( dataView, offset );
+				const greenY = parseFloat32( dataView, offset );
+				const blueX = parseFloat32( dataView, offset );
+				const blueY = parseFloat32( dataView, offset );
+				const whiteX = parseFloat32( dataView, offset );
+				const whiteY = parseFloat32( dataView, offset );
+				return {
+					redX: redX,
+					redY: redY,
+					greenX: greenX,
+					greenY: greenY,
+					blueX: blueX,
+					blueY: blueY,
+					whiteX: whiteX,
+					whiteY: whiteY
+				};
 
 			}
 
 			function parseCompression( dataView, offset ) {
 
-				var compressionCodes = [
-					'NO_COMPRESSION',
-					'RLE_COMPRESSION',
-					'ZIPS_COMPRESSION',
-					'ZIP_COMPRESSION',
-					'PIZ_COMPRESSION',
-					'PXR24_COMPRESSION',
-					'B44_COMPRESSION',
-					'B44A_COMPRESSION',
-					'DWAA_COMPRESSION',
-					'DWAB_COMPRESSION'
-				];
-
-				var compression = parseUint8( dataView, offset );
-
+				const compressionCodes = [ 'NO_COMPRESSION', 'RLE_COMPRESSION', 'ZIPS_COMPRESSION', 'ZIP_COMPRESSION', 'PIZ_COMPRESSION', 'PXR24_COMPRESSION', 'B44_COMPRESSION', 'B44A_COMPRESSION', 'DWAA_COMPRESSION', 'DWAB_COMPRESSION' ];
+				const compression = parseUint8( dataView, offset );
 				return compressionCodes[ compression ];
 
 			}
 
 			function parseBox2i( dataView, offset ) {
 
-				var xMin = parseUint32( dataView, offset );
-				var yMin = parseUint32( dataView, offset );
-				var xMax = parseUint32( dataView, offset );
-				var yMax = parseUint32( dataView, offset );
-
-				return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
+				const xMin = parseUint32( dataView, offset );
+				const yMin = parseUint32( dataView, offset );
+				const xMax = parseUint32( dataView, offset );
+				const yMax = parseUint32( dataView, offset );
+				return {
+					xMin: xMin,
+					yMin: yMin,
+					xMax: xMax,
+					yMax: yMax
+				};
 
 			}
 
 			function parseLineOrder( dataView, offset ) {
 
-				var lineOrders = [
-					'INCREASING_Y'
-				];
-
-				var lineOrder = parseUint8( dataView, offset );
-
+				const lineOrders = [ 'INCREASING_Y' ];
+				const lineOrder = parseUint8( dataView, offset );
 				return lineOrders[ lineOrder ];
 
 			}
 
 			function parseV2f( dataView, offset ) {
 
-				var x = parseFloat32( dataView, offset );
-				var y = parseFloat32( dataView, offset );
-
+				const x = parseFloat32( dataView, offset );
+				const y = parseFloat32( dataView, offset );
 				return [ x, y ];
+
+			}
+
+			function parseV3f( dataView, offset ) {
+
+				const x = parseFloat32( dataView, offset );
+				const y = parseFloat32( dataView, offset );
+				const z = parseFloat32( dataView, offset );
+				return [ x, y, z ];
 
 			}
 
 			function parseValue( dataView, buffer, offset, type, size ) {
 
-				if ( type === 'string' || type === 'iccProfile' ) {
+				if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
 
 					return parseFixedLengthString( buffer, offset, size );
 
@@ -1021,140 +1798,82 @@
 
 					return parseV2f( dataView, offset );
 
+				} else if ( type === 'v3f' ) {
+
+					return parseV3f( dataView, offset );
+
 				} else if ( type === 'int' ) {
 
-					return parseUint32( dataView, offset );
+					return parseInt32( dataView, offset );
+
+				} else if ( type === 'rational' ) {
+
+					return parseRational( dataView, offset );
+
+				} else if ( type === 'timecode' ) {
+
+					return parseTimecode( dataView, offset );
+
+				} else if ( type === 'preview' ) {
+
+					offset.value += size;
+					return 'skipped';
 
 				} else {
 
-					throw 'Cannot parse value for unsupported type: ' + type;
+					offset.value += size;
+					return undefined;
 
 				}
 
 			}
 
-			var bufferDataView = new DataView( buffer );
-			var uInt8Array = new Uint8Array( buffer );
+			function parseHeader( dataView, buffer, offset ) {
 
-			var EXRHeader = {};
+				const EXRHeader = {};
 
-			bufferDataView.getUint32( 0, true ); // magic
-			bufferDataView.getUint8( 4, true ); // versionByteZero
-			bufferDataView.getUint8( 5, true ); // fullMask
+				if ( dataView.getUint32( 0, true ) != 20000630 ) {
 
-			// start of header
-
-			var offset = { value: 8 }; // start at 8, after magic stuff
-
-			var keepReading = true;
-
-			while ( keepReading ) {
-
-				var attributeName = parseNullTerminatedString( buffer, offset );
-
-				if ( attributeName == 0 ) {
-
-					keepReading = false;
-
-				} else {
-
-					var attributeType = parseNullTerminatedString( buffer, offset );
-					var attributeSize = parseUint32( bufferDataView, offset );
-					var attributeValue = parseValue( bufferDataView, buffer, offset, attributeType, attributeSize );
-
-					EXRHeader[ attributeName ] = attributeValue;
+					// magic
+					throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
 
 				}
 
-			}
+				EXRHeader.version = dataView.getUint8( 4 );
+				const spec = dataView.getUint8( 5 ); // fullMask
 
-			// offsets
+				EXRHeader.spec = {
+					singleTile: !! ( spec & 2 ),
+					longName: !! ( spec & 4 ),
+					deepFormat: !! ( spec & 8 ),
+					multiPart: !! ( spec & 16 )
+				}; // start of header
 
-			var dataWindowHeight = EXRHeader.dataWindow.yMax + 1;
-			var scanlineBlockSize = 1; // 1 for NO_COMPRESSION
+				offset.value = 8; // start at 8 - after pre-amble
 
-			if ( EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+				let keepReading = true;
 
-				scanlineBlockSize = 32;
+				while ( keepReading ) {
 
-			}
+					const attributeName = parseNullTerminatedString( buffer, offset );
 
-			var numBlocks = dataWindowHeight / scanlineBlockSize;
+					if ( attributeName == 0 ) {
 
-			for ( var i = 0; i < numBlocks; i ++ ) {
+						keepReading = false;
 
-				parseUlong( bufferDataView, offset ); // scanlineOffset
+					} else {
 
-			}
+						const attributeType = parseNullTerminatedString( buffer, offset );
+						const attributeSize = parseUint32( dataView, offset );
+						const attributeValue = parseValue( dataView, buffer, offset, attributeType, attributeSize );
 
-			// we should be passed the scanline offset table, start reading pixel data
+						if ( attributeValue === undefined ) {
 
-			var width = EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1;
-			var height = EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1;
-			var numChannels = EXRHeader.channels.length;
-
-			switch ( this.type ) {
-
-				case THREE.FloatType:
-
-					var byteArray = new Float32Array( width * height * numChannels );
-					break;
-
-				case THREE.HalfFloatType:
-
-					var byteArray = new Uint16Array( width * height * numChannels );
-					break;
-
-				default:
-
-					console.error( 'THREE.EXRLoader: unsupported type: ', this.type );
-					break;
-
-			}
-
-			var channelOffsets = {
-				R: 0,
-				G: 1,
-				B: 2,
-				A: 3
-			};
-
-			if ( EXRHeader.compression === 'NO_COMPRESSION' ) {
-
-				for ( var y = 0; y < height; y ++ ) {
-
-					var y_scanline = parseUint32( bufferDataView, offset );
-					parseUint32( bufferDataView, offset ); // dataSize
-
-					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
-
-						var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
-
-						if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
-
-							for ( var x = 0; x < width; x ++ ) {
-
-								switch ( this.type ) {
-
-									case THREE.FloatType:
-
-										var val = parseFloat16( bufferDataView, offset );
-										break;
-
-									case THREE.HalfFloatType:
-
-										var val = parseUint16( bufferDataView, offset );
-										break;
-
-								}
-
-								byteArray[ ( ( ( height - y_scanline ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
-
-							}
+							console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${attributeType}\'.` );
 
 						} else {
 
-							throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+							EXRHeader[ attributeName ] = attributeValue;
 
 						}
 
@@ -1162,123 +1881,266 @@
 
 				}
 
-			} else if ( EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+				if ( spec != 0 ) {
 
-				for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
+					console.error( 'EXRHeader:', EXRHeader );
+					throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );
 
-					parseUint32( bufferDataView, offset ); // line_no
-					parseUint32( bufferDataView, offset ); // data_len
+				}
 
-					var tmpBufferSize = width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
-					var tmpBuffer = new Uint16Array( tmpBufferSize );
-					var tmpOffset = { value: 0 };
+				return EXRHeader;
 
-					decompressPIZ( tmpBuffer, tmpOffset, uInt8Array, bufferDataView, offset, tmpBufferSize, numChannels, EXRHeader.channels, width, scanlineBlockSize );
+			}
 
-					for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
+			function setupDecoder( EXRHeader, dataView, uInt8Array, offset, outputType ) {
 
-						for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+				const EXRDecoder = {
+					size: 0,
+					viewer: dataView,
+					array: uInt8Array,
+					offset: offset,
+					width: EXRHeader.dataWindow.xMax - EXRHeader.dataWindow.xMin + 1,
+					height: EXRHeader.dataWindow.yMax - EXRHeader.dataWindow.yMin + 1,
+					channels: EXRHeader.channels.length,
+					bytesPerLine: null,
+					lines: null,
+					inputSize: null,
+					type: EXRHeader.channels[ 0 ].pixelType,
+					uncompress: null,
+					getter: null,
+					format: null,
+					encoding: null
+				};
 
-							var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+				switch ( EXRHeader.compression ) {
 
-							if ( EXRHeader.channels[ channelID ].pixelType === 1 ) { // half
+					case 'NO_COMPRESSION':
+						EXRDecoder.lines = 1;
+						EXRDecoder.uncompress = uncompressRAW;
+						break;
 
-								for ( var x = 0; x < width; x ++ ) {
+					case 'RLE_COMPRESSION':
+						EXRDecoder.lines = 1;
+						EXRDecoder.uncompress = uncompressRLE;
+						break;
 
-									var idx = ( channelID * ( scanlineBlockSize * width ) ) + ( line_y * width ) + x;
+					case 'ZIPS_COMPRESSION':
+						EXRDecoder.lines = 1;
+						EXRDecoder.uncompress = uncompressZIP;
+						break;
 
-									switch ( this.type ) {
+					case 'ZIP_COMPRESSION':
+						EXRDecoder.lines = 16;
+						EXRDecoder.uncompress = uncompressZIP;
+						break;
 
-										case THREE.FloatType:
+					case 'PIZ_COMPRESSION':
+						EXRDecoder.lines = 32;
+						EXRDecoder.uncompress = uncompressPIZ;
+						break;
 
-											var val = decodeFloat16( tmpBuffer[ idx ] );
-											break;
+					case 'PXR24_COMPRESSION':
+						EXRDecoder.lines = 16;
+						EXRDecoder.uncompress = uncompressPXR;
+						break;
 
-										case THREE.HalfFloatType:
+					case 'DWAA_COMPRESSION':
+						EXRDecoder.lines = 32;
+						EXRDecoder.uncompress = uncompressDWA;
+						break;
 
-											var val = tmpBuffer[ idx ];
-											break;
+					case 'DWAB_COMPRESSION':
+						EXRDecoder.lines = 256;
+						EXRDecoder.uncompress = uncompressDWA;
+						break;
 
-									}
+					default:
+						throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported' );
 
-									var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+				}
 
-									byteArray[ ( ( ( height - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
+				EXRDecoder.scanlineBlockSize = EXRDecoder.lines;
 
-								}
+				if ( EXRDecoder.type == 1 ) {
 
-							} else {
+					// half
+					switch ( outputType ) {
 
-								throw 'EXRLoader._parser: unsupported pixelType ' + EXRHeader.channels[ channelID ].pixelType + '. Only pixelType is 1 (HALF) is supported.';
+						case THREE.FloatType:
+							EXRDecoder.getter = parseFloat16;
+							EXRDecoder.inputSize = INT16_SIZE;
+							break;
 
-							}
+						case THREE.HalfFloatType:
+							EXRDecoder.getter = parseUint16;
+							EXRDecoder.inputSize = INT16_SIZE;
+							break;
+
+					}
+
+				} else if ( EXRDecoder.type == 2 ) {
+
+					// float
+					switch ( outputType ) {
+
+						case THREE.FloatType:
+							EXRDecoder.getter = parseFloat32;
+							EXRDecoder.inputSize = FLOAT32_SIZE;
+							break;
+
+						case THREE.HalfFloatType:
+							EXRDecoder.getter = decodeFloat32;
+							EXRDecoder.inputSize = FLOAT32_SIZE;
+
+					}
+
+				} else {
+
+					throw new Error( 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
+
+				}
+
+				EXRDecoder.blockCount = ( EXRHeader.dataWindow.yMax + 1 ) / EXRDecoder.scanlineBlockSize;
+
+				for ( let i = 0; i < EXRDecoder.blockCount; i ++ ) parseInt64( dataView, offset ); // scanlineOffset
+				// we should be passed the scanline offset table, ready to start reading pixel data.
+				// RGB images will be converted to RGBA format, preventing software emulation in select devices.
+
+
+				EXRDecoder.outputChannels = EXRDecoder.channels == 3 ? 4 : EXRDecoder.channels;
+				const size = EXRDecoder.width * EXRDecoder.height * EXRDecoder.outputChannels;
+
+				switch ( outputType ) {
+
+					case THREE.FloatType:
+						EXRDecoder.byteArray = new Float32Array( size ); // Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
+
+						if ( EXRDecoder.channels < EXRDecoder.outputChannels ) EXRDecoder.byteArray.fill( 1, 0, size );
+						break;
+
+					case THREE.HalfFloatType:
+						EXRDecoder.byteArray = new Uint16Array( size );
+						if ( EXRDecoder.channels < EXRDecoder.outputChannels ) EXRDecoder.byteArray.fill( 0x3C00, 0, size ); // Uint16Array holds half float data, 0x3C00 is 1
+
+						break;
+
+					default:
+						console.error( 'THREE.EXRLoader: unsupported type: ', outputType );
+						break;
+
+				}
+
+				EXRDecoder.bytesPerLine = EXRDecoder.width * EXRDecoder.inputSize * EXRDecoder.channels;
+
+				if ( EXRDecoder.outputChannels == 4 ) {
+
+					EXRDecoder.format = THREE.RGBAFormat;
+					EXRDecoder.encoding = THREE.LinearEncoding;
+
+				} else {
+
+					EXRDecoder.format = THREE.RedFormat;
+					EXRDecoder.encoding = THREE.LinearEncoding;
+
+				}
+
+				return EXRDecoder;
+
+			} // start parsing file [START]
+
+
+			const bufferDataView = new DataView( buffer );
+			const uInt8Array = new Uint8Array( buffer );
+			const offset = {
+				value: 0
+			}; // get header information and validate format.
+
+			const EXRHeader = parseHeader( bufferDataView, buffer, offset ); // get input compression information and prepare decoding.
+
+			const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type );
+			const tmpOffset = {
+				value: 0
+			};
+			const channelOffsets = {
+				R: 0,
+				G: 1,
+				B: 2,
+				A: 3,
+				Y: 0
+			};
+
+			for ( let scanlineBlockIdx = 0; scanlineBlockIdx < EXRDecoder.height / EXRDecoder.scanlineBlockSize; scanlineBlockIdx ++ ) {
+
+				const line = parseUint32( bufferDataView, offset ); // line_no
+
+				EXRDecoder.size = parseUint32( bufferDataView, offset ); // data_len
+
+				EXRDecoder.lines = line + EXRDecoder.scanlineBlockSize > EXRDecoder.height ? EXRDecoder.height - line : EXRDecoder.scanlineBlockSize;
+				const isCompressed = EXRDecoder.size < EXRDecoder.lines * EXRDecoder.bytesPerLine;
+				const viewer = isCompressed ? EXRDecoder.uncompress( EXRDecoder ) : uncompressRAW( EXRDecoder );
+				offset.value += EXRDecoder.size;
+
+				for ( let line_y = 0; line_y < EXRDecoder.scanlineBlockSize; line_y ++ ) {
+
+					const true_y = line_y + scanlineBlockIdx * EXRDecoder.scanlineBlockSize;
+					if ( true_y >= EXRDecoder.height ) break;
+
+					for ( let channelID = 0; channelID < EXRDecoder.channels; channelID ++ ) {
+
+						const cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+
+						for ( let x = 0; x < EXRDecoder.width; x ++ ) {
+
+							tmpOffset.value = ( line_y * ( EXRDecoder.channels * EXRDecoder.width ) + channelID * EXRDecoder.width + x ) * EXRDecoder.inputSize;
+							const outIndex = ( EXRDecoder.height - 1 - true_y ) * ( EXRDecoder.width * EXRDecoder.outputChannels ) + x * EXRDecoder.outputChannels + cOff;
+							EXRDecoder.byteArray[ outIndex ] = EXRDecoder.getter( viewer, tmpOffset );
 
 						}
 
 					}
 
 				}
-
-			} else {
-
-				throw 'EXRLoader._parser: ' + EXRHeader.compression + ' is unsupported';
 
 			}
 
 			return {
 				header: EXRHeader,
-				width: width,
-				height: height,
-				data: byteArray,
-				format: EXRHeader.channels.length == 4 ? THREE.RGBAFormat : THREE.RGBFormat,
+				width: EXRDecoder.width,
+				height: EXRDecoder.height,
+				data: EXRDecoder.byteArray,
+				format: EXRDecoder.format,
+				encoding: EXRDecoder.encoding,
 				type: this.type
 			};
 
-		},
+		}
 
-		setDataType: function ( value ) {
+		setDataType( value ) {
 
 			this.type = value;
 			return this;
 
-		},
+		}
 
-		load: function ( url, onLoad, onProgress, onError ) {
+		load( url, onLoad, onProgress, onError ) {
 
 			function onLoadCallback( texture, texData ) {
 
-				switch ( texture.type ) {
-
-					case THREE.FloatType:
-
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-					case THREE.HalfFloatType:
-
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-				}
-
+				texture.encoding = texData.encoding;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = false;
 				if ( onLoad ) onLoad( texture, texData );
 
 			}
 
-			return THREE.DataTextureLoader.prototype.load.call( this, url, onLoadCallback, onProgress, onError );
+			return super.load( url, onLoadCallback, onProgress, onError );
 
 		}
 
-	} );
+	}
 
-	exports.EXRLoader = EXRLoader;
+	THREE.EXRLoader = EXRLoader;
 
-})));
+} )();

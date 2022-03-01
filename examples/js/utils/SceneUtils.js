@@ -1,51 +1,60 @@
-/**
- * Generated from 'examples/jsm/utils/SceneUtils.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+	function createMeshesFromInstancedMesh( instancedMesh ) {
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
+		const group = new THREE.Group();
+		const count = instancedMesh.count;
+		const geometry = instancedMesh.geometry;
+		const material = instancedMesh.material;
 
-	var SceneUtils = {
+		for ( let i = 0; i < count; i ++ ) {
 
-		createMultiMaterialObject: function ( geometry, materials ) {
-
-			var group = new THREE.Group();
-
-			for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-				group.add( new THREE.Mesh( geometry, materials[ i ] ) );
-
-			}
-
-			return group;
-
-		},
-
-		detach: function ( child, parent, scene ) {
-
-			console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
-
-			scene.attach( child );
-
-		},
-
-		attach: function ( child, scene, parent ) {
-
-			console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
-
-			parent.attach( child );
+			const mesh = new THREE.Mesh( geometry, material );
+			instancedMesh.getMatrixAt( i, mesh.matrix );
+			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+			group.add( mesh );
 
 		}
 
-	};
+		group.copy( instancedMesh );
+		group.updateMatrixWorld(); // ensure correct world matrices of meshes
 
-	exports.SceneUtils = SceneUtils;
+		return group;
 
-})));
+	}
+
+	function createMultiMaterialObject( geometry, materials ) {
+
+		const group = new THREE.Group();
+
+		for ( let i = 0, l = materials.length; i < l; i ++ ) {
+
+			group.add( new THREE.Mesh( geometry, materials[ i ] ) );
+
+		}
+
+		return group;
+
+	}
+
+	function detach( child, parent, scene ) {
+
+		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
+		scene.attach( child );
+
+	}
+
+	function attach( child, scene, parent ) {
+
+		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
+		parent.attach( child );
+
+	}
+
+	THREE.SceneUtils = {};
+	THREE.SceneUtils.attach = attach;
+	THREE.SceneUtils.createMeshesFromInstancedMesh = createMeshesFromInstancedMesh;
+	THREE.SceneUtils.createMultiMaterialObject = createMultiMaterialObject;
+	THREE.SceneUtils.detach = detach;
+
+} )();

@@ -1,95 +1,66 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import Node from './Node.js';
 
-import { TempNode } from './TempNode.js';
+class InputNode extends Node {
 
-function InputNode( type, params ) {
+	constructor( inputType ) {
 
-	params = params || {};
-	params.shared = params.shared !== undefined ? params.shared : false;
+		super( inputType );
 
-	TempNode.call( this, type, params );
+		this.inputType = inputType;
 
-	this.readonly = false;
+		this.constant = false;
 
-}
+	}
 
-InputNode.prototype = Object.create( TempNode.prototype );
-InputNode.prototype.constructor = InputNode;
+	setConst( value ) {
 
-InputNode.prototype.setReadonly = function ( value ) {
+		this.constant = value;
 
-	this.readonly = value;
+		return this;
 
-	return this;
+	}
 
-};
+	getConst() {
 
-InputNode.prototype.getReadonly = function ( /* builder */ ) {
+		return this.constant;
 
-	return this.readonly;
+	}
 
-};
+	getInputType( /* builder */ ) {
 
-InputNode.prototype.copy = function ( source ) {
+		return this.inputType;
 
-	TempNode.prototype.copy.call( this, source );
+	}
 
-	if ( source.readonly !== undefined ) this.readonly = source.readonly;
+	generateConst( builder ) {
 
-	return this;
+		return builder.getConst( this.getNodeType( builder ), this.value );
 
-};
+	}
 
-InputNode.prototype.createJSONNode = function ( meta ) {
+	generate( builder, output ) {
 
-	var data = TempNode.prototype.createJSONNode.call( this, meta );
+		const type = this.getNodeType( builder );
 
-	if ( this.readonly === true ) data.readonly = this.readonly;
+		if ( this.constant === true ) {
 
-	return data;
-
-};
-
-InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
-
-	uuid = builder.getUuid( uuid || this.getUuid() );
-	type = type || this.getType( builder );
-
-	var data = builder.getNodeData( uuid ),
-		readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
-
-	if ( readonly ) {
-
-		return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
-
-	} else {
-
-		if ( builder.isShader( 'vertex' ) ) {
-
-			if ( ! data.vertex ) {
-
-				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-			}
-
-			return builder.format( data.vertex.name, type, output );
+			return builder.format( this.generateConst( builder ), type, output );
 
 		} else {
 
-			if ( ! data.fragment ) {
+			const inputType = this.getInputType( builder );
 
-				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
+			const nodeUniform = builder.getUniformFromNode( this, builder.shaderStage, inputType );
+			const propertyName = builder.getPropertyName( nodeUniform );
 
-			}
-
-			return builder.format( data.fragment.name, type, output );
+			return builder.format( propertyName, type, output );
 
 		}
 
 	}
 
-};
+}
 
-export { InputNode };
+InputNode.prototype.isInputNode = true;
+
+export default InputNode;

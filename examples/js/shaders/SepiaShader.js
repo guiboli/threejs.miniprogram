@@ -1,70 +1,55 @@
-/**
- * Generated from 'examples/jsm/shaders/SepiaShader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function () {
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Sepia tone shader
-	 * based on glfx.js sepia shader
-	 * https://github.com/evanw/glfx.js
-	 */
-
-
-
-	var SepiaShader = {
-
+ * Sepia tone shader
+ * based on glfx.js sepia shader
+ * https://github.com/evanw/glfx.js
+ */
+	const SepiaShader = {
 		uniforms: {
-
-			"tDiffuse": { value: null },
-			"amount": { value: 1.0 }
-
+			'tDiffuse': {
+				value: null
+			},
+			'amount': {
+				value: 1.0
+			}
 		},
+		vertexShader:
+  /* glsl */
+  `
 
-		vertexShader: [
+		varying vec2 vUv;
 
-			"varying vec2 vUv;",
+		void main() {
 
-			"void main() {",
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"	vUv = uv;",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-			"}"
+		uniform float amount;
 
-		].join( "\n" ),
+		uniform sampler2D tDiffuse;
 
-		fragmentShader: [
+		varying vec2 vUv;
 
-			"uniform float amount;",
+		void main() {
 
-			"uniform sampler2D tDiffuse;",
+			vec4 color = texture2D( tDiffuse, vUv );
+			vec3 c = color.rgb;
 
-			"varying vec2 vUv;",
+			color.r = dot( c, vec3( 1.0 - 0.607 * amount, 0.769 * amount, 0.189 * amount ) );
+			color.g = dot( c, vec3( 0.349 * amount, 1.0 - 0.314 * amount, 0.168 * amount ) );
+			color.b = dot( c, vec3( 0.272 * amount, 0.534 * amount, 1.0 - 0.869 * amount ) );
 
-			"void main() {",
+			gl_FragColor = vec4( min( vec3( 1.0 ), color.rgb ), color.a );
 
-			"	vec4 color = texture2D( tDiffuse, vUv );",
-			"	vec3 c = color.rgb;",
-
-			"	color.r = dot( c, vec3( 1.0 - 0.607 * amount, 0.769 * amount, 0.189 * amount ) );",
-			"	color.g = dot( c, vec3( 0.349 * amount, 1.0 - 0.314 * amount, 0.168 * amount ) );",
-			"	color.b = dot( c, vec3( 0.272 * amount, 0.534 * amount, 1.0 - 0.869 * amount ) );",
-
-			"	gl_FragColor = vec4( min( vec3( 1.0 ), color.rgb ), color.a );",
-
-			"}"
-
-		].join( "\n" )
-
+		}`
 	};
 
-	exports.SepiaShader = SepiaShader;
+	THREE.SepiaShader = SepiaShader;
 
-})));
+} )();

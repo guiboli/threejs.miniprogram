@@ -1,86 +1,75 @@
-/**
- * Generated from 'examples/jsm/postprocessing/HalftonePass.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/shaders/HalftoneShader.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/shaders/HalftoneShader.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Pass_js, HalftoneShader_js) { 'use strict';
+( function () {
 
 	/**
-	 * @author meatbags / xavierburrow.com, github/meatbags
-	 *
-	 * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
-	 *
-	 */
+ * RGB Halftone pass for three.js effects composer. Requires THREE.HalftoneShader.
+ */
 
-	var HalftonePass = function ( width, height, params ) {
+	class HalftonePass extends THREE.Pass {
 
-		Pass_js.Pass.call( this );
+		constructor( width, height, params ) {
 
-	 	if ( HalftoneShader_js.HalftoneShader === undefined ) {
+			super();
 
-	 		console.error( 'THREE.HalftonePass requires HalftoneShader' );
+			if ( THREE.HalftoneShader === undefined ) {
 
-	 	}
+				console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
 
-	 	this.uniforms = THREE.UniformsUtils.clone( HalftoneShader_js.HalftoneShader.uniforms );
-	 	this.material = new THREE.ShaderMaterial( {
-	 		uniforms: this.uniforms,
-	 		fragmentShader: HalftoneShader_js.HalftoneShader.fragmentShader,
-	 		vertexShader: HalftoneShader_js.HalftoneShader.vertexShader
-	 	} );
+			}
 
-		// set params
-		this.uniforms.width.value = width;
-		this.uniforms.height.value = height;
+			this.uniforms = THREE.UniformsUtils.clone( THREE.HalftoneShader.uniforms );
+			this.material = new THREE.ShaderMaterial( {
+				uniforms: this.uniforms,
+				fragmentShader: THREE.HalftoneShader.fragmentShader,
+				vertexShader: THREE.HalftoneShader.vertexShader
+			} ); // set params
 
-		for ( var key in params ) {
+			this.uniforms.width.value = width;
+			this.uniforms.height.value = height;
 
-			if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
+			for ( const key in params ) {
 
-				this.uniforms[ key ].value = params[ key ];
+				if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
+
+					this.uniforms[ key ].value = params[ key ];
+
+				}
+
+			}
+
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
+
+		}
+
+		render( renderer, writeBuffer, readBuffer
+			/*, deltaTime, maskActive*/
+		) {
+
+			this.material.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+
+			if ( this.renderToScreen ) {
+
+				renderer.setRenderTarget( null );
+				this.fsQuad.render( renderer );
+
+			} else {
+
+				renderer.setRenderTarget( writeBuffer );
+				if ( this.clear ) renderer.clear();
+				this.fsQuad.render( renderer );
 
 			}
 
 		}
 
-		this.fsQuad = new Pass_js.Pass.FullScreenQuad( this.material );
+		setSize( width, height ) {
 
-	};
+			this.uniforms.width.value = width;
+			this.uniforms.height.value = height;
 
-	HalftonePass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
+		}
 
-		constructor: HalftonePass,
+	}
 
-		render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
+	THREE.HalftonePass = HalftonePass;
 
-	 		this.material.uniforms[ "tDiffuse" ].value = readBuffer.texture;
-
-	 		if ( this.renderToScreen ) {
-
-	 			renderer.setRenderTarget( null );
-	 			this.fsQuad.render( renderer );
-
-			} else {
-
-	 			renderer.setRenderTarget( writeBuffer );
-	 			if ( this.clear ) renderer.clear();
-				this.fsQuad.render( renderer );
-
-			}
-
-	 	},
-
-	 	setSize: function ( width, height ) {
-
-	 		this.uniforms.width.value = width;
-	 		this.uniforms.height.value = height;
-
-	 	}
-	} );
-
-	exports.HalftonePass = HalftonePass;
-
-})));
+} )();

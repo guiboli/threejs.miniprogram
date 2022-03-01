@@ -1,84 +1,69 @@
-/**
- * Generated from 'examples/jsm/misc/MorphAnimMesh.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+	class MorphAnimMesh extends THREE.Mesh {
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
+		constructor( geometry, material ) {
 
-	var MorphAnimMesh = function ( geometry, material ) {
-
-		THREE.Mesh.call( this, geometry, material );
-
-		this.type = 'MorphAnimMesh';
-
-		this.mixer = new THREE.AnimationMixer( this );
-		this.activeAction = null;
-
-	};
-
-	MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
-	MorphAnimMesh.prototype.constructor = MorphAnimMesh;
-
-	MorphAnimMesh.prototype.setDirectionForward = function () {
-
-		this.mixer.timeScale = 1.0;
-
-	};
-
-	MorphAnimMesh.prototype.setDirectionBackward = function () {
-
-		this.mixer.timeScale = - 1.0;
-
-	};
-
-	MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
-
-		if ( this.activeAction ) {
-
-			this.activeAction.stop();
+			super( geometry, material );
+			this.type = 'MorphAnimMesh';
+			this.mixer = new THREE.AnimationMixer( this );
 			this.activeAction = null;
 
 		}
 
-		var clip = THREE.AnimationClip.findByName( this, label );
+		setDirectionForward() {
 
-		if ( clip ) {
-
-			var action = this.mixer.clipAction( clip );
-			action.timeScale = ( clip.tracks.length * fps ) / clip.duration;
-			this.activeAction = action.play();
-
-		} else {
-
-			throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
+			this.mixer.timeScale = 1.0;
 
 		}
 
-	};
+		setDirectionBackward() {
 
-	MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
+			this.mixer.timeScale = - 1.0;
 
-		this.mixer.update( delta );
+		}
 
-	};
+		playAnimation( label, fps ) {
 
-	MorphAnimMesh.prototype.copy = function ( source ) {
+			if ( this.activeAction ) {
 
-		THREE.Mesh.prototype.copy.call( this, source );
+				this.activeAction.stop();
+				this.activeAction = null;
 
-		this.mixer = new THREE.AnimationMixer( this );
+			}
 
-		return this;
+			const clip = THREE.AnimationClip.findByName( this, label );
 
-	};
+			if ( clip ) {
 
-	exports.MorphAnimMesh = MorphAnimMesh;
+				const action = this.mixer.clipAction( clip );
+				action.timeScale = clip.tracks.length * fps / clip.duration;
+				this.activeAction = action.play();
 
-})));
+			} else {
+
+				throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
+
+			}
+
+		}
+
+		updateAnimation( delta ) {
+
+			this.mixer.update( delta );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+			this.mixer = new THREE.AnimationMixer( this );
+			return this;
+
+		}
+
+	}
+
+	THREE.MorphAnimMesh = MorphAnimMesh;
+
+} )();

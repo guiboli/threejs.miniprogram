@@ -1,47 +1,30 @@
-/**
- * Generated from 'examples/jsm/shaders/BasicShader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function () {
 
 	/**
-	 * @author mrdoob / http://www.mrdoob.com
-	 *
-	 * Simple test shader
-	 */
-
-
-
-	var BasicShader = {
-
+ * Simple test shader
+ */
+	const BasicShader = {
 		uniforms: {},
+		vertexShader:
+  /* glsl */
+  `
 
-		vertexShader: [
+		void main() {
 
-			"void main() {",
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-			"}"
+		void main() {
 
-		].join( "\n" ),
+			gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );
 
-		fragmentShader: [
-
-			"void main() {",
-
-			"	gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );",
-
-			"}"
-
-		].join( "\n" )
-
+		}`
 	};
 
-	exports.BasicShader = BasicShader;
+	THREE.BasicShader = BasicShader;
 
-})));
+} )();

@@ -1,53 +1,33 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import InputNode from '../core/InputNode.js';
 
-import { InputNode } from '../core/InputNode.js';
+class IntNode extends InputNode {
 
-function IntNode( value ) {
+	constructor( value = 0 ) {
 
-	InputNode.call( this, 'i' );
+		super( 'int' );
 
-	this.value = Math.floor( value || 0 );
-
-}
-
-IntNode.prototype = Object.create( InputNode.prototype );
-IntNode.prototype.constructor = IntNode;
-IntNode.prototype.nodeType = "Int";
-
-IntNode.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate */ ) {
-
-	return builder.format( this.value, type, output );
-
-};
-
-IntNode.prototype.copy = function ( source ) {
-
-	InputNode.prototype.copy.call( this, source );
-
-	this.value = source.value;
-
-	return this;
-
-};
-
-IntNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.value = this.value;
-
-		if ( this.readonly === true ) data.readonly = true;
+		this.value = value;
 
 	}
 
-	return data;
+	serialize( data ) {
 
-};
+		super.serialize( data );
 
-export { IntNode };
+		data.value = this.value;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		this.value = data.value;
+
+	}
+
+}
+
+IntNode.prototype.isIntNode = true;
+
+export default IntNode;

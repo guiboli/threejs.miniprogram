@@ -1,53 +1,36 @@
-/**
- * Generated from 'examples/jsm/postprocessing/ShaderPass.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Pass_js) { 'use strict';
+	class ShaderPass extends THREE.Pass {
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
+		constructor( shader, textureID ) {
 
-	var ShaderPass = function ( shader, textureID ) {
+			super();
+			this.textureID = textureID !== undefined ? textureID : 'tDiffuse';
 
-		Pass_js.Pass.call( this );
+			if ( shader instanceof THREE.ShaderMaterial ) {
 
-		this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+				this.uniforms = shader.uniforms;
+				this.material = shader;
 
-		if ( shader instanceof THREE.ShaderMaterial ) {
+			} else if ( shader ) {
 
-			this.uniforms = shader.uniforms;
+				this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				this.material = new THREE.ShaderMaterial( {
+					defines: Object.assign( {}, shader.defines ),
+					uniforms: this.uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader
+				} );
 
-			this.material = shader;
+			}
 
-		} else if ( shader ) {
-
-			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-			this.material = new THREE.ShaderMaterial( {
-
-				defines: Object.assign( {}, shader.defines ),
-				uniforms: this.uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-
-			} );
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
 
-		this.fsQuad = new Pass_js.Pass.FullScreenQuad( this.material );
-
-	};
-
-	ShaderPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
-
-		constructor: ShaderPass,
-
-		render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
+		render( renderer, writeBuffer, readBuffer
+			/*, deltaTime, maskActive */
+		) {
 
 			if ( this.uniforms[ this.textureID ] ) {
 
@@ -64,8 +47,8 @@
 
 			} else {
 
-				renderer.setRenderTarget( writeBuffer );
-				// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
+				renderer.setRenderTarget( writeBuffer ); // TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
+
 				if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 				this.fsQuad.render( renderer );
 
@@ -73,8 +56,8 @@
 
 		}
 
-	} );
+	}
 
-	exports.ShaderPass = ShaderPass;
+	THREE.ShaderPass = ShaderPass;
 
-})));
+} )();

@@ -1,51 +1,56 @@
-/**
- * Generated from 'examples/jsm/loaders/KMZLoader.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/ColladaLoader.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/ColladaLoader.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, ColladaLoader_js) { 'use strict';
+	class KMZLoader extends THREE.Loader {
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
+		constructor( manager ) {
 
-	var KMZLoader = function ( manager ) {
+			super( manager );
 
-		THREE.Loader.call( this, manager );
+		}
 
-	};
+		load( url, onLoad, onProgress, onError ) {
 
-	KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-		constructor: KMZLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
-
-			var scope = this;
-
-			var loader = new THREE.FileLoader( scope.manager );
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( text ) );
+				try {
+
+					onLoad( scope.parse( text ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		parse: function ( data ) {
+		parse( data ) {
 
 			function findFile( url ) {
 
-				for ( var path in zip.files ) {
+				for ( const path in zip ) {
 
-					if ( path.substr( - url.length ) === url ) {
+					if ( path.slice( - url.length ) === url ) {
 
-						return zip.files[ path ];
+						return zip[ path ];
 
 					}
 
@@ -53,38 +58,37 @@
 
 			}
 
-			var manager = new THREE.LoadingManager();
+			const manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
-				var image = findFile( url );
+				const image = findFile( url );
 
 				if ( image ) {
 
 					console.log( 'Loading', url );
-
-					var blob = new Blob( [ image.asArrayBuffer() ], { type: 'application/octet-stream' } );
+					const blob = new Blob( [ image.buffer ], {
+						type: 'application/octet-stream'
+					} );
 					return URL.createObjectURL( blob );
 
 				}
 
 				return url;
 
-			} );
+			} ); //
 
-			//
+			const zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
-			var zip = new JSZip( data ); // eslint-disable-line no-undef
+			if ( zip[ 'doc.kml' ] ) {
 
-			if ( zip.files[ 'doc.kml' ] ) {
+				const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
 
-				var xml = new DOMParser().parseFromString( zip.files[ 'doc.kml' ].asText(), 'application/xml' );
-
-				var model = xml.querySelector( 'Placemark Model Link href' );
+				const model = xml.querySelector( 'Placemark Model Link href' );
 
 				if ( model ) {
 
-					var loader = new ColladaLoader_js.ColladaLoader( manager );
-					return loader.parse( zip.files[ model.textContent ].asText() );
+					const loader = new THREE.ColladaLoader( manager );
+					return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
 
 				}
 
@@ -92,14 +96,14 @@
 
 				console.warn( 'KMZLoader: Missing doc.kml file.' );
 
-				for ( var path in zip.files ) {
+				for ( const path in zip ) {
 
-					var extension = path.split( '.' ).pop().toLowerCase();
+					const extension = path.split( '.' ).pop().toLowerCase();
 
 					if ( extension === 'dae' ) {
 
-						var loader = new ColladaLoader_js.ColladaLoader( manager );
-						return loader.parse( zip.files[ path ].asText() );
+						const loader = new THREE.ColladaLoader( manager );
+						return loader.parse( fflate.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
 
 					}
 
@@ -108,12 +112,14 @@
 			}
 
 			console.error( 'KMZLoader: Couldn\'t find .dae file.' );
-			return { scene: new THREE.Group() };
+			return {
+				scene: new THREE.Group()
+			};
 
 		}
 
-	} );
+	}
 
-	exports.KMZLoader = KMZLoader;
+	THREE.KMZLoader = KMZLoader;
 
-})));
+} )();

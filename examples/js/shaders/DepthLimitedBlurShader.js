@@ -1,139 +1,142 @@
-/**
- * Generated from 'examples/jsm/shaders/DepthLimitedBlurShader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function () {
 
 	/**
-	 * TODO
-	 */
+ * TODO
+ */
 
-	var DepthLimitedBlurShader = {
+	const DepthLimitedBlurShader = {
 		defines: {
-			"KERNEL_RADIUS": 4,
-			"DEPTH_PACKING": 1,
-			"PERSPECTIVE_CAMERA": 1
+			'KERNEL_RADIUS': 4,
+			'DEPTH_PACKING': 1,
+			'PERSPECTIVE_CAMERA': 1
 		},
 		uniforms: {
-			"tDiffuse": { value: null },
-			"size": { value: new THREE.Vector2( 512, 512 ) },
-			"sampleUvOffsets": { value: [ new THREE.Vector2( 0, 0 ) ] },
-			"sampleWeights": { value: [ 1.0 ] },
-			"tDepth": { value: null },
-			"cameraNear": { value: 10 },
-			"cameraFar": { value: 1000 },
-			"depthCutoff": { value: 10 },
+			'tDiffuse': {
+				value: null
+			},
+			'size': {
+				value: new THREE.Vector2( 512, 512 )
+			},
+			'sampleUvOffsets': {
+				value: [ new THREE.Vector2( 0, 0 ) ]
+			},
+			'sampleWeights': {
+				value: [ 1.0 ]
+			},
+			'tDepth': {
+				value: null
+			},
+			'cameraNear': {
+				value: 10
+			},
+			'cameraFar': {
+				value: 1000
+			},
+			'depthCutoff': {
+				value: 10
+			}
 		},
-		vertexShader: [
-			"#include <common>",
+		vertexShader:
+  /* glsl */
+  `
 
-			"uniform vec2 size;",
+		#include <common>
 
-			"varying vec2 vUv;",
-			"varying vec2 vInvSize;",
+		uniform vec2 size;
 
-			"void main() {",
-			"	vUv = uv;",
-			"	vInvSize = 1.0 / size;",
+		varying vec2 vUv;
+		varying vec2 vInvSize;
 
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-			"}"
+		void main() {
+			vUv = uv;
+			vInvSize = 1.0 / size;
 
-		].join( "\n" ),
-		fragmentShader: [
-			"#include <common>",
-			"#include <packing>",
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-			"uniform sampler2D tDiffuse;",
-			"uniform sampler2D tDepth;",
+		#include <common>
+		#include <packing>
 
-			"uniform float cameraNear;",
-			"uniform float cameraFar;",
-			"uniform float depthCutoff;",
+		uniform sampler2D tDiffuse;
+		uniform sampler2D tDepth;
 
-			"uniform vec2 sampleUvOffsets[ KERNEL_RADIUS + 1 ];",
-			"uniform float sampleWeights[ KERNEL_RADIUS + 1 ];",
+		uniform float cameraNear;
+		uniform float cameraFar;
+		uniform float depthCutoff;
 
-			"varying vec2 vUv;",
-			"varying vec2 vInvSize;",
+		uniform vec2 sampleUvOffsets[ KERNEL_RADIUS + 1 ];
+		uniform float sampleWeights[ KERNEL_RADIUS + 1 ];
 
-			"float getDepth( const in vec2 screenPosition ) {",
-			"	#if DEPTH_PACKING == 1",
-			"	return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );",
-			"	#else",
-			"	return texture2D( tDepth, screenPosition ).x;",
-			"	#endif",
-			"}",
+		varying vec2 vUv;
+		varying vec2 vInvSize;
 
-			"float getViewZ( const in float depth ) {",
-			"	#if PERSPECTIVE_CAMERA == 1",
-			"	return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );",
-			"	#else",
-			"	return orthographicDepthToViewZ( depth, cameraNear, cameraFar );",
-			"	#endif",
-			"}",
+		float getDepth( const in vec2 screenPosition ) {
+			#if DEPTH_PACKING == 1
+			return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );
+			#else
+			return texture2D( tDepth, screenPosition ).x;
+			#endif
+		}
 
-			"void main() {",
-			"	float depth = getDepth( vUv );",
-			"	if( depth >= ( 1.0 - EPSILON ) ) {",
-			"		discard;",
-			"	}",
+		float getViewZ( const in float depth ) {
+			#if PERSPECTIVE_CAMERA == 1
+			return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+			#else
+			return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
+			#endif
+		}
 
-			"	float centerViewZ = -getViewZ( depth );",
-			"	bool rBreak = false, lBreak = false;",
+		void main() {
+			float depth = getDepth( vUv );
+			if( depth >= ( 1.0 - EPSILON ) ) {
+				discard;
+			}
 
-			"	float weightSum = sampleWeights[0];",
-			"	vec4 diffuseSum = texture2D( tDiffuse, vUv ) * weightSum;",
+			float centerViewZ = -getViewZ( depth );
+			bool rBreak = false, lBreak = false;
 
-			"	for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {",
+			float weightSum = sampleWeights[0];
+			vec4 diffuseSum = texture2D( tDiffuse, vUv ) * weightSum;
 
-			"		float sampleWeight = sampleWeights[i];",
-			"		vec2 sampleUvOffset = sampleUvOffsets[i] * vInvSize;",
+			for( int i = 1; i <= KERNEL_RADIUS; i ++ ) {
 
-			"		vec2 sampleUv = vUv + sampleUvOffset;",
-			"		float viewZ = -getViewZ( getDepth( sampleUv ) );",
+				float sampleWeight = sampleWeights[i];
+				vec2 sampleUvOffset = sampleUvOffsets[i] * vInvSize;
 
-			"		if( abs( viewZ - centerViewZ ) > depthCutoff ) rBreak = true;",
+				vec2 sampleUv = vUv + sampleUvOffset;
+				float viewZ = -getViewZ( getDepth( sampleUv ) );
 
-			"		if( ! rBreak ) {",
-			"			diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
-			"			weightSum += sampleWeight;",
-			"		}",
+				if( abs( viewZ - centerViewZ ) > depthCutoff ) rBreak = true;
 
-			"		sampleUv = vUv - sampleUvOffset;",
-			"		viewZ = -getViewZ( getDepth( sampleUv ) );",
+				if( ! rBreak ) {
+					diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;
+					weightSum += sampleWeight;
+				}
 
-			"		if( abs( viewZ - centerViewZ ) > depthCutoff ) lBreak = true;",
+				sampleUv = vUv - sampleUvOffset;
+				viewZ = -getViewZ( getDepth( sampleUv ) );
 
-			"		if( ! lBreak ) {",
-			"			diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;",
-			"			weightSum += sampleWeight;",
-			"		}",
+				if( abs( viewZ - centerViewZ ) > depthCutoff ) lBreak = true;
 
-			"	}",
+				if( ! lBreak ) {
+					diffuseSum += texture2D( tDiffuse, sampleUv ) * sampleWeight;
+					weightSum += sampleWeight;
+				}
 
-			"	gl_FragColor = diffuseSum / weightSum;",
-			"}"
-		].join( "\n" )
+			}
+
+			gl_FragColor = diffuseSum / weightSum;
+		}`
 	};
-
-	var BlurShaderUtils = {
-
+	const BlurShaderUtils = {
 		createSampleWeights: function ( kernelRadius, stdDev ) {
 
-			var gaussian = function ( x, stdDev ) {
+			const weights = [];
 
-				return Math.exp( - ( x * x ) / ( 2.0 * ( stdDev * stdDev ) ) ) / ( Math.sqrt( 2.0 * Math.PI ) * stdDev );
-
-			};
-
-			var weights = [];
-
-			for ( var i = 0; i <= kernelRadius; i ++ ) {
+			for ( let i = 0; i <= kernelRadius; i ++ ) {
 
 				weights.push( gaussian( i, stdDev ) );
 
@@ -142,12 +145,11 @@
 			return weights;
 
 		},
-
 		createSampleOffsets: function ( kernelRadius, uvIncrement ) {
 
-			var offsets = [];
+			const offsets = [];
 
-			for ( var i = 0; i <= kernelRadius; i ++ ) {
+			for ( let i = 0; i <= kernelRadius; i ++ ) {
 
 				offsets.push( uvIncrement.clone().multiplyScalar( i ) );
 
@@ -156,19 +158,23 @@
 			return offsets;
 
 		},
-
 		configure: function ( material, kernelRadius, stdDev, uvIncrement ) {
 
-			material.defines[ "KERNEL_RADIUS" ] = kernelRadius;
-			material.uniforms[ "sampleUvOffsets" ].value = BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
-			material.uniforms[ "sampleWeights" ].value = BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
+			material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
+			material.uniforms[ 'sampleUvOffsets' ].value = BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
+			material.uniforms[ 'sampleWeights' ].value = BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
 			material.needsUpdate = true;
 
 		}
-
 	};
 
-	exports.BlurShaderUtils = BlurShaderUtils;
-	exports.DepthLimitedBlurShader = DepthLimitedBlurShader;
+	function gaussian( x, stdDev ) {
 
-})));
+		return Math.exp( - ( x * x ) / ( 2.0 * ( stdDev * stdDev ) ) ) / ( Math.sqrt( 2.0 * Math.PI ) * stdDev );
+
+	}
+
+	THREE.BlurShaderUtils = BlurShaderUtils;
+	THREE.DepthLimitedBlurShader = DepthLimitedBlurShader;
+
+} )();

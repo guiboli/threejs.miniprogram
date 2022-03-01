@@ -1,90 +1,94 @@
-/**
- * Generated from 'examples/jsm/loaders/AMFLoader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function () {
 
 	/**
-	 * @author tamarintech / https://tamarintech.com
-	 *
-	 * Description: Early release of an AMF Loader following the pattern of the
-	 * example loaders in the three.js project.
-	 *
-	 * More information about the AMF format: http://amf.wikispaces.com
-	 *
-	 * Usage:
-	 *	var loader = new AMFLoader();
-	 *	loader.load('/path/to/project.amf', function(objecttree) {
-	 *		scene.add(objecttree);
-	 *	});
-	 *
-	 * Materials now supported, material colors supported
-	 * Zip support, requires jszip
-	 * No constellation support (yet)!
-	 *
-	 */
+ * Description: Early release of an AMF THREE.Loader following the pattern of the
+ * example loaders in the three.js project.
+ *
+ * Usage:
+ *	const loader = new AMFLoader();
+ *	loader.load('/path/to/project.amf', function(objecttree) {
+ *		scene.add(objecttree);
+ *	});
+ *
+ * Materials now supported, material colors supported
+ * Zip support, requires fflate
+ * No constellation support (yet)!
+ *
+ */
 
-	var AMFLoader = function ( manager ) {
+	class AMFLoader extends THREE.Loader {
 
-		THREE.Loader.call( this, manager );
+		constructor( manager ) {
 
-	};
+			super( manager );
 
-	AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+		}
 
-		constructor: AMFLoader,
+		load( url, onLoad, onProgress, onError ) {
 
-		load: function ( url, onLoad, onProgress, onError ) {
-
-			var scope = this;
-
-			var loader = new THREE.FileLoader( scope.manager );
+			const scope = this;
+			const loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( text ) );
+				try {
+
+					onLoad( scope.parse( text ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
-		},
+		}
 
-		parse: function ( data ) {
+		parse( data ) {
 
 			function loadDocument( data ) {
 
-				var view = new DataView( data );
-				var magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
+				let view = new DataView( data );
+				const magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
 
 				if ( magic === 'PK' ) {
 
-					var zip = null;
-					var file = null;
-
+					let zip = null;
+					let file = null;
 					console.log( 'THREE.AMFLoader: Loading Zip' );
 
 					try {
 
-						zip = new JSZip( data ); // eslint-disable-line no-undef
+						zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
 					} catch ( e ) {
 
 						if ( e instanceof ReferenceError ) {
 
-							console.log( 'THREE.AMFLoader: jszip missing and file is compressed.' );
+							console.log( 'THREE.AMFLoader: fflate missing and file is compressed.' );
 							return null;
 
 						}
 
 					}
 
-					for ( file in zip.files ) {
+					for ( file in zip ) {
 
-						if ( file.toLowerCase().substr( - 4 ) === '.amf' ) {
+						if ( file.toLowerCase().slice( - 4 ) === '.amf' ) {
 
 							break;
 
@@ -93,12 +97,12 @@
 					}
 
 					console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
-					view = new DataView( zip.file( file ).asArrayBuffer() );
+					view = new DataView( zip[ file ].buffer );
 
 				}
 
-				var fileText = THREE.LoaderUtils.decodeText( view );
-				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+				const fileText = THREE.LoaderUtils.decodeText( view );
+				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
@@ -113,8 +117,8 @@
 
 			function loadDocumentScale( node ) {
 
-				var scale = 1.0;
-				var unit = 'millimeter';
+				let scale = 1.0;
+				let unit = 'millimeter';
 
 				if ( node.documentElement.attributes.unit !== undefined ) {
 
@@ -122,7 +126,7 @@
 
 				}
 
-				var scaleUnits = {
+				const scaleUnits = {
 					millimeter: 1.0,
 					inch: 25.4,
 					feet: 304.8,
@@ -143,15 +147,19 @@
 
 			function loadMaterials( node ) {
 
-				var matName = 'AMF Material';
-				var matId = node.attributes.id.textContent;
-				var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
+				let matName = 'AMF Material';
+				const matId = node.attributes.id.textContent;
+				let color = {
+					r: 1.0,
+					g: 1.0,
+					b: 1.0,
+					a: 1.0
+				};
+				let loadedMaterial = null;
 
-				var loadedMaterial = null;
+				for ( let i = 0; i < node.childNodes.length; i ++ ) {
 
-				for ( var i = 0; i < node.childNodes.length; i ++ ) {
-
-					var matChildEl = node.childNodes[ i ];
+					const matChildEl = node.childNodes[ i ];
 
 					if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
 
@@ -182,17 +190,25 @@
 
 				}
 
-				return { id: matId, material: loadedMaterial };
+				return {
+					id: matId,
+					material: loadedMaterial
+				};
 
 			}
 
 			function loadColor( node ) {
 
-				var color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
+				const color = {
+					r: 1.0,
+					g: 1.0,
+					b: 1.0,
+					a: 1.0
+				};
 
-				for ( var i = 0; i < node.childNodes.length; i ++ ) {
+				for ( let i = 0; i < node.childNodes.length; i ++ ) {
 
-					var matColor = node.childNodes[ i ];
+					const matColor = node.childNodes[ i ];
 
 					if ( matColor.nodeName === 'r' ) {
 
@@ -220,9 +236,12 @@
 
 			function loadMeshVolume( node ) {
 
-				var volume = { name: '', triangles: [], materialid: null };
-
-				var currVolumeNode = node.firstElementChild;
+				const volume = {
+					name: '',
+					triangles: [],
+					materialid: null
+				};
+				let currVolumeNode = node.firstElementChild;
 
 				if ( node.attributes.materialid !== undefined ) {
 
@@ -246,10 +265,9 @@
 
 					} else if ( currVolumeNode.nodeName === 'triangle' ) {
 
-						var v1 = currVolumeNode.getElementsByTagName( 'v1' )[ 0 ].textContent;
-						var v2 = currVolumeNode.getElementsByTagName( 'v2' )[ 0 ].textContent;
-						var v3 = currVolumeNode.getElementsByTagName( 'v3' )[ 0 ].textContent;
-
+						const v1 = currVolumeNode.getElementsByTagName( 'v1' )[ 0 ].textContent;
+						const v2 = currVolumeNode.getElementsByTagName( 'v2' )[ 0 ].textContent;
+						const v3 = currVolumeNode.getElementsByTagName( 'v3' )[ 0 ].textContent;
 						volume.triangles.push( v1, v2, v3 );
 
 					}
@@ -264,32 +282,30 @@
 
 			function loadMeshVertices( node ) {
 
-				var vertArray = [];
-				var normalArray = [];
-				var currVerticesNode = node.firstElementChild;
+				const vertArray = [];
+				const normalArray = [];
+				let currVerticesNode = node.firstElementChild;
 
 				while ( currVerticesNode ) {
 
 					if ( currVerticesNode.nodeName === 'vertex' ) {
 
-						var vNode = currVerticesNode.firstElementChild;
+						let vNode = currVerticesNode.firstElementChild;
 
 						while ( vNode ) {
 
 							if ( vNode.nodeName === 'coordinates' ) {
 
-								var x = vNode.getElementsByTagName( 'x' )[ 0 ].textContent;
-								var y = vNode.getElementsByTagName( 'y' )[ 0 ].textContent;
-								var z = vNode.getElementsByTagName( 'z' )[ 0 ].textContent;
-
+								const x = vNode.getElementsByTagName( 'x' )[ 0 ].textContent;
+								const y = vNode.getElementsByTagName( 'y' )[ 0 ].textContent;
+								const z = vNode.getElementsByTagName( 'z' )[ 0 ].textContent;
 								vertArray.push( x, y, z );
 
 							} else if ( vNode.nodeName === 'normal' ) {
 
-								var nx = vNode.getElementsByTagName( 'nx' )[ 0 ].textContent;
-								var ny = vNode.getElementsByTagName( 'ny' )[ 0 ].textContent;
-								var nz = vNode.getElementsByTagName( 'nz' )[ 0 ].textContent;
-
+								const nx = vNode.getElementsByTagName( 'nx' )[ 0 ].textContent;
+								const ny = vNode.getElementsByTagName( 'ny' )[ 0 ].textContent;
+								const nz = vNode.getElementsByTagName( 'nz' )[ 0 ].textContent;
 								normalArray.push( nx, ny, nz );
 
 							}
@@ -299,20 +315,27 @@
 						}
 
 					}
+
 					currVerticesNode = currVerticesNode.nextElementSibling;
 
 				}
 
-				return { 'vertices': vertArray, 'normals': normalArray };
+				return {
+					'vertices': vertArray,
+					'normals': normalArray
+				};
 
 			}
 
 			function loadObject( node ) {
 
-				var objId = node.attributes.id.textContent;
-				var loadedObject = { name: 'amfobject', meshes: [] };
-				var currColor = null;
-				var currObjNode = node.firstElementChild;
+				const objId = node.attributes.id.textContent;
+				const loadedObject = {
+					name: 'amfobject',
+					meshes: []
+				};
+				let currColor = null;
+				let currObjNode = node.firstElementChild;
 
 				while ( currObjNode ) {
 
@@ -334,15 +357,19 @@
 
 					} else if ( currObjNode.nodeName === 'mesh' ) {
 
-						var currMeshNode = currObjNode.firstElementChild;
-						var mesh = { vertices: [], normals: [], volumes: [], color: currColor };
+						let currMeshNode = currObjNode.firstElementChild;
+						const mesh = {
+							vertices: [],
+							normals: [],
+							volumes: [],
+							color: currColor
+						};
 
 						while ( currMeshNode ) {
 
 							if ( currMeshNode.nodeName === 'vertices' ) {
 
-								var loadedVertices = loadMeshVertices( currMeshNode );
-
+								const loadedVertices = loadMeshVertices( currMeshNode );
 								mesh.normals = mesh.normals.concat( loadedVertices.normals );
 								mesh.vertices = mesh.vertices.concat( loadedVertices.vertices );
 
@@ -364,23 +391,25 @@
 
 				}
 
-				return { 'id': objId, 'obj': loadedObject };
+				return {
+					'id': objId,
+					'obj': loadedObject
+				};
 
 			}
 
-			var xmlData = loadDocument( data );
-			var amfName = '';
-			var amfAuthor = '';
-			var amfScale = loadDocumentScale( xmlData );
-			var amfMaterials = {};
-			var amfObjects = {};
-			var childNodes = xmlData.documentElement.childNodes;
-
-			var i, j;
+			const xmlData = loadDocument( data );
+			let amfName = '';
+			let amfAuthor = '';
+			const amfScale = loadDocumentScale( xmlData );
+			const amfMaterials = {};
+			const amfObjects = {};
+			const childNodes = xmlData.documentElement.childNodes;
+			let i, j;
 
 			for ( i = 0; i < childNodes.length; i ++ ) {
 
-				var child = childNodes[ i ];
+				const child = childNodes[ i ];
 
 				if ( child.nodeName === 'metadata' ) {
 
@@ -400,40 +429,40 @@
 
 				} else if ( child.nodeName === 'material' ) {
 
-					var loadedMaterial = loadMaterials( child );
-
+					const loadedMaterial = loadMaterials( child );
 					amfMaterials[ loadedMaterial.id ] = loadedMaterial.material;
 
 				} else if ( child.nodeName === 'object' ) {
 
-					var loadedObject = loadObject( child );
-
+					const loadedObject = loadObject( child );
 					amfObjects[ loadedObject.id ] = loadedObject.obj;
 
 				}
 
 			}
 
-			var sceneObject = new THREE.Group();
-			var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xaaaaff, flatShading: true } );
-
+			const sceneObject = new THREE.Group();
+			const defaultMaterial = new THREE.MeshPhongMaterial( {
+				color: 0xaaaaff,
+				flatShading: true
+			} );
 			sceneObject.name = amfName;
 			sceneObject.userData.author = amfAuthor;
 			sceneObject.userData.loader = 'AMF';
 
-			for ( var id in amfObjects ) {
+			for ( const id in amfObjects ) {
 
-				var part = amfObjects[ id ];
-				var meshes = part.meshes;
-				var newObject = new THREE.Group();
+				const part = amfObjects[ id ];
+				const meshes = part.meshes;
+				const newObject = new THREE.Group();
 				newObject.name = part.name || '';
 
 				for ( i = 0; i < meshes.length; i ++ ) {
 
-					var objDefaultMaterial = defaultMaterial;
-					var mesh = meshes[ i ];
-					var vertices = new THREE.Float32BufferAttribute( mesh.vertices, 3 );
-					var normals = null;
+					let objDefaultMaterial = defaultMaterial;
+					const mesh = meshes[ i ];
+					const vertices = new THREE.Float32BufferAttribute( mesh.vertices, 3 );
+					let normals = null;
 
 					if ( mesh.normals.length ) {
 
@@ -443,8 +472,7 @@
 
 					if ( mesh.color ) {
 
-						var color = mesh.color;
-
+						const color = mesh.color;
 						objDefaultMaterial = defaultMaterial.clone();
 						objDefaultMaterial.color = new THREE.Color( color.r, color.g, color.b );
 
@@ -457,14 +485,13 @@
 
 					}
 
-					var volumes = mesh.volumes;
+					const volumes = mesh.volumes;
 
 					for ( j = 0; j < volumes.length; j ++ ) {
 
-						var volume = volumes[ j ];
-						var newGeometry = new THREE.BufferGeometry();
-						var material = objDefaultMaterial;
-
+						const volume = volumes[ j ];
+						const newGeometry = new THREE.BufferGeometry();
+						let material = objDefaultMaterial;
 						newGeometry.setIndex( volume.triangles );
 						newGeometry.setAttribute( 'position', vertices.clone() );
 
@@ -495,8 +522,8 @@
 
 		}
 
-	} );
+	}
 
-	exports.AMFLoader = AMFLoader;
+	THREE.AMFLoader = AMFLoader;
 
-})));
+} )();

@@ -1,41 +1,27 @@
-/**
- * Generated from 'examples/jsm/postprocessing/ClearPass.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/Pass.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, Pass_js) { 'use strict';
+	class ClearPass extends THREE.Pass {
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
+		constructor( clearColor, clearAlpha ) {
 
-	var ClearPass = function ( clearColor, clearAlpha ) {
+			super();
+			this.needsSwap = false;
+			this.clearColor = clearColor !== undefined ? clearColor : 0x000000;
+			this.clearAlpha = clearAlpha !== undefined ? clearAlpha : 0;
+			this._oldClearColor = new THREE.Color();
 
-		Pass_js.Pass.call( this );
+		}
 
-		this.needsSwap = false;
+		render( renderer, writeBuffer, readBuffer
+			/*, deltaTime, maskActive */
+		) {
 
-		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
-		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-
-	};
-
-	ClearPass.prototype = Object.assign( Object.create( Pass_js.Pass.prototype ), {
-
-		constructor: ClearPass,
-
-		render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-			var oldClearColor, oldClearAlpha;
+			let oldClearAlpha;
 
 			if ( this.clearColor ) {
 
-				oldClearColor = renderer.getClearColor().getHex();
+				renderer.getClearColor( this._oldClearColor );
 				oldClearAlpha = renderer.getClearAlpha();
-
 				renderer.setClearColor( this.clearColor, this.clearAlpha );
 
 			}
@@ -45,14 +31,14 @@
 
 			if ( this.clearColor ) {
 
-				renderer.setClearColor( oldClearColor, oldClearAlpha );
+				renderer.setClearColor( this._oldClearColor, oldClearAlpha );
 
 			}
 
 		}
 
-	} );
+	}
 
-	exports.ClearPass = ClearPass;
+	THREE.ClearPass = ClearPass;
 
-})));
+} )();

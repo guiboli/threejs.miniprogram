@@ -1,59 +1,41 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import InputNode from '../core/InputNode.js';
+import { Vector2 } from 'three';
 
-import { Vector2 } from '../../../../build/three.module.js';
+class Vector2Node extends InputNode {
 
-import { InputNode } from '../core/InputNode.js';
-import { NodeUtils } from '../core/NodeUtils.js';
+	constructor( value = new Vector2() ) {
 
-function Vector2Node( x, y ) {
+		super( 'vec2' );
 
-	InputNode.call( this, 'v2' );
-
-	this.value = x instanceof Vector2 ? x : new Vector2( x, y );
-
-}
-
-Vector2Node.prototype = Object.create( InputNode.prototype );
-Vector2Node.prototype.constructor = Vector2Node;
-Vector2Node.prototype.nodeType = "Vector2";
-
-NodeUtils.addShortcuts( Vector2Node.prototype, 'value', [ 'x', 'y' ] );
-
-Vector2Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
-
-	return builder.format( "vec2( " + this.x + ", " + this.y + " )", type, output );
-
-};
-
-Vector2Node.prototype.copy = function ( source ) {
-
-	InputNode.prototype.copy.call( this, source );
-
-	this.value.copy( source );
-
-	return this;
-
-};
-
-Vector2Node.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.x = this.x;
-		data.y = this.y;
-
-		if ( this.readonly === true ) data.readonly = true;
+		this.value = value;
 
 	}
 
-	return data;
+	serialize( data ) {
 
-};
+		super.serialize( data );
 
-export { Vector2Node };
+		const { x, y } = this.value;
+
+		data.x = x;
+		data.y = y;
+
+	}
+
+	deserialize( data ) {
+
+		super.serialize( data );
+
+		const { x, y } = data;
+		const value = this.value;
+
+		value.x = x;
+		value.y = y;
+
+	}
+
+}
+
+Vector2Node.prototype.isVector2Node = true;
+
+export default Vector2Node;

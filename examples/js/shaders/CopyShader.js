@@ -1,62 +1,47 @@
-/**
- * Generated from 'examples/jsm/shaders/CopyShader.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function () {
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Full-screen textured quad shader
-	 */
-
-
-
-	var CopyShader = {
-
+ * Full-screen textured quad shader
+ */
+	const CopyShader = {
 		uniforms: {
-
-			"tDiffuse": { value: null },
-			"opacity": { value: 1.0 }
-
+			'tDiffuse': {
+				value: null
+			},
+			'opacity': {
+				value: 1.0
+			}
 		},
+		vertexShader:
+  /* glsl */
+  `
 
-		vertexShader: [
+		varying vec2 vUv;
 
-			"varying vec2 vUv;",
+		void main() {
 
-			"void main() {",
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"	vUv = uv;",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-			"}"
+		uniform float opacity;
 
-		].join( "\n" ),
+		uniform sampler2D tDiffuse;
 
-		fragmentShader: [
+		varying vec2 vUv;
 
-			"uniform float opacity;",
+		void main() {
 
-			"uniform sampler2D tDiffuse;",
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = opacity * texel;
 
-			"varying vec2 vUv;",
-
-			"void main() {",
-
-			"	vec4 texel = texture2D( tDiffuse, vUv );",
-			"	gl_FragColor = opacity * texel;",
-
-			"}"
-
-		].join( "\n" )
-
+		}`
 	};
 
-	exports.CopyShader = CopyShader;
+	THREE.CopyShader = CopyShader;
 
-})));
+} )();

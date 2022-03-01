@@ -1,104 +1,79 @@
-/**
- * Generated from 'examples/jsm/postprocessing/TAARenderPass.js'
- */
-
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/SSAARenderPass.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/postprocessing/SSAARenderPass.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, SSAARenderPass_js) { 'use strict';
+( function () {
 
 	/**
-	 *
-	 * Temporal Anti-Aliasing Render Pass
-	 *
-	 * @author bhouston / http://clara.io/
-	 *
-	 * When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.
-	 *
-	 * References:
-	 *
-	 * TODO: Add support for motion vector pas so that accumulation of samples across frames can occur on dynamics scenes.
-	 *
-	 */
+ *
+ * Temporal Anti-Aliasing Render Pass
+ *
+ * When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.
+ *
+ * References:
+ *
+ * TODO: Add support for motion vector pas so that accumulation of samples across frames can occur on dynamics scenes.
+ *
+ */
 
-	var TAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
+	class TAARenderPass extends THREE.SSAARenderPass {
 
-		if ( SSAARenderPass_js.SSAARenderPass === undefined ) {
+		constructor( scene, camera, clearColor, clearAlpha ) {
 
-			console.error( "TAARenderPass relies on SSAARenderPass" );
+			super( scene, camera, clearColor, clearAlpha );
+			this.sampleLevel = 0;
+			this.accumulate = false;
 
 		}
 
-		SSAARenderPass_js.SSAARenderPass.call( this, scene, camera, clearColor, clearAlpha );
+		render( renderer, writeBuffer, readBuffer, deltaTime ) {
 
-		this.sampleLevel = 0;
-		this.accumulate = false;
+			if ( this.accumulate === false ) {
 
-	};
-
-	TAARenderPass.JitterVectors = SSAARenderPass_js.SSAARenderPass.JitterVectors;
-
-	TAARenderPass.prototype = Object.assign( Object.create( SSAARenderPass_js.SSAARenderPass.prototype ), {
-
-		constructor: TAARenderPass,
-
-		render: function ( renderer, writeBuffer, readBuffer, deltaTime ) {
-
-			if ( ! this.accumulate ) {
-
-				SSAARenderPass_js.SSAARenderPass.prototype.render.call( this, renderer, writeBuffer, readBuffer, deltaTime );
-
+				super.render( renderer, writeBuffer, readBuffer, deltaTime );
 				this.accumulateIndex = - 1;
 				return;
 
 			}
 
-			var jitterOffsets = TAARenderPass.JitterVectors[ 5 ];
+			const jitterOffsets = _JitterVectors[ 5 ];
 
-			if ( ! this.sampleRenderTarget ) {
+			if ( this.sampleRenderTarget === undefined ) {
 
 				this.sampleRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-				this.sampleRenderTarget.texture.name = "TAARenderPass.sample";
+				this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
 
 			}
 
-			if ( ! this.holdRenderTarget ) {
+			if ( this.holdRenderTarget === undefined ) {
 
 				this.holdRenderTarget = new THREE.WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
-				this.holdRenderTarget.texture.name = "TAARenderPass.hold";
+				this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 			}
 
-			if ( this.accumulate && this.accumulateIndex === - 1 ) {
+			if ( this.accumulateIndex === - 1 ) {
 
-				SSAARenderPass_js.SSAARenderPass.prototype.render.call( this, renderer, this.holdRenderTarget, readBuffer, deltaTime );
-
+				super.render( renderer, this.holdRenderTarget, readBuffer, deltaTime );
 				this.accumulateIndex = 0;
 
 			}
 
-			var autoClear = renderer.autoClear;
+			const autoClear = renderer.autoClear;
 			renderer.autoClear = false;
-
-			var sampleWeight = 1.0 / ( jitterOffsets.length );
+			const sampleWeight = 1.0 / jitterOffsets.length;
 
 			if ( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
-				this.copyUniforms[ "opacity" ].value = sampleWeight;
-				this.copyUniforms[ "tDiffuse" ].value = writeBuffer.texture;
+				this.copyUniforms[ 'opacity' ].value = sampleWeight;
+				this.copyUniforms[ 'tDiffuse' ].value = writeBuffer.texture; // render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 
-				// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
-				var numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
-				for ( var i = 0; i < numSamplesPerFrame; i ++ ) {
+				const numSamplesPerFrame = Math.pow( 2, this.sampleLevel );
 
-					var j = this.accumulateIndex;
-					var jitterOffset = jitterOffsets[ j ];
+				for ( let i = 0; i < numSamplesPerFrame; i ++ ) {
+
+					const j = this.accumulateIndex;
+					const jitterOffset = jitterOffsets[ j ];
 
 					if ( this.camera.setViewOffset ) {
 
-						this.camera.setViewOffset( readBuffer.width, readBuffer.height,
-							jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
+						this.camera.setViewOffset( readBuffer.width, readBuffer.height, jitterOffset[ 0 ] * 0.0625, jitterOffset[ 1 ] * 0.0625, // 0.0625 = 1 / 16
 							readBuffer.width, readBuffer.height );
 
 					}
@@ -106,13 +81,10 @@
 					renderer.setRenderTarget( writeBuffer );
 					renderer.clear();
 					renderer.render( this.scene, this.camera );
-
 					renderer.setRenderTarget( this.sampleRenderTarget );
 					if ( this.accumulateIndex === 0 ) renderer.clear();
 					this.fsQuad.render( renderer );
-
 					this.accumulateIndex ++;
-
 					if ( this.accumulateIndex >= jitterOffsets.length ) break;
 
 				}
@@ -121,12 +93,12 @@
 
 			}
 
-			var accumulationWeight = this.accumulateIndex * sampleWeight;
+			const accumulationWeight = this.accumulateIndex * sampleWeight;
 
 			if ( accumulationWeight > 0 ) {
 
-				this.copyUniforms[ "opacity" ].value = 1.0;
-				this.copyUniforms[ "tDiffuse" ].value = this.sampleRenderTarget.texture;
+				this.copyUniforms[ 'opacity' ].value = 1.0;
+				this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 				renderer.setRenderTarget( writeBuffer );
 				renderer.clear();
 				this.fsQuad.render( renderer );
@@ -135,8 +107,8 @@
 
 			if ( accumulationWeight < 1.0 ) {
 
-				this.copyUniforms[ "opacity" ].value = 1.0 - accumulationWeight;
-				this.copyUniforms[ "tDiffuse" ].value = this.holdRenderTarget.texture;
+				this.copyUniforms[ 'opacity' ].value = 1.0 - accumulationWeight;
+				this.copyUniforms[ 'tDiffuse' ].value = this.holdRenderTarget.texture;
 				renderer.setRenderTarget( writeBuffer );
 				if ( accumulationWeight === 0 ) renderer.clear();
 				this.fsQuad.render( renderer );
@@ -147,8 +119,10 @@
 
 		}
 
-	} );
+	}
 
-	exports.TAARenderPass = TAARenderPass;
+	const _JitterVectors = [[[ 0, 0 ]], [[ 4, 4 ], [ - 4, - 4 ]], [[ - 2, - 6 ], [ 6, - 2 ], [ - 6, 2 ], [ 2, 6 ]], [[ 1, - 3 ], [ - 1, 3 ], [ 5, 1 ], [ - 3, - 5 ], [ - 5, 5 ], [ - 7, - 1 ], [ 3, 7 ], [ 7, - 7 ]], [[ 1, 1 ], [ - 1, - 3 ], [ - 3, 2 ], [ 4, - 1 ], [ - 5, - 2 ], [ 2, 5 ], [ 5, 3 ], [ 3, - 5 ], [ - 2, 6 ], [ 0, - 7 ], [ - 4, - 6 ], [ - 6, 4 ], [ - 8, 0 ], [ 7, - 4 ], [ 6, 7 ], [ - 7, - 8 ]], [[ - 4, - 7 ], [ - 7, - 5 ], [ - 3, - 5 ], [ - 5, - 4 ], [ - 1, - 4 ], [ - 2, - 2 ], [ - 6, - 1 ], [ - 4, 0 ], [ - 7, 1 ], [ - 1, 2 ], [ - 6, 3 ], [ - 3, 3 ], [ - 7, 6 ], [ - 3, 6 ], [ - 5, 7 ], [ - 1, 7 ], [ 5, - 7 ], [ 1, - 6 ], [ 6, - 5 ], [ 4, - 4 ], [ 2, - 3 ], [ 7, - 2 ], [ 1, - 1 ], [ 4, - 1 ], [ 2, 1 ], [ 6, 2 ], [ 0, 4 ], [ 4, 4 ], [ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]]];
 
-})));
+	THREE.TAARenderPass = TAARenderPass;
+
+} )();

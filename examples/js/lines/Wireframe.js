@@ -1,71 +1,53 @@
-/**
- * Generated from 'examples/jsm/lines/Wireframe.js'
- */
+( function () {
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/lines/LineSegmentsGeometry.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/lines/LineMaterial.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/lines/LineSegmentsGeometry.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/lines/LineMaterial.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, LineSegmentsGeometry_js, LineMaterial_js) { 'use strict';
+	const _start = new THREE.Vector3();
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
-	 */
+	const _end = new THREE.Vector3();
 
-	var Wireframe = function ( geometry, material ) {
+	class Wireframe extends THREE.Mesh {
 
-		THREE.Mesh.call( this );
+		constructor( geometry = new THREE.LineSegmentsGeometry(), material = new THREE.LineMaterial( {
+			color: Math.random() * 0xffffff
+		} ) ) {
 
-		this.type = 'Wireframe';
+			super( geometry, material );
+			this.type = 'Wireframe';
 
-		this.geometry = geometry !== undefined ? geometry : new LineSegmentsGeometry_js.LineSegmentsGeometry();
-		this.material = material !== undefined ? material : new LineMaterial_js.LineMaterial( { color: Math.random() * 0xffffff } );
+		} // for backwards-compatability, but could be a method of THREE.LineSegmentsGeometry...
 
-	};
 
-	Wireframe.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), {
+		computeLineDistances() {
 
-		constructor: Wireframe,
+			const geometry = this.geometry;
+			const instanceStart = geometry.attributes.instanceStart;
+			const instanceEnd = geometry.attributes.instanceEnd;
+			const lineDistances = new Float32Array( 2 * instanceStart.count );
 
-		isWireframe: true,
+			for ( let i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
-		computeLineDistances: ( function () { // for backwards-compatability, but could be a method of LineSegmentsGeometry...
+				_start.fromBufferAttribute( instanceStart, i );
 
-			var start = new THREE.Vector3();
-			var end = new THREE.Vector3();
+				_end.fromBufferAttribute( instanceEnd, i );
 
-			return function computeLineDistances() {
+				lineDistances[ j ] = j === 0 ? 0 : lineDistances[ j - 1 ];
+				lineDistances[ j + 1 ] = lineDistances[ j ] + _start.distanceTo( _end );
 
-				var geometry = this.geometry;
+			}
 
-				var instanceStart = geometry.attributes.instanceStart;
-				var instanceEnd = geometry.attributes.instanceEnd;
-				var lineDistances = new Float32Array( 2 * instanceStart.data.count );
+			const instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-				for ( var i = 0, j = 0, l = instanceStart.data.count; i < l; i ++, j += 2 ) {
+			geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
 
-					start.fromBufferAttribute( instanceStart, i );
-					end.fromBufferAttribute( instanceEnd, i );
+			geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
-					lineDistances[ j ] = ( j === 0 ) ? 0 : lineDistances[ j - 1 ];
-					lineDistances[ j + 1 ] = lineDistances[ j ] + start.distanceTo( end );
+			return this;
 
-				}
+		}
 
-				var instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
+	}
 
-				geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-				geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+	Wireframe.prototype.isWireframe = true;
 
-				return this;
+	THREE.Wireframe = Wireframe;
 
-			};
-
-		}() )
-
-	} );
-
-	exports.Wireframe = Wireframe;
-
-})));
+} )();
