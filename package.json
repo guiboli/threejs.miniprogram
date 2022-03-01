@@ -2,14 +2,15 @@
   "name": "three",
   "version": "0.110.0",
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "module": "build/three.module.js",
+  "main": "export/index.js",
+  "module": "export/index.js",
   "types": "src/Three.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
   "files": [
+    "export/index.js",
     "build/three.js",
     "build/three.min.js",
     "build/three.module.js",
