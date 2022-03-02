@@ -2,6 +2,7 @@ import babel from "@rollup/plugin-babel";
 import path from "path";
 import os from "os";
 import glob from "glob";
+import { terser } from "rollup-plugin-terser";
 import babelrc from "./.babelrc.json";
 
 const EOL = os.EOL;
@@ -192,6 +193,7 @@ export default files.map((file) => {
 			}),
 			babelCleanup(),
 			unmodularize(),
+			terser(),
 		],
 
 		output: {
