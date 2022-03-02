@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/bridge/MtlObjBridge.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/MTLLoader.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/MTLLoader.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, MTLLoader_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/MTLLoader.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/MTLLoader.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, MTLLoader_js ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -45,6 +49,7 @@
 				newMaterials = materialCreator.materials;
 
 			}
+
 			return newMaterials;
 
 		}
@@ -52,4 +57,4 @@
 
 	exports.MtlObjBridge = MtlObjBridge;
 
-})));
+} ) ) );

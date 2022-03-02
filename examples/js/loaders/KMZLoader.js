@@ -1,125 +1,172 @@
 ( function () {
 
-	class KMZLoader extends THREE.Loader {
+	( function ( global, factory ) {
 
-		constructor( manager ) {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( './ColladaLoader.js' ), require( '../libs/fflate.module.js' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', './ColladaLoader', '../libs/fflate.module' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
 
-			super( manager );
+	} )( this, ( function ( exports, three, ColladaLoader_js, fflate ) {
 
-		}
+		'use strict';
 
-		load( url, onLoad, onProgress, onError ) {
+		function _interopNamespace( e ) {
 
-			const scope = this;
-			const loader = new THREE.FileLoader( scope.manager );
-			loader.setPath( scope.path );
-			loader.setResponseType( 'arraybuffer' );
-			loader.setRequestHeader( scope.requestHeader );
-			loader.setWithCredentials( scope.withCredentials );
-			loader.load( url, function ( text ) {
+			if ( e && e.__esModule ) return e;
+			var n = Object.create( null );
+			if ( e ) {
 
-				try {
+				Object.keys( e ).forEach( function ( k ) {
 
-					onLoad( scope.parse( text ) );
+					if ( k !== 'default' ) {
 
-				} catch ( e ) {
+						var d = Object.getOwnPropertyDescriptor( e, k );
+						Object.defineProperty( n, k, d.get ? d : {
+							enumerable: true,
+							get: function () {
 
-					if ( onError ) {
+								return e[ k ];
 
-						onError( e );
-
-					} else {
-
-						console.error( e );
+							}
+						} );
 
 					}
 
-					scope.manager.itemError( url );
-
-				}
-
-			}, onProgress, onError );
-
-		}
-
-		parse( data ) {
-
-			function findFile( url ) {
-
-				for ( const path in zip ) {
-
-					if ( path.slice( - url.length ) === url ) {
-
-						return zip[ path ];
-
-					}
-
-				}
+				} );
 
 			}
 
-			const manager = new THREE.LoadingManager();
-			manager.setURLModifier( function ( url ) {
+			n[ 'default' ] = e;
+			return Object.freeze( n );
 
-				const image = findFile( url );
+		}
 
-				if ( image ) {
+		var fflate__namespace = /*#__PURE__*/_interopNamespace( fflate );
 
-					console.log( 'Loading', url );
-					const blob = new Blob( [ image.buffer ], {
-						type: 'application/octet-stream'
-					} );
-					return URL.createObjectURL( blob );
+		class KMZLoader extends three.Loader {
 
-				}
+	  constructor( manager ) {
 
-				return url;
+	    super( manager );
 
-			} ); //
+			}
 
-			const zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+	  load( url, onLoad, onProgress, onError ) {
 
-			if ( zip[ 'doc.kml' ] ) {
+	    const scope = this;
+	    const loader = new three.FileLoader( scope.manager );
+	    loader.setPath( scope.path );
+	    loader.setResponseType( 'arraybuffer' );
+	    loader.setRequestHeader( scope.requestHeader );
+	    loader.setWithCredentials( scope.withCredentials );
+	    loader.load( url, function ( text ) {
 
-				const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
+	      try {
 
-				const model = xml.querySelector( 'Placemark Model Link href' );
+	        onLoad( scope.parse( text ) );
 
-				if ( model ) {
+					} catch ( e ) {
 
-					const loader = new THREE.ColladaLoader( manager );
-					return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
+	        if ( onError ) {
 
-				}
+	          onError( e );
 
-			} else {
+						} else {
 
-				console.warn( 'KMZLoader: Missing doc.kml file.' );
+	          console.error( e );
 
-				for ( const path in zip ) {
+						}
 
-					const extension = path.split( '.' ).pop().toLowerCase();
+	        scope.manager.itemError( url );
 
-					if ( extension === 'dae' ) {
+					}
 
-						const loader = new THREE.ColladaLoader( manager );
-						return loader.parse( fflate.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
+				}, onProgress, onError );
+
+			}
+
+	  parse( data ) {
+
+	    function findFile( url ) {
+
+	      for ( const path in zip ) {
+
+	        if ( path.slice( - url.length ) === url ) {
+
+	          return zip[ path ];
+
+						}
 
 					}
 
 				}
 
-			}
+	    const manager = new three.LoadingManager();
+	    manager.setURLModifier( function ( url ) {
 
-			console.error( 'KMZLoader: Couldn\'t find .dae file.' );
-			return {
-				scene: new THREE.Group()
-			};
+	      const image = findFile( url );
+
+	      if ( image ) {
+
+	        console.log( 'Loading', url );
+	        const blob = new Blob( [ image.buffer ], {
+	          type: 'application/octet-stream'
+	        } );
+	        return URL.createObjectURL( blob );
+
+					}
+
+	      return url;
+
+				} ); //
+
+	    const zip = fflate__namespace.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+
+	    if ( zip[ 'doc.kml' ] ) {
+
+	      const xml = new DOMParser().parseFromString( fflate__namespace.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
+
+	      const model = xml.querySelector( 'Placemark Model Link href' );
+
+	      if ( model ) {
+
+	        const loader = new ColladaLoader_js.ColladaLoader( manager );
+	        return loader.parse( fflate__namespace.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
+
+					}
+
+				} else {
+
+	      console.warn( 'KMZLoader: Missing doc.kml file.' );
+
+	      for ( const path in zip ) {
+
+	        const extension = path.split( '.' ).pop().toLowerCase();
+
+	        if ( extension === 'dae' ) {
+
+	          const loader = new ColladaLoader_js.ColladaLoader( manager );
+	          return loader.parse( fflate__namespace.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
+
+						}
+
+					}
+
+				}
+
+	    console.error( 'KMZLoader: Couldn\'t find .dae file.' );
+	    return {
+	      scene: new three.Group()
+	    };
+
+			}
 
 		}
 
-	}
+		exports.KMZLoader = KMZLoader;
 
-	THREE.KMZLoader = KMZLoader;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/ExpressionNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, FunctionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, FunctionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -20,8 +24,8 @@
 
 	ExpressionNode.prototype = Object.create( FunctionNode_js.FunctionNode.prototype );
 	ExpressionNode.prototype.constructor = ExpressionNode;
-	ExpressionNode.prototype.nodeType = "Expression";
+	ExpressionNode.prototype.nodeType = 'Expression';
 
 	exports.ExpressionNode = ExpressionNode;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/materials/NodeMaterial.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/RawNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/RawNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, NodeBuilder_js, ColorNode_js, PositionNode_js, RawNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/RawNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/RawNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, NodeBuilder_js, ColorNode_js, PositionNode_js, RawNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -51,7 +55,7 @@
 
 	NodeMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 	NodeMaterial.prototype.constructor = NodeMaterial;
-	NodeMaterial.prototype.type = "NodeMaterial";
+	NodeMaterial.prototype.type = 'NodeMaterial';
 
 	NodeMaterial.prototype.isNodeMaterial = true;
 
@@ -168,7 +172,7 @@
 
 			meta.materials[ data.uuid ] = data;
 
-			if ( this.name !== "" ) data.name = this.name;
+			if ( this.name !== '' ) data.name = this.name;
 
 			if ( this.size !== undefined ) data.size = this.size;
 			if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
@@ -219,4 +223,4 @@
 
 	exports.NodeMaterial = NodeMaterial;
 
-})));
+} ) ) );

@@ -1,23 +1,33 @@
 ( function () {
 
-	/**
- * Pixelation shader
- */
-	const PixelShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'resolution': {
-				value: null
-			},
-			'pixelSize': {
-				value: 1
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Pixelation shader
+	 */
+		const PixelShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'resolution': {
+	      value: null
+	    },
+	    'pixelSize': {
+	      value: 1
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying highp vec2 vUv;
 
@@ -27,9 +37,9 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDiffuse;
 		uniform float pixelSize;
@@ -44,8 +54,12 @@
 			gl_FragColor = texture2D(tDiffuse, coord);
 
 		}`
-	};
+		};
 
-	THREE.PixelShader = PixelShader;
+		exports.PixelShader = PixelShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

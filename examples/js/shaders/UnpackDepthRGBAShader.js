@@ -1,21 +1,31 @@
 ( function () {
 
-	/**
- * Unpack RGBA depth shader
- * - show RGBA encoded depth as monochrome color
- */
-	const UnpackDepthRGBAShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'opacity': {
-				value: 1.0
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Unpack RGBA depth shader
+	 * - show RGBA encoded depth as monochrome color
+	 */
+		const UnpackDepthRGBAShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'opacity': {
+	      value: 1.0
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -25,9 +35,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform float opacity;
 
@@ -43,8 +53,12 @@
 			gl_FragColor = vec4( vec3( depth ), opacity );
 
 		}`
-	};
+		};
 
-	THREE.UnpackDepthRGBAShader = UnpackDepthRGBAShader;
+		exports.UnpackDepthRGBAShader = UnpackDepthRGBAShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

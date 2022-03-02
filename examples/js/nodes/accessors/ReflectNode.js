@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/accessors/ReflectNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, PositionNode_js, NormalNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, PositionNode_js, NormalNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -26,7 +30,7 @@
 
 	ReflectNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	ReflectNode.prototype.constructor = ReflectNode;
-	ReflectNode.prototype.nodeType = "Reflect";
+	ReflectNode.prototype.nodeType = 'Reflect';
 
 	ReflectNode.prototype.getUnique = function ( builder ) {
 
@@ -138,7 +142,7 @@
 
 		} else {
 
-			console.warn( "THREE.ReflectNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.ReflectNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec3( 0.0 )', this.type, output );
 
@@ -164,4 +168,4 @@
 
 	exports.ReflectNode = ReflectNode;
 
-})));
+} ) ) );

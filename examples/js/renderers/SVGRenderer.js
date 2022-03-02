@@ -1,254 +1,325 @@
 ( function () {
 
-	class SVGObject extends THREE.Object3D {
+	( function ( global, factory ) {
 
-		constructor( node ) {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( './Projector.js' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', './Projector' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
 
-			super();
-			this.node = node;
+	} )( this, ( function ( exports, three, Projector_js ) {
+
+		'use strict';
+
+		class SVGObject extends three.Object3D {
+
+	  constructor( node ) {
+
+	    super();
+	    this.node = node;
+
+			}
 
 		}
 
-	}
+		SVGObject.prototype.isSVGObject = true;
 
-	SVGObject.prototype.isSVGObject = true;
+		class SVGRenderer {
 
-	class SVGRenderer {
+	  constructor() {
 
-		constructor() {
+	    let _renderData,
+	        _elements,
+	        _lights,
+	        _svgWidth,
+	        _svgHeight,
+	        _svgWidthHalf,
+	        _svgHeightHalf,
+	        _v1,
+	        _v2,
+	        _v3,
+	        _svgNode,
+	        _pathCount = 0,
+	        _precision = null,
+	        _quality = 1,
+	        _currentPath,
+	        _currentStyle;
 
-			let _renderData,
-				_elements,
-				_lights,
-				_svgWidth,
-				_svgHeight,
-				_svgWidthHalf,
-				_svgHeightHalf,
-				_v1,
-				_v2,
-				_v3,
-				_svgNode,
-				_pathCount = 0,
-				_precision = null,
-				_quality = 1,
-				_currentPath,
-				_currentStyle;
+	    const _this = this,
+	          _clipBox = new three.Box2(),
+	          _elemBox = new three.Box2(),
+	          _color = new three.Color(),
+	          _diffuseColor = new three.Color(),
+	          _ambientLight = new three.Color(),
+	          _directionalLights = new three.Color(),
+	          _pointLights = new three.Color(),
+	          _clearColor = new three.Color(),
+	          _vector3 = new three.Vector3(),
+	          // Needed for PointLight
+	    _centroid = new three.Vector3(),
+	          _normal = new three.Vector3(),
+	          _normalViewMatrix = new three.Matrix3(),
+	          _viewMatrix = new three.Matrix4(),
+	          _viewProjectionMatrix = new three.Matrix4(),
+	          _svgPathPool = [],
+	          _projector = new Projector_js.Projector(),
+	          _svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 
-			const _this = this,
-				_clipBox = new THREE.Box2(),
-				_elemBox = new THREE.Box2(),
-				_color = new THREE.Color(),
-				_diffuseColor = new THREE.Color(),
-				_ambientLight = new THREE.Color(),
-				_directionalLights = new THREE.Color(),
-				_pointLights = new THREE.Color(),
-				_clearColor = new THREE.Color(),
-				_vector3 = new THREE.Vector3(),
-				// Needed for PointLight
-				_centroid = new THREE.Vector3(),
-				_normal = new THREE.Vector3(),
-				_normalViewMatrix = new THREE.Matrix3(),
-				_viewMatrix = new THREE.Matrix4(),
-				_viewProjectionMatrix = new THREE.Matrix4(),
-				_svgPathPool = [],
-				_projector = new THREE.Projector(),
-				_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+	    this.domElement = _svg;
+	    this.autoClear = true;
+	    this.sortObjects = true;
+	    this.sortElements = true;
+	    this.overdraw = 0.5;
+	    this.info = {
+	      render: {
+	        vertices: 0,
+	        faces: 0
+	      }
+	    };
 
-			this.domElement = _svg;
-			this.autoClear = true;
-			this.sortObjects = true;
-			this.sortElements = true;
-			this.overdraw = 0.5;
-			this.info = {
-				render: {
-					vertices: 0,
-					faces: 0
-				}
-			};
+	    this.setQuality = function ( quality ) {
 
-			this.setQuality = function ( quality ) {
+	      switch ( quality ) {
 
-				switch ( quality ) {
+	        case 'high':
+	          _quality = 1;
+	          break;
 
-					case 'high':
-						_quality = 1;
-						break;
+	        case 'low':
+	          _quality = 0;
+	          break;
 
-					case 'low':
-						_quality = 0;
-						break;
+					}
 
-				}
-
-			};
-
-			this.setClearColor = function ( color ) {
-
-				_clearColor.set( color );
-
-			};
-
-			this.setPixelRatio = function () {};
-
-			this.setSize = function ( width, height ) {
-
-				_svgWidth = width;
-				_svgHeight = height;
-				_svgWidthHalf = _svgWidth / 2;
-				_svgHeightHalf = _svgHeight / 2;
-
-				_svg.setAttribute( 'viewBox', - _svgWidthHalf + ' ' + - _svgHeightHalf + ' ' + _svgWidth + ' ' + _svgHeight );
-
-				_svg.setAttribute( 'width', _svgWidth );
-
-				_svg.setAttribute( 'height', _svgHeight );
-
-				_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
-
-				_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
-
-			};
-
-			this.getSize = function () {
-
-				return {
-					width: _svgWidth,
-					height: _svgHeight
 				};
 
-			};
+	    this.setClearColor = function ( color ) {
 
-			this.setPrecision = function ( precision ) {
+	      _clearColor.set( color );
 
-				_precision = precision;
+				};
 
-			};
+	    this.setPixelRatio = function () {};
 
-			function removeChildNodes() {
+	    this.setSize = function ( width, height ) {
 
-				_pathCount = 0;
+	      _svgWidth = width;
+	      _svgHeight = height;
+	      _svgWidthHalf = _svgWidth / 2;
+	      _svgHeightHalf = _svgHeight / 2;
 
-				while ( _svg.childNodes.length > 0 ) {
+	      _svg.setAttribute( 'viewBox', - _svgWidthHalf + ' ' + - _svgHeightHalf + ' ' + _svgWidth + ' ' + _svgHeight );
 
-					_svg.removeChild( _svg.childNodes[ 0 ] );
+	      _svg.setAttribute( 'width', _svgWidth );
+
+	      _svg.setAttribute( 'height', _svgHeight );
+
+	      _clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
+
+	      _clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
+
+				};
+
+	    this.getSize = function () {
+
+	      return {
+	        width: _svgWidth,
+	        height: _svgHeight
+	      };
+
+				};
+
+	    this.setPrecision = function ( precision ) {
+
+	      _precision = precision;
+
+				};
+
+	    function removeChildNodes() {
+
+	      _pathCount = 0;
+
+	      while ( _svg.childNodes.length > 0 ) {
+
+	        _svg.removeChild( _svg.childNodes[ 0 ] );
+
+					}
 
 				}
 
-			}
+	    function convert( c ) {
 
-			function convert( c ) {
-
-				return _precision !== null ? c.toFixed( _precision ) : c;
-
-			}
-
-			this.clear = function () {
-
-				removeChildNodes();
-				_svg.style.backgroundColor = _clearColor.getStyle();
-
-			};
-
-			this.render = function ( scene, camera ) {
-
-				if ( camera instanceof THREE.Camera === false ) {
-
-					console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
-					return;
+	      return _precision !== null ? c.toFixed( _precision ) : c;
 
 				}
 
-				const background = scene.background;
+	    this.clear = function () {
 
-				if ( background && background.isColor ) {
+	      removeChildNodes();
+	      _svg.style.backgroundColor = _clearColor.getStyle();
 
-					removeChildNodes();
-					_svg.style.backgroundColor = background.getStyle();
+				};
 
-				} else if ( this.autoClear === true ) {
+	    this.render = function ( scene, camera ) {
 
-					this.clear();
+	      if ( camera instanceof three.Camera === false ) {
 
-				}
+	        console.error( 'THREE.SVGRenderer.render: camera is not an instance of Camera.' );
+	        return;
 
-				_this.info.render.vertices = 0;
-				_this.info.render.faces = 0;
+					}
 
-				_viewMatrix.copy( camera.matrixWorldInverse );
+	      const background = scene.background;
 
-				_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+	      if ( background && background.isColor ) {
 
-				_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
-				_elements = _renderData.elements;
-				_lights = _renderData.lights;
+	        removeChildNodes();
+	        _svg.style.backgroundColor = background.getStyle();
 
-				_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
+					} else if ( this.autoClear === true ) {
 
-				calculateLights( _lights ); // reset accumulated path
+	        this.clear();
 
-				_currentPath = '';
-				_currentStyle = '';
+					}
 
-				for ( let e = 0, el = _elements.length; e < el; e ++ ) {
+	      _this.info.render.vertices = 0;
+	      _this.info.render.faces = 0;
 
-					const element = _elements[ e ];
-					const material = element.material;
-					if ( material === undefined || material.opacity === 0 ) continue;
+	      _viewMatrix.copy( camera.matrixWorldInverse );
 
-					_elemBox.makeEmpty();
+	      _viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-					if ( element instanceof THREE.RenderableSprite ) {
+	      _renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+	      _elements = _renderData.elements;
+	      _lights = _renderData.lights;
 
-						_v1 = element;
-						_v1.x *= _svgWidthHalf;
-						_v1.y *= - _svgHeightHalf;
-						renderSprite( _v1, element, material );
+	      _normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
 
-					} else if ( element instanceof THREE.RenderableLine ) {
+	      calculateLights( _lights ); // reset accumulated path
 
-						_v1 = element.v1;
-						_v2 = element.v2;
-						_v1.positionScreen.x *= _svgWidthHalf;
-						_v1.positionScreen.y *= - _svgHeightHalf;
-						_v2.positionScreen.x *= _svgWidthHalf;
-						_v2.positionScreen.y *= - _svgHeightHalf;
+	      _currentPath = '';
+	      _currentStyle = '';
 
-						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+	      for ( let e = 0, el = _elements.length; e < el; e ++ ) {
 
-						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+	        const element = _elements[ e ];
+	        const material = element.material;
+	        if ( material === undefined || material.opacity === 0 ) continue;
 
-							renderLine( _v1, _v2, material );
+	        _elemBox.makeEmpty();
+
+	        if ( element instanceof Projector_js.RenderableSprite ) {
+
+	          _v1 = element;
+	          _v1.x *= _svgWidthHalf;
+	          _v1.y *= - _svgHeightHalf;
+	          renderSprite( _v1, element, material );
+
+						} else if ( element instanceof Projector_js.RenderableLine ) {
+
+	          _v1 = element.v1;
+	          _v2 = element.v2;
+	          _v1.positionScreen.x *= _svgWidthHalf;
+	          _v1.positionScreen.y *= - _svgHeightHalf;
+	          _v2.positionScreen.x *= _svgWidthHalf;
+	          _v2.positionScreen.y *= - _svgHeightHalf;
+
+	          _elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+
+	          if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+	            renderLine( _v1, _v2, material );
+
+							}
+
+						} else if ( element instanceof Projector_js.RenderableFace ) {
+
+	          _v1 = element.v1;
+	          _v2 = element.v2;
+	          _v3 = element.v3;
+	          if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
+	          if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
+	          if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
+	          _v1.positionScreen.x *= _svgWidthHalf;
+	          _v1.positionScreen.y *= - _svgHeightHalf;
+	          _v2.positionScreen.x *= _svgWidthHalf;
+	          _v2.positionScreen.y *= - _svgHeightHalf;
+	          _v3.positionScreen.x *= _svgWidthHalf;
+	          _v3.positionScreen.y *= - _svgHeightHalf;
+
+	          if ( this.overdraw > 0 ) {
+
+	            expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
+	            expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
+	            expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
+
+							}
+
+	          _elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+
+	          if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+
+	            renderFace3( _v1, _v2, _v3, element, material );
+
+							}
 
 						}
 
-					} else if ( element instanceof THREE.RenderableFace ) {
+					}
 
-						_v1 = element.v1;
-						_v2 = element.v2;
-						_v3 = element.v3;
-						if ( _v1.positionScreen.z < - 1 || _v1.positionScreen.z > 1 ) continue;
-						if ( _v2.positionScreen.z < - 1 || _v2.positionScreen.z > 1 ) continue;
-						if ( _v3.positionScreen.z < - 1 || _v3.positionScreen.z > 1 ) continue;
-						_v1.positionScreen.x *= _svgWidthHalf;
-						_v1.positionScreen.y *= - _svgHeightHalf;
-						_v2.positionScreen.x *= _svgWidthHalf;
-						_v2.positionScreen.y *= - _svgHeightHalf;
-						_v3.positionScreen.x *= _svgWidthHalf;
-						_v3.positionScreen.y *= - _svgHeightHalf;
+	      flushPath(); // just to flush last svg:path
 
-						if ( this.overdraw > 0 ) {
+	      scene.traverseVisible( function ( object ) {
 
-							expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
-							expand( _v2.positionScreen, _v3.positionScreen, this.overdraw );
-							expand( _v3.positionScreen, _v1.positionScreen, this.overdraw );
+	        if ( object.isSVGObject ) {
+
+	          _vector3.setFromMatrixPosition( object.matrixWorld );
+
+	          _vector3.applyMatrix4( _viewProjectionMatrix );
+
+	          if ( _vector3.z < - 1 || _vector3.z > 1 ) return;
+	          const x = _vector3.x * _svgWidthHalf;
+	          const y = - _vector3.y * _svgHeightHalf;
+	          const node = object.node;
+	          node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+
+	          _svg.appendChild( node );
 
 						}
 
-						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+					} );
 
-						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
+				};
 
-							renderFace3( _v1, _v2, _v3, element, material );
+	    function calculateLights( lights ) {
+
+	      _ambientLight.setRGB( 0, 0, 0 );
+
+	      _directionalLights.setRGB( 0, 0, 0 );
+
+	      _pointLights.setRGB( 0, 0, 0 );
+
+	      for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
+
+	        const light = lights[ l ];
+	        const lightColor = light.color;
+
+	        if ( light.isAmbientLight ) {
+
+	          _ambientLight.r += lightColor.r;
+	          _ambientLight.g += lightColor.g;
+	          _ambientLight.b += lightColor.b;
+
+						} else if ( light.isDirectionalLight ) {
+
+	          _directionalLights.r += lightColor.r;
+	          _directionalLights.g += lightColor.g;
+	          _directionalLights.b += lightColor.b;
+
+						} else if ( light.isPointLight ) {
+
+	          _pointLights.r += lightColor.r;
+	          _pointLights.g += lightColor.g;
+	          _pointLights.b += lightColor.b;
 
 						}
 
@@ -256,283 +327,226 @@
 
 				}
 
-				flushPath(); // just to flush last svg:path
+	    function calculateLight( lights, position, normal, color ) {
 
-				scene.traverseVisible( function ( object ) {
+	      for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
 
-					if ( object.isSVGObject ) {
+	        const light = lights[ l ];
+	        const lightColor = light.color;
 
-						_vector3.setFromMatrixPosition( object.matrixWorld );
+	        if ( light.isDirectionalLight ) {
 
-						_vector3.applyMatrix4( _viewProjectionMatrix );
+	          const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
 
-						if ( _vector3.z < - 1 || _vector3.z > 1 ) return;
-						const x = _vector3.x * _svgWidthHalf;
-						const y = - _vector3.y * _svgHeightHalf;
-						const node = object.node;
-						node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
+	          let amount = normal.dot( lightPosition );
+	          if ( amount <= 0 ) continue;
+	          amount *= light.intensity;
+	          color.r += lightColor.r * amount;
+	          color.g += lightColor.g * amount;
+	          color.b += lightColor.b * amount;
 
-						_svg.appendChild( node );
+						} else if ( light.isPointLight ) {
 
-					}
+	          const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
-				} );
+	          let amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+	          if ( amount <= 0 ) continue;
+	          amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
+	          if ( amount == 0 ) continue;
+	          amount *= light.intensity;
+	          color.r += lightColor.r * amount;
+	          color.g += lightColor.g * amount;
+	          color.b += lightColor.b * amount;
 
-			};
-
-			function calculateLights( lights ) {
-
-				_ambientLight.setRGB( 0, 0, 0 );
-
-				_directionalLights.setRGB( 0, 0, 0 );
-
-				_pointLights.setRGB( 0, 0, 0 );
-
-				for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
-
-					const light = lights[ l ];
-					const lightColor = light.color;
-
-					if ( light.isAmbientLight ) {
-
-						_ambientLight.r += lightColor.r;
-						_ambientLight.g += lightColor.g;
-						_ambientLight.b += lightColor.b;
-
-					} else if ( light.isDirectionalLight ) {
-
-						_directionalLights.r += lightColor.r;
-						_directionalLights.g += lightColor.g;
-						_directionalLights.b += lightColor.b;
-
-					} else if ( light.isPointLight ) {
-
-						_pointLights.r += lightColor.r;
-						_pointLights.g += lightColor.g;
-						_pointLights.b += lightColor.b;
+						}
 
 					}
 
 				}
 
-			}
+	    function renderSprite( v1, element, material ) {
 
-			function calculateLight( lights, position, normal, color ) {
+	      let scaleX = element.scale.x * _svgWidthHalf;
+	      let scaleY = element.scale.y * _svgHeightHalf;
 
-				for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
+	      if ( material.isPointsMaterial ) {
 
-					const light = lights[ l ];
-					const lightColor = light.color;
+	        scaleX *= material.size;
+	        scaleY *= material.size;
 
-					if ( light.isDirectionalLight ) {
+					}
 
-						const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
+	      const path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert( - scaleX ) + 'z';
+	      let style = '';
 
-						let amount = normal.dot( lightPosition );
-						if ( amount <= 0 ) continue;
-						amount *= light.intensity;
-						color.r += lightColor.r * amount;
-						color.g += lightColor.g * amount;
-						color.b += lightColor.b * amount;
+	      if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-					} else if ( light.isPointLight ) {
+	        style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
 
-						const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
+					}
 
-						let amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
-						if ( amount <= 0 ) continue;
-						amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
-						if ( amount == 0 ) continue;
-						amount *= light.intensity;
-						color.r += lightColor.r * amount;
-						color.g += lightColor.g * amount;
-						color.b += lightColor.b * amount;
+	      addPath( style, path );
+
+				}
+
+	    function renderLine( v1, v2, material ) {
+
+	      const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
+
+	      if ( material.isLineBasicMaterial ) {
+
+	        let style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+
+	        if ( material.isLineDashedMaterial ) {
+
+	          style = style + ';stroke-dasharray:' + material.dashSize + ',' + material.gapSize;
+
+						}
+
+	        addPath( style, path );
 
 					}
 
 				}
 
-			}
+	    function renderFace3( v1, v2, v3, element, material ) {
 
-			function renderSprite( v1, element, material ) {
+	      _this.info.render.vertices += 3;
+	      _this.info.render.faces ++;
+	      const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y ) + 'L' + convert( v3.positionScreen.x ) + ',' + convert( v3.positionScreen.y ) + 'z';
+	      let style = '';
 
-				let scaleX = element.scale.x * _svgWidthHalf;
-				let scaleY = element.scale.y * _svgHeightHalf;
+	      if ( material.isMeshBasicMaterial ) {
 
-				if ( material.isPointsMaterial ) {
+	        _color.copy( material.color );
 
-					scaleX *= material.size;
-					scaleY *= material.size;
+	        if ( material.vertexColors ) {
 
-				}
+	          _color.multiply( element.color );
 
-				const path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert( - scaleX ) + 'z';
-				let style = '';
+						}
 
-				if ( material.isSpriteMaterial || material.isPointsMaterial ) {
+					} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial ) {
 
-					style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
+	        _diffuseColor.copy( material.color );
 
-				}
+	        if ( material.vertexColors ) {
 
-				addPath( style, path );
+	          _diffuseColor.multiply( element.color );
 
-			}
+						}
 
-			function renderLine( v1, v2, material ) {
+	        _color.copy( _ambientLight );
 
-				const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
+	        _centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
 
-				if ( material.isLineBasicMaterial ) {
+	        calculateLight( _lights, _centroid, element.normalModel, _color );
 
-					let style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+	        _color.multiply( _diffuseColor ).add( material.emissive );
 
-					if ( material.isLineDashedMaterial ) {
+					} else if ( material.isMeshNormalMaterial ) {
 
-						style = style + ';stroke-dasharray:' + material.dashSize + ',' + material.gapSize;
+	        _normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
 
-					}
-
-					addPath( style, path );
-
-				}
-
-			}
-
-			function renderFace3( v1, v2, v3, element, material ) {
-
-				_this.info.render.vertices += 3;
-				_this.info.render.faces ++;
-				const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y ) + 'L' + convert( v3.positionScreen.x ) + ',' + convert( v3.positionScreen.y ) + 'z';
-				let style = '';
-
-				if ( material.isMeshBasicMaterial ) {
-
-					_color.copy( material.color );
-
-					if ( material.vertexColors ) {
-
-						_color.multiply( element.color );
+	        _color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 					}
 
-				} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial ) {
+	      if ( material.wireframe ) {
 
-					_diffuseColor.copy( material.color );
+	        style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
-					if ( material.vertexColors ) {
+					} else {
 
-						_diffuseColor.multiply( element.color );
-
-					}
-
-					_color.copy( _ambientLight );
-
-					_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
-
-					calculateLight( _lights, _centroid, element.normalModel, _color );
-
-					_color.multiply( _diffuseColor ).add( material.emissive );
-
-				} else if ( material.isMeshNormalMaterial ) {
-
-					_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
-
-					_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				}
-
-				if ( material.wireframe ) {
-
-					style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
-
-				} else {
-
-					style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
-
-				}
-
-				addPath( style, path );
-
-			} // Hide anti-alias gaps
-
-
-			function expand( v1, v2, pixels ) {
-
-				let x = v2.x - v1.x,
-					y = v2.y - v1.y;
-				const det = x * x + y * y;
-				if ( det === 0 ) return;
-				const idet = pixels / Math.sqrt( det );
-				x *= idet;
-				y *= idet;
-				v2.x += x;
-				v2.y += y;
-				v1.x -= x;
-				v1.y -= y;
-
-			}
-
-			function addPath( style, path ) {
-
-				if ( _currentStyle === style ) {
-
-					_currentPath += path;
-
-				} else {
-
-					flushPath();
-					_currentStyle = style;
-					_currentPath = path;
-
-				}
-
-			}
-
-			function flushPath() {
-
-				if ( _currentPath ) {
-
-					_svgNode = getPathNode( _pathCount ++ );
-
-					_svgNode.setAttribute( 'd', _currentPath );
-
-					_svgNode.setAttribute( 'style', _currentStyle );
-
-					_svg.appendChild( _svgNode );
-
-				}
-
-				_currentPath = '';
-				_currentStyle = '';
-
-			}
-
-			function getPathNode( id ) {
-
-				if ( _svgPathPool[ id ] == null ) {
-
-					_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-
-					if ( _quality == 0 ) {
-
-						_svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
+	        style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
 
 					}
 
-					return _svgPathPool[ id ];
+	      addPath( style, path );
+
+				} // Hide anti-alias gaps
+
+
+	    function expand( v1, v2, pixels ) {
+
+	      let x = v2.x - v1.x,
+	          y = v2.y - v1.y;
+	      const det = x * x + y * y;
+	      if ( det === 0 ) return;
+	      const idet = pixels / Math.sqrt( det );
+	      x *= idet;
+	      y *= idet;
+	      v2.x += x;
+	      v2.y += y;
+	      v1.x -= x;
+	      v1.y -= y;
 
 				}
 
-				return _svgPathPool[ id ];
+	    function addPath( style, path ) {
+
+	      if ( _currentStyle === style ) {
+
+	        _currentPath += path;
+
+					} else {
+
+	        flushPath();
+	        _currentStyle = style;
+	        _currentPath = path;
+
+					}
+
+				}
+
+	    function flushPath() {
+
+	      if ( _currentPath ) {
+
+	        _svgNode = getPathNode( _pathCount ++ );
+
+	        _svgNode.setAttribute( 'd', _currentPath );
+
+	        _svgNode.setAttribute( 'style', _currentStyle );
+
+	        _svg.appendChild( _svgNode );
+
+					}
+
+	      _currentPath = '';
+	      _currentStyle = '';
+
+				}
+
+	    function getPathNode( id ) {
+
+	      if ( _svgPathPool[ id ] == null ) {
+
+	        _svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+
+	        if ( _quality == 0 ) {
+
+	          _svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
+
+	        }
+
+	        return _svgPathPool[ id ];
+
+					}
+
+	      return _svgPathPool[ id ];
+
+				}
 
 			}
 
 		}
 
-	}
+		exports.SVGObject = SVGObject;
+		exports.SVGRenderer = SVGRenderer;
 
-	THREE.SVGObject = SVGObject;
-	THREE.SVGRenderer = SVGRenderer;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

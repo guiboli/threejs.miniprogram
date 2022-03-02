@@ -1,362 +1,376 @@
 ( function () {
 
-	class HTMLMesh extends THREE.Mesh {
+	( function ( global, factory ) {
 
-		constructor( dom ) {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-			const texture = new HTMLTexture( dom );
-			const geometry = new THREE.PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
-			const material = new THREE.MeshBasicMaterial( {
-				map: texture,
-				toneMapped: false
-			} );
-			super( geometry, material );
+	} )( this, ( function ( exports, three ) {
 
-			function onEvent( event ) {
+		'use strict';
 
-				material.map.dispatchDOMEvent( event );
+		class HTMLMesh extends three.Mesh {
 
-			}
+	  constructor( dom ) {
 
-			this.addEventListener( 'mousedown', onEvent );
-			this.addEventListener( 'mousemove', onEvent );
-			this.addEventListener( 'mouseup', onEvent );
-			this.addEventListener( 'click', onEvent );
+	    const texture = new HTMLTexture( dom );
+	    const geometry = new three.PlaneGeometry( texture.image.width * 0.001, texture.image.height * 0.001 );
+	    const material = new three.MeshBasicMaterial( {
+	      map: texture,
+	      toneMapped: false
+	    } );
+	    super( geometry, material );
 
-			this.dispose = function () {
+	    function onEvent( event ) {
 
-				geometry.dispose();
-				material.dispose();
-				material.map.dispose();
-				this.removeEventListener( 'mousedown', onEvent );
-				this.removeEventListener( 'mousemove', onEvent );
-				this.removeEventListener( 'mouseup', onEvent );
-				this.removeEventListener( 'click', onEvent );
-
-			};
-
-		}
-
-	}
-
-	class HTMLTexture extends THREE.CanvasTexture {
-
-		constructor( dom ) {
-
-			super( html2canvas( dom ) );
-			this.dom = dom;
-			this.anisotropy = 16;
-			this.encoding = THREE.sRGBEncoding;
-			this.minFilter = THREE.LinearFilter;
-			this.magFilter = THREE.LinearFilter; // Create an observer on the DOM, and run html2canvas update in the next loop
-
-			const observer = new MutationObserver( () => {
-
-				if ( ! this.scheduleUpdate ) {
-
-					// ideally should use xr.requestAnimationFrame, here setTimeout to avoid passing the renderer
-					this.scheduleUpdate = setTimeout( () => this.update(), 16 );
+	      material.map.dispatchDOMEvent( event );
 
 				}
 
-			} );
-			const config = {
-				attributes: true,
-				childList: true,
-				subtree: true,
-				characterData: true
-			};
-			observer.observe( dom, config );
-			this.observer = observer;
+	    this.addEventListener( 'mousedown', onEvent );
+	    this.addEventListener( 'mousemove', onEvent );
+	    this.addEventListener( 'mouseup', onEvent );
+	    this.addEventListener( 'click', onEvent );
 
-		}
+	    this.dispose = function () {
 
-		dispatchDOMEvent( event ) {
+	      geometry.dispose();
+	      material.dispose();
+	      material.map.dispose();
+	      this.removeEventListener( 'mousedown', onEvent );
+	      this.removeEventListener( 'mousemove', onEvent );
+	      this.removeEventListener( 'mouseup', onEvent );
+	      this.removeEventListener( 'click', onEvent );
 
-			if ( event.data ) {
-
-				htmlevent( this.dom, event.type, event.data.x, event.data.y );
-
-			}
-
-		}
-
-		update() {
-
-			this.image = html2canvas( this.dom );
-			this.needsUpdate = true;
-			this.scheduleUpdate = null;
-
-		}
-
-		dispose() {
-
-			if ( this.observer ) {
-
-				this.observer.disconnect();
+				};
 
 			}
 
-			this.scheduleUpdate = clearTimeout( this.scheduleUpdate );
-			super.dispose();
-
 		}
 
-	} //
+		class HTMLTexture extends three.CanvasTexture {
 
+	  constructor( dom ) {
 
-	const canvases = new WeakMap();
+	    super( html2canvas( dom ) );
+	    this.dom = dom;
+	    this.anisotropy = 16;
+	    this.encoding = three.sRGBEncoding;
+	    this.minFilter = three.LinearFilter;
+	    this.magFilter = three.LinearFilter; // Create an observer on the DOM, and run html2canvas update in the next loop
 
-	function html2canvas( element ) {
+	    const observer = new MutationObserver( () => {
 
-		const range = document.createRange();
+	      if ( ! this.scheduleUpdate ) {
 
-		function Clipper( context ) {
+	        // ideally should use xr.requestAnimationFrame, here setTimeout to avoid passing the renderer
+	        this.scheduleUpdate = setTimeout( () => this.update(), 16 );
 
-			const clips = [];
-			let isClipping = false;
+					}
 
-			function doClip() {
+				} );
+	    const config = {
+	      attributes: true,
+	      childList: true,
+	      subtree: true,
+	      characterData: true
+	    };
+	    observer.observe( dom, config );
+	    this.observer = observer;
 
-				if ( isClipping ) {
+			}
 
-					isClipping = false;
-					context.restore();
+	  dispatchDOMEvent( event ) {
+
+	    if ( event.data ) {
+
+	      htmlevent( this.dom, event.type, event.data.x, event.data.y );
 
 				}
 
-				if ( clips.length === 0 ) return;
-				let minX = - Infinity,
-					minY = - Infinity;
-				let maxX = Infinity,
-					maxY = Infinity;
+			}
 
-				for ( let i = 0; i < clips.length; i ++ ) {
+	  update() {
 
-					const clip = clips[ i ];
-					minX = Math.max( minX, clip.x );
-					minY = Math.max( minY, clip.y );
-					maxX = Math.min( maxX, clip.x + clip.width );
-					maxY = Math.min( maxY, clip.y + clip.height );
-
-				}
-
-				context.save();
-				context.beginPath();
-				context.rect( minX, minY, maxX - minX, maxY - minY );
-				context.clip();
-				isClipping = true;
+	    this.image = html2canvas( this.dom );
+	    this.needsUpdate = true;
+	    this.scheduleUpdate = null;
 
 			}
 
-			return {
-				add: function ( clip ) {
+	  dispose() {
 
-					clips.push( clip );
-					doClip();
+	    if ( this.observer ) {
 
-				},
-				remove: function () {
-
-					clips.pop();
-					doClip();
-
-				}
-			};
-
-		}
-
-		function drawText( style, x, y, string ) {
-
-			if ( string !== '' ) {
-
-				if ( style.textTransform === 'uppercase' ) {
-
-					string = string.toUpperCase();
+	      this.observer.disconnect();
 
 				}
 
-				context.font = style.fontSize + ' ' + style.fontFamily;
-				context.textBaseline = 'top';
-				context.fillStyle = style.color;
-				context.fillText( string, x, y );
+	    this.scheduleUpdate = clearTimeout( this.scheduleUpdate );
+	    super.dispose();
 
 			}
 
-		}
+		} //
 
-		function drawBorder( style, which, x, y, width, height ) {
 
-			const borderWidth = style[ which + 'Width' ];
-			const borderStyle = style[ which + 'Style' ];
-			const borderColor = style[ which + 'Color' ];
+		const canvases = new WeakMap();
 
-			if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
+		function html2canvas( element ) {
 
-				context.strokeStyle = borderColor;
-				context.beginPath();
-				context.moveTo( x, y );
-				context.lineTo( x + width, y + height );
-				context.stroke();
+	  const range = document.createRange();
+
+	  function Clipper( context ) {
+
+	    const clips = [];
+	    let isClipping = false;
+
+	    function doClip() {
+
+	      if ( isClipping ) {
+
+	        isClipping = false;
+	        context.restore();
+
+					}
+
+	      if ( clips.length === 0 ) return;
+	      let minX = - Infinity,
+	          minY = - Infinity;
+	      let maxX = Infinity,
+	          maxY = Infinity;
+
+	      for ( let i = 0; i < clips.length; i ++ ) {
+
+	        const clip = clips[ i ];
+	        minX = Math.max( minX, clip.x );
+	        minY = Math.max( minY, clip.y );
+	        maxX = Math.min( maxX, clip.x + clip.width );
+	        maxY = Math.min( maxY, clip.y + clip.height );
+
+					}
+
+	      context.save();
+	      context.beginPath();
+	      context.rect( minX, minY, maxX - minX, maxY - minY );
+	      context.clip();
+	      isClipping = true;
+
+				}
+
+	    return {
+	      add: function ( clip ) {
+
+	        clips.push( clip );
+	        doClip();
+
+					},
+	      remove: function () {
+
+	        clips.pop();
+	        doClip();
+
+					}
+	    };
 
 			}
 
-		}
+	  function drawText( style, x, y, string ) {
 
-		function drawElement( element, style ) {
+	    if ( string !== '' ) {
 
-			let x = 0,
-				y = 0,
-				width = 0,
-				height = 0;
+	      if ( style.textTransform === 'uppercase' ) {
 
-			if ( element.nodeType === 3 ) {
+	        string = string.toUpperCase();
 
-				// text
-				range.selectNode( element );
-				const rect = range.getBoundingClientRect();
-				x = rect.left - offset.left - 0.5;
-				y = rect.top - offset.top - 0.5;
-				width = rect.width;
-				height = rect.height;
-				drawText( style, x, y, element.nodeValue.trim() );
+					}
 
-			} else if ( element instanceof HTMLCanvasElement ) {
+	      context.font = style.fontSize + ' ' + style.fontFamily;
+	      context.textBaseline = 'top';
+	      context.fillStyle = style.color;
+	      context.fillText( string, x, y );
 
-				// Canvas element
-				if ( element.style.display === 'none' ) return;
-				context.save();
-				const dpr = window.devicePixelRatio;
-				context.scale( 1 / dpr, 1 / dpr );
-				context.drawImage( element, 0, 0 );
-				context.restore();
+				}
+
+			}
+
+	  function drawBorder( style, which, x, y, width, height ) {
+
+	    const borderWidth = style[ which + 'Width' ];
+	    const borderStyle = style[ which + 'Style' ];
+	    const borderColor = style[ which + 'Color' ];
+
+	    if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
+
+	      context.strokeStyle = borderColor;
+	      context.beginPath();
+	      context.moveTo( x, y );
+	      context.lineTo( x + width, y + height );
+	      context.stroke();
+
+				}
+
+			}
+
+	  function drawElement( element, style ) {
+
+	    let x = 0,
+	        y = 0,
+	        width = 0,
+	        height = 0;
+
+	    if ( element.nodeType === 3 ) {
+
+	      // text
+	      range.selectNode( element );
+	      const rect = range.getBoundingClientRect();
+	      x = rect.left - offset.left - 0.5;
+	      y = rect.top - offset.top - 0.5;
+	      width = rect.width;
+	      height = rect.height;
+	      drawText( style, x, y, element.nodeValue.trim() );
+
+				} else if ( element instanceof HTMLCanvasElement ) {
+
+	      // Canvas element
+	      if ( element.style.display === 'none' ) return;
+	      context.save();
+	      const dpr = window.devicePixelRatio;
+	      context.scale( 1 / dpr, 1 / dpr );
+	      context.drawImage( element, 0, 0 );
+	      context.restore();
+
+				} else {
+
+	      if ( element.style.display === 'none' ) return;
+	      const rect = element.getBoundingClientRect();
+	      x = rect.left - offset.left - 0.5;
+	      y = rect.top - offset.top - 0.5;
+	      width = rect.width;
+	      height = rect.height;
+	      style = window.getComputedStyle( element );
+	      const backgroundColor = style.backgroundColor;
+
+	      if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
+
+	        context.fillStyle = backgroundColor;
+	        context.fillRect( x, y, width, height );
+
+					}
+
+	      drawBorder( style, 'borderTop', x, y, width, 0 );
+	      drawBorder( style, 'borderLeft', x, y, 0, height );
+	      drawBorder( style, 'borderBottom', x, y + height, width, 0 );
+	      drawBorder( style, 'borderRight', x + width, y, 0, height );
+
+	      if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
+
+	        clipper.add( {
+	          x: x,
+	          y: y,
+	          width: width,
+	          height: height
+	        } );
+	        drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
+	        clipper.remove();
+
+					}
+
+				}
+	    /*
+	    // debug
+	    context.strokeStyle = '#' + Math.random().toString( 16 ).slice( - 3 );
+	    context.strokeRect( x - 0.5, y - 0.5, width + 1, height + 1 );
+	    */
+
+
+	    const isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
+	    if ( isClipping ) clipper.add( {
+	      x: x,
+	      y: y,
+	      width: width,
+	      height: height
+	    } );
+
+	    for ( let i = 0; i < element.childNodes.length; i ++ ) {
+
+	      drawElement( element.childNodes[ i ], style );
+
+				}
+
+	    if ( isClipping ) clipper.remove();
+
+			}
+
+	  const offset = element.getBoundingClientRect();
+	  let canvas;
+
+	  if ( canvases.has( element ) ) {
+
+	    canvas = canvases.get( element );
 
 			} else {
 
-				if ( element.style.display === 'none' ) return;
-				const rect = element.getBoundingClientRect();
-				x = rect.left - offset.left - 0.5;
-				y = rect.top - offset.top - 0.5;
-				width = rect.width;
-				height = rect.height;
-				style = window.getComputedStyle( element );
-				const backgroundColor = style.backgroundColor;
-
-				if ( backgroundColor !== 'transparent' && backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
-
-					context.fillStyle = backgroundColor;
-					context.fillRect( x, y, width, height );
-
-				}
-
-				drawBorder( style, 'borderTop', x, y, width, 0 );
-				drawBorder( style, 'borderLeft', x, y, 0, height );
-				drawBorder( style, 'borderBottom', x, y + height, width, 0 );
-				drawBorder( style, 'borderRight', x + width, y, 0, height );
-
-				if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
-
-					clipper.add( {
-						x: x,
-						y: y,
-						width: width,
-						height: height
-					} );
-					drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
-					clipper.remove();
-
-				}
-
-			}
-			/*
-    // debug
-    context.strokeStyle = '#' + Math.random().toString( 16 ).slice( - 3 );
-    context.strokeRect( x - 0.5, y - 0.5, width + 1, height + 1 );
-    */
-
-
-			const isClipping = style.overflow === 'auto' || style.overflow === 'hidden';
-			if ( isClipping ) clipper.add( {
-				x: x,
-				y: y,
-				width: width,
-				height: height
-			} );
-
-			for ( let i = 0; i < element.childNodes.length; i ++ ) {
-
-				drawElement( element.childNodes[ i ], style );
+	    canvas = document.createElement( 'canvas' );
+	    canvas.width = offset.width;
+	    canvas.height = offset.height;
 
 			}
 
-			if ( isClipping ) clipper.remove();
+	  const context = canvas.getContext( '2d'
+	  /*, { alpha: false }*/
+	  );
+	  const clipper = new Clipper( context ); // console.time( 'drawElement' );
+
+	  drawElement( element ); // console.timeEnd( 'drawElement' );
+
+	  return canvas;
 
 		}
 
-		const offset = element.getBoundingClientRect();
-		let canvas;
+		function htmlevent( element, event, x, y ) {
 
-		if ( canvases.has( element ) ) {
+	  const mouseEventInit = {
+	    clientX: x * element.offsetWidth + element.offsetLeft,
+	    clientY: y * element.offsetHeight + element.offsetTop,
+	    view: element.ownerDocument.defaultView
+	  };
+	  window.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
+	  const rect = element.getBoundingClientRect();
+	  x = x * rect.width + rect.left;
+	  y = y * rect.height + rect.top;
 
-			canvas = canvases.get( element );
+	  function traverse( element ) {
 
-		} else {
+	    if ( element.nodeType !== 3 ) {
 
-			canvas = document.createElement( 'canvas' );
-			canvas.width = offset.width;
-			canvas.height = offset.height;
+	      const rect = element.getBoundingClientRect();
 
-		}
+	      if ( x > rect.left && x < rect.right && y > rect.top && y < rect.bottom ) {
 
-		const context = canvas.getContext( '2d'
-			/*, { alpha: false }*/
-		);
-		const clipper = new Clipper( context ); // console.time( 'drawElement' );
+	        element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
-		drawElement( element ); // console.timeEnd( 'drawElement' );
+					}
 
-		return canvas;
+	      for ( let i = 0; i < element.childNodes.length; i ++ ) {
 
-	}
+	        traverse( element.childNodes[ i ] );
 
-	function htmlevent( element, event, x, y ) {
-
-		const mouseEventInit = {
-			clientX: x * element.offsetWidth + element.offsetLeft,
-			clientY: y * element.offsetHeight + element.offsetTop,
-			view: element.ownerDocument.defaultView
-		};
-		window.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
-		const rect = element.getBoundingClientRect();
-		x = x * rect.width + rect.left;
-		y = y * rect.height + rect.top;
-
-		function traverse( element ) {
-
-			if ( element.nodeType !== 3 ) {
-
-				const rect = element.getBoundingClientRect();
-
-				if ( x > rect.left && x < rect.right && y > rect.top && y < rect.bottom ) {
-
-					element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
-
-				}
-
-				for ( let i = 0; i < element.childNodes.length; i ++ ) {
-
-					traverse( element.childNodes[ i ] );
+					}
 
 				}
 
 			}
 
+	  traverse( element );
+
 		}
 
-		traverse( element );
+		exports.HTMLMesh = HTMLMesh;
 
-	}
+		Object.defineProperty( exports, '__esModule', { value: true } );
 
-	THREE.HTMLMesh = HTMLMesh;
+	} ) );
 
 } )();

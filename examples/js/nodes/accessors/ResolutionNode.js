@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/accessors/ResolutionNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Vector2Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, Vector2Node_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,7 +26,7 @@
 
 	ResolutionNode.prototype = Object.create( Vector2Node_js.Vector2Node.prototype );
 	ResolutionNode.prototype.constructor = ResolutionNode;
-	ResolutionNode.prototype.nodeType = "Resolution";
+	ResolutionNode.prototype.nodeType = 'Resolution';
 
 	ResolutionNode.prototype.updateFrame = function ( frame ) {
 
@@ -37,7 +41,7 @@
 
 		} else {
 
-			console.warn( "ResolutionNode need a renderer in NodeFrame" );
+			console.warn( 'ResolutionNode need a renderer in NodeFrame' );
 
 		}
 
@@ -71,4 +75,4 @@
 
 	exports.ResolutionNode = ResolutionNode;
 
-})));
+} ) ) );

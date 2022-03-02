@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/ConstNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, TempNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -31,7 +35,7 @@
 
 	ConstNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	ConstNode.prototype.constructor = ConstNode;
-	ConstNode.prototype.nodeType = "Const";
+	ConstNode.prototype.nodeType = 'Const';
 
 	ConstNode.prototype.getType = function ( builder ) {
 
@@ -43,7 +47,7 @@
 
 		this.src = src || '';
 
-		var name, type, value = "";
+		var name, type, value = '';
 
 		var match = this.src.match( declarationRegexp );
 
@@ -134,4 +138,4 @@
 
 	exports.ConstNode = ConstNode;
 
-})));
+} ) ) );

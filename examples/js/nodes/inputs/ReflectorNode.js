@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/ReflectorNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix4Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix4Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, InputNode_js, PositionNode_js, OperatorNode_js, TextureNode_js, Matrix4Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix4Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix4Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, InputNode_js, PositionNode_js, OperatorNode_js, TextureNode_js, Matrix4Node_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,7 +26,7 @@
 
 	ReflectorNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	ReflectorNode.prototype.constructor = ReflectorNode;
-	ReflectorNode.prototype.nodeType = "Reflector";
+	ReflectorNode.prototype.nodeType = 'Reflector';
 
 	ReflectorNode.prototype.setMirror = function ( mirror ) {
 
@@ -56,7 +60,7 @@
 
 		} else {
 
-			console.warn( "THREE.ReflectorNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.ReflectorNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec4( 0.0 )', this.type, output );
 
@@ -94,4 +98,4 @@
 
 	exports.ReflectorNode = ReflectorNode;
 
-})));
+} ) ) );

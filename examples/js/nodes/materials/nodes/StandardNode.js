@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/materials/nodes/StandardNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SpecularMIPLevelNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SpecularMIPLevelNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Node_js, ExpressionNode_js, ColorNode_js, FloatNode_js, SpecularMIPLevelNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SpecularMIPLevelNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ColorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SpecularMIPLevelNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, Node_js, ExpressionNode_js, ColorNode_js, FloatNode_js, SpecularMIPLevelNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -26,7 +30,7 @@
 
 	StandardNode.prototype = Object.create( Node_js.Node.prototype );
 	StandardNode.prototype.constructor = StandardNode;
-	StandardNode.prototype.nodeType = "Standard";
+	StandardNode.prototype.nodeType = 'Standard';
 
 	StandardNode.prototype.build = function ( builder ) {
 
@@ -67,64 +71,64 @@
 			}
 
 			builder.addParsCode( [
-				"varying vec3 vViewPosition;",
+				'varying vec3 vViewPosition;',
 
-				"#ifndef FLAT_SHADED",
+				'#ifndef FLAT_SHADED',
 
-				"	varying vec3 vNormal;",
+				'	varying vec3 vNormal;',
 
-				"#endif",
+				'#endif',
 
 				//"#include <encodings_pars_fragment>", // encoding functions
-				"#include <fog_pars_vertex>",
-				"#include <morphtarget_pars_vertex>",
-				"#include <skinning_pars_vertex>",
-				"#include <shadowmap_pars_vertex>",
-				"#include <logdepthbuf_pars_vertex>",
-				"#include <clipping_planes_pars_vertex>"
+				'#include <fog_pars_vertex>',
+				'#include <morphtarget_pars_vertex>',
+				'#include <skinning_pars_vertex>',
+				'#include <shadowmap_pars_vertex>',
+				'#include <logdepthbuf_pars_vertex>',
+				'#include <clipping_planes_pars_vertex>'
 
-			].join( "\n" ) );
+			].join( '\n' ) );
 
 			var output = [
-				"#include <beginnormal_vertex>",
-				"#include <morphnormal_vertex>",
-				"#include <skinbase_vertex>",
-				"#include <skinnormal_vertex>",
-				"#include <defaultnormal_vertex>",
+				'#include <beginnormal_vertex>',
+				'#include <morphnormal_vertex>',
+				'#include <skinbase_vertex>',
+				'#include <skinnormal_vertex>',
+				'#include <defaultnormal_vertex>',
 
-				"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+				'#ifndef FLAT_SHADED', // Normal computed with derivatives when FLAT_SHADED
 
-				"	vNormal = normalize( transformedNormal );",
+				'	vNormal = normalize( transformedNormal );',
 
-				"#endif",
+				'#endif',
 
-				"#include <begin_vertex>"
+				'#include <begin_vertex>'
 			];
 
 			if ( position ) {
 
 				output.push(
 					position.code,
-					position.result ? "transformed = " + position.result + ";" : ''
+					position.result ? 'transformed = ' + position.result + ';' : ''
 				);
 
 			}
 
 			output.push(
-				"#include <morphtarget_vertex>",
-				"#include <skinning_vertex>",
-				"#include <project_vertex>",
-				"#include <fog_vertex>",
-				"#include <logdepthbuf_vertex>",
-				"#include <clipping_planes_vertex>",
+				'#include <morphtarget_vertex>',
+				'#include <skinning_vertex>',
+				'#include <project_vertex>',
+				'#include <fog_vertex>',
+				'#include <logdepthbuf_vertex>',
+				'#include <clipping_planes_vertex>',
 
-				"	vViewPosition = - mvPosition.xyz;",
+				'	vViewPosition = - mvPosition.xyz;',
 
-				"#include <worldpos_vertex>",
-				"#include <shadowmap_vertex>"
+				'#include <worldpos_vertex>',
+				'#include <shadowmap_vertex>'
 			);
 
-			code = output.join( "\n" );
+			code = output.join( '\n' );
 
 		} else {
 
@@ -239,33 +243,33 @@
 			builder.requires.transparent = alpha !== undefined;
 
 			builder.addParsCode( [
-				"varying vec3 vViewPosition;",
+				'varying vec3 vViewPosition;',
 
-				"#ifndef FLAT_SHADED",
+				'#ifndef FLAT_SHADED',
 
-				"	varying vec3 vNormal;",
+				'	varying vec3 vNormal;',
 
-				"#endif",
+				'#endif',
 
-				"#include <dithering_pars_fragment>",
-				"#include <fog_pars_fragment>",
-				"#include <bsdfs>",
-				"#include <lights_pars_begin>",
-				"#include <lights_physical_pars_fragment>",
-				"#include <shadowmap_pars_fragment>",
-				"#include <logdepthbuf_pars_fragment>"
-			].join( "\n" ) );
+				'#include <dithering_pars_fragment>',
+				'#include <fog_pars_fragment>',
+				'#include <bsdfs>',
+				'#include <lights_pars_begin>',
+				'#include <lights_physical_pars_fragment>',
+				'#include <shadowmap_pars_fragment>',
+				'#include <logdepthbuf_pars_fragment>'
+			].join( '\n' ) );
 
 			var output = [
-				"#include <clipping_planes_fragment>",
+				'#include <clipping_planes_fragment>',
 
 				// add before: prevent undeclared normal
-				"	#include <normal_fragment_begin>",
-				"	#include <clearcoat_normal_fragment_begin>",
+				'	#include <normal_fragment_begin>',
+				'	#include <clearcoat_normal_fragment_begin>',
 
 				// add before: prevent undeclared material
-				"	PhysicalMaterial material;",
-				"	material.diffuseColor = vec3( 1.0 );"
+				'	PhysicalMaterial material;',
+				'	material.diffuseColor = vec3( 1.0 );'
 			];
 
 			if ( mask ) {
@@ -279,16 +283,16 @@
 
 			output.push(
 				color.code,
-				"	vec3 diffuseColor = " + color.result + ";",
-				"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
+				'	vec3 diffuseColor = ' + color.result + ';',
+				'	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
 
-				"#include <logdepthbuf_fragment>",
+				'#include <logdepthbuf_fragment>',
 
 				roughness.code,
-				"	float roughnessFactor = " + roughness.result + ";",
+				'	float roughnessFactor = ' + roughness.result + ';',
 
 				metalness.code,
-				"	float metalnessFactor = " + metalness.result + ";"
+				'	float metalnessFactor = ' + metalness.result + ';'
 			);
 
 			if ( alpha ) {
@@ -377,23 +381,23 @@
 			}
 
 			output.push(
-				"#include <lights_fragment_begin>"
+				'#include <lights_fragment_begin>'
 			);
 
 			if ( light ) {
 
 				output.push(
 					light.code,
-					"reflectedLight.directDiffuse = " + light.result + ";"
+					'reflectedLight.directDiffuse = ' + light.result + ';'
 				);
 
 				// apply color
 
 				output.push(
-					"diffuseColor *= 1.0 - metalnessFactor;",
+					'diffuseColor *= 1.0 - metalnessFactor;',
 
-					"reflectedLight.directDiffuse *= diffuseColor;",
-					"reflectedLight.indirectDiffuse *= diffuseColor;"
+					'reflectedLight.directDiffuse *= diffuseColor;',
+					'reflectedLight.indirectDiffuse *= diffuseColor;'
 				);
 
 			}
@@ -402,9 +406,9 @@
 
 				output.push(
 					ao.code,
-					"reflectedLight.indirectDiffuse *= " + ao.result + ";",
-					"float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );",
-					"reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, " + ao.result + ", material.specularRoughness );"
+					'reflectedLight.indirectDiffuse *= ' + ao.result + ';',
+					'float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );',
+					'reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ' + ao.result + ', material.specularRoughness );'
 				);
 
 			}
@@ -413,7 +417,7 @@
 
 				output.push(
 					ambient.code,
-					"reflectedLight.indirectDiffuse += " + ambient.result + ";"
+					'reflectedLight.indirectDiffuse += ' + ambient.result + ';'
 				);
 
 			}
@@ -422,8 +426,8 @@
 
 				output.push(
 					shadow.code,
-					"reflectedLight.directDiffuse *= " + shadow.result + ";",
-					"reflectedLight.directSpecular *= " + shadow.result + ";"
+					'reflectedLight.directDiffuse *= ' + shadow.result + ';',
+					'reflectedLight.directSpecular *= ' + shadow.result + ';'
 				);
 
 			}
@@ -432,7 +436,7 @@
 
 				output.push(
 					emissive.code,
-					"reflectedLight.directDiffuse += " + emissive.result + ";"
+					'reflectedLight.directDiffuse += ' + emissive.result + ';'
 				);
 
 			}
@@ -451,46 +455,46 @@
 
 					output.push(
 						clearcoatEnv.code,
-						"clearcoatRadiance += " + clearcoatEnv.result + ";"
+						'clearcoatRadiance += ' + clearcoatEnv.result + ';'
 					);
 
 				}
 
-				output.push( "radiance += " + environment.radiance.result + ";" );
+				output.push( 'radiance += ' + environment.radiance.result + ';' );
 
 				if ( builder.requires.irradiance ) {
 
-					output.push( "iblIrradiance += PI * " + environment.irradiance.result + ";" );
+					output.push( 'iblIrradiance += PI * ' + environment.irradiance.result + ';' );
 
 				}
 
 			}
 
 			output.push(
-				"#include <lights_fragment_end>"
+				'#include <lights_fragment_end>'
 			);
 
-			output.push( "vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;" );
+			output.push( 'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;' );
 
 			if ( alpha ) {
 
-				output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
+				output.push( 'gl_FragColor = vec4( outgoingLight, ' + alpha.result + ' );' );
 
 			} else {
 
-				output.push( "gl_FragColor = vec4( outgoingLight, 1.0 );" );
+				output.push( 'gl_FragColor = vec4( outgoingLight, 1.0 );' );
 
 			}
 
 			output.push(
-				"#include <tonemapping_fragment>",
-				"#include <encodings_fragment>",
-				"#include <fog_fragment>",
-				"#include <premultiplied_alpha_fragment>",
-				"#include <dithering_fragment>"
+				'#include <tonemapping_fragment>',
+				'#include <encodings_fragment>',
+				'#include <fog_fragment>',
+				'#include <premultiplied_alpha_fragment>',
+				'#include <dithering_fragment>'
 			);
 
-			code = output.join( "\n" );
+			code = output.join( '\n' );
 
 		}
 
@@ -590,4 +594,4 @@
 
 	exports.StandardNode = StandardNode;
 
-})));
+} ) ) );

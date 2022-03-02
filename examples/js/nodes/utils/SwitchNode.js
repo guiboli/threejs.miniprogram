@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/utils/SwitchNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, Node_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -23,7 +27,7 @@
 
 	SwitchNode.prototype = Object.create( Node_js.Node.prototype );
 	SwitchNode.prototype.constructor = SwitchNode;
-	SwitchNode.prototype.nodeType = "Switch";
+	SwitchNode.prototype.nodeType = 'Switch';
 
 	SwitchNode.prototype.getType = function ( builder ) {
 
@@ -111,4 +115,4 @@
 
 	exports.SwitchNode = SwitchNode;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/TempNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, Node_js ) {
+
+	'use strict';
 
 	/**
 	 * Automatic node cache
@@ -126,7 +130,7 @@
 
 		var uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
 
-		if ( typeof this.scope === "string" ) uuid = this.scope + '-' + uuid;
+		if ( typeof this.scope === 'string' ) uuid = this.scope + '-' + uuid;
 
 		return uuid;
 
@@ -144,7 +148,7 @@
 
 	TempNode.prototype.generate = function ( builder, output, uuid, type, ns ) {
 
-		if ( ! this.getShared( builder, output ) ) console.error( "THREE.TempNode is not shared!" );
+		if ( ! this.getShared( builder, output ) ) console.error( 'THREE.TempNode is not shared!' );
 
 		uuid = uuid || this.uuid;
 
@@ -154,4 +158,4 @@
 
 	exports.TempNode = TempNode;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/Matrix4Node.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, InputNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, InputNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,7 +26,7 @@
 
 	Matrix4Node.prototype = Object.create( InputNode_js.InputNode.prototype );
 	Matrix4Node.prototype.constructor = Matrix4Node;
-	Matrix4Node.prototype.nodeType = "Matrix4";
+	Matrix4Node.prototype.nodeType = 'Matrix4';
 
 	Object.defineProperties( Matrix4Node.prototype, {
 
@@ -46,7 +50,7 @@
 
 	Matrix4Node.prototype.generateReadonly = function ( builder, output, uuid, type /*, ns, needsUpdate */ ) {
 
-		return builder.format( "mat4( " + this.value.elements.join( ", " ) + " )", type, output );
+		return builder.format( 'mat4( ' + this.value.elements.join( ', ' ) + ' )', type, output );
 
 	};
 
@@ -78,4 +82,4 @@
 
 	exports.Matrix4Node = Matrix4Node;
 
-})));
+} ) ) );

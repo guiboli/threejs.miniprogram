@@ -1,63 +1,73 @@
 ( function () {
 
-	/**
- * References:
- * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
- */
+	( function ( global, factory ) {
 
-	const SSRShader = {
-		defines: {
-			MAX_STEP: 0,
-			PERSPECTIVE_CAMERA: true,
-			DISTANCE_ATTENUATION: true,
-			FRESNEL: true,
-			INFINITE_THICK: false,
-			SELECTIVE: false
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tNormal': {
-				value: null
-			},
-			'tMetalness': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'opacity': {
-				value: .5
-			},
-			'maxDistance': {
-				value: 180
-			},
-			'cameraRange': {
-				value: 0
-			},
-			'thickness': {
-				value: .018
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		/**
+	 * References:
+	 * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
+	 */
+
+		const SSRShader = {
+	  defines: {
+	    MAX_STEP: 0,
+	    PERSPECTIVE_CAMERA: true,
+	    DISTANCE_ATTENUATION: true,
+	    FRESNEL: true,
+	    INFINITE_THICK: false,
+	    SELECTIVE: false
+	  },
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'tNormal': {
+	      value: null
+	    },
+	    'tMetalness': {
+	      value: null
+	    },
+	    'tDepth': {
+	      value: null
+	    },
+	    'cameraNear': {
+	      value: null
+	    },
+	    'cameraFar': {
+	      value: null
+	    },
+	    'resolution': {
+	      value: new three.Vector2()
+	    },
+	    'cameraProjectionMatrix': {
+	      value: new three.Matrix4()
+	    },
+	    'cameraInverseProjectionMatrix': {
+	      value: new three.Matrix4()
+	    },
+	    'opacity': {
+	      value: .5
+	    },
+	    'maxDistance': {
+	      value: 180
+	    },
+	    'cameraRange': {
+	      value: 0
+	    },
+	    'thickness': {
+	      value: .018
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -70,9 +80,9 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -250,25 +260,25 @@
 			}
 		}
 	`
-	};
-	const SSRDepthShader = {
-		defines: {
-			'PERSPECTIVE_CAMERA': 1
-		},
-		uniforms: {
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		};
+		const SSRDepthShader = {
+	  defines: {
+	    'PERSPECTIVE_CAMERA': 1
+	  },
+	  uniforms: {
+	    'tDepth': {
+	      value: null
+	    },
+	    'cameraNear': {
+	      value: null
+	    },
+	    'cameraFar': {
+	      value: null
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -280,9 +290,9 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDepth;
 
@@ -319,22 +329,22 @@
 		}
 
 	`
-	};
-	const SSRBlurShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'opacity': {
-				value: .5
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		};
+		const SSRBlurShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'resolution': {
+	      value: new three.Vector2()
+	    },
+	    'opacity': {
+	      value: .5
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -346,9 +356,9 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
@@ -384,10 +394,14 @@
 
 		}
 	`
-	};
+		};
 
-	THREE.SSRBlurShader = SSRBlurShader;
-	THREE.SSRDepthShader = SSRDepthShader;
-	THREE.SSRShader = SSRShader;
+		exports.SSRBlurShader = SSRBlurShader;
+		exports.SSRDepthShader = SSRDepthShader;
+		exports.SSRShader = SSRShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

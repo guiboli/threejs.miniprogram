@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/shared/MeshReceiver.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, THREE ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -64,6 +68,7 @@
 				this.callbacks.onProgress = onProgress;
 
 			}
+
 			if ( onMeshAlter !== null && onMeshAlter !== undefined && onMeshAlter instanceof Function ) {
 
 				this.callbacks.onMeshAlter = onMeshAlter;
@@ -80,25 +85,28 @@
 		 */
 		buildMeshes: function ( meshPayload ) {
 
-			let meshName = meshPayload.params.meshName;
-			let buffers = meshPayload.buffers;
+			const meshName = meshPayload.params.meshName;
+			const buffers = meshPayload.buffers;
 
-			let bufferGeometry = new THREE.BufferGeometry();
+			const bufferGeometry = new THREE.BufferGeometry();
 			if ( buffers.vertices !== undefined && buffers.vertices !== null ) {
 
 				bufferGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( buffers.vertices ), 3 ) );
 
 			}
+
 			if ( buffers.indices !== undefined && buffers.indices !== null ) {
 
 				bufferGeometry.setIndex( new THREE.BufferAttribute( new Uint32Array( buffers.indices ), 1 ) );
 
 			}
+
 			if ( buffers.colors !== undefined && buffers.colors !== null ) {
 
 				bufferGeometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( buffers.colors ), 3 ) );
 
 			}
+
 			if ( buffers.normals !== undefined && buffers.normals !== null ) {
 
 				bufferGeometry.setAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( buffers.normals ), 3 ) );
@@ -108,16 +116,19 @@
 				bufferGeometry.computeVertexNormals();
 
 			}
+
 			if ( buffers.uvs !== undefined && buffers.uvs !== null ) {
 
 				bufferGeometry.setAttribute( 'uv', new THREE.BufferAttribute( new Float32Array( buffers.uvs ), 2 ) );
 
 			}
+
 			if ( buffers.skinIndex !== undefined && buffers.skinIndex !== null ) {
 
 				bufferGeometry.setAttribute( 'skinIndex', new THREE.BufferAttribute( new Uint16Array( buffers.skinIndex ), 4 ) );
 
 			}
+
 			if ( buffers.skinWeight !== undefined && buffers.skinWeight !== null ) {
 
 				bufferGeometry.setAttribute( 'skinWeight', new THREE.BufferAttribute( new Float32Array( buffers.skinWeight ), 4 ) );
@@ -125,9 +136,9 @@
 			}
 
 			let material, materialName, key;
-			let materialNames = meshPayload.materials.materialNames;
-			let createMultiMaterial = meshPayload.materials.multiMaterial;
-			let multiMaterials = [];
+			const materialNames = meshPayload.materials.materialNames;
+			const createMultiMaterial = meshPayload.materials.multiMaterial;
+			const multiMaterials = [];
 			for ( key in materialNames ) {
 
 				materialName = materialNames[ key ];
@@ -135,10 +146,11 @@
 				if ( createMultiMaterial ) multiMaterials.push( material );
 
 			}
+
 			if ( createMultiMaterial ) {
 
 				material = multiMaterials;
-				let materialGroups = meshPayload.materials.materialGroups;
+				const materialGroups = meshPayload.materials.materialGroups;
 				let materialGroup;
 				for ( key in materialGroups ) {
 
@@ -149,11 +161,11 @@
 
 			}
 
-			let meshes = [];
+			const meshes = [];
 			let mesh;
 			let callbackOnMeshAlterResult;
 			let useOrgMesh = true;
-			let geometryType = meshPayload.geometryType === null ? 0 : meshPayload.geometryType;
+			const geometryType = meshPayload.geometryType === null ? 0 : meshPayload.geometryType;
 
 			if ( this.callbacks.onMeshAlter ) {
 
@@ -179,16 +191,18 @@
 
 				} else if ( callbackOnMeshAlterResult.providesAlteredMeshes() ) {
 
-					for ( let i in callbackOnMeshAlterResult.meshes ) {
+					for ( const i in callbackOnMeshAlterResult.meshes ) {
 
 						meshes.push( callbackOnMeshAlterResult.meshes[ i ] );
 
 					}
+
 					useOrgMesh = false;
 
 				}
 
 			}
+
 			if ( useOrgMesh ) {
 
 				if ( meshPayload.computeBoundingSphere ) bufferGeometry.computeBoundingSphere();
@@ -205,6 +219,7 @@
 					mesh = new THREE.Points( bufferGeometry, material );
 
 				}
+
 				mesh.name = meshName;
 				meshes.push( mesh );
 
@@ -213,13 +228,14 @@
 			let progressMessage = meshPayload.params.meshName;
 			if ( meshes.length > 0 ) {
 
-				let meshNames = [];
-				for ( let i in meshes ) {
+				const meshNames = [];
+				for ( const i in meshes ) {
 
 					mesh = meshes[ i ];
 					meshNames[ i ] = mesh.name;
 
 				}
+
 				progressMessage += ': Adding mesh(es) (' + meshNames.length + ': ' + meshNames + ') from input mesh: ' + meshName;
 				progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100 ).toFixed( 2 ) + '%)';
 
@@ -229,6 +245,7 @@
 				progressMessage += ' (' + ( meshPayload.progress.numericalValue * 100 ).toFixed( 2 ) + '%)';
 
 			}
+
 			if ( this.callbacks.onProgress ) {
 
 				this.callbacks.onProgress( 'progress', progressMessage, meshPayload.progress.numericalValue );
@@ -299,4 +316,4 @@
 	exports.LoadedMeshUserOverride = LoadedMeshUserOverride;
 	exports.MeshReceiver = MeshReceiver;
 
-})));
+} ) ) );

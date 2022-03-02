@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/OBJLoader2Parallel.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/main/WorkerExecutionSupport.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/utils/CodeSerializer.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/OBJLoader2.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/WorkerRunner.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/main/WorkerExecutionSupport.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/utils/CodeSerializer.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/OBJLoader2.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/WorkerRunner.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, WorkerExecutionSupport_js, CodeSerializer_js, OBJLoader2_js, OBJLoader2Parser_js, WorkerRunner_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/main/WorkerExecutionSupport.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/utils/CodeSerializer.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/OBJLoader2.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/WorkerRunner.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/main/WorkerExecutionSupport.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/utils/CodeSerializer.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/OBJLoader2.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/WorkerRunner.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, WorkerExecutionSupport_js, CodeSerializer_js, OBJLoader2_js, OBJLoader2Parser_js, WorkerRunner_js ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -80,18 +84,19 @@
 		 */
 		buildWorkerCode: function () {
 
-			let codeBuilderInstructions = new WorkerExecutionSupport_js.CodeBuilderInstructions( true, true, this.preferJsmWorker );
+			const codeBuilderInstructions = new WorkerExecutionSupport_js.CodeBuilderInstructions( true, true, this.preferJsmWorker );
 			if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
 				codeBuilderInstructions.setJsmWorkerFile( '../examples/loaders/jsm/obj2/worker/parallel/jsm/OBJLoader2Worker.js' );
 
 			}
+
 			if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
 
-				let codeOBJLoader2Parser = CodeSerializer_js.CodeSerializer.serializeClass( 'OBJLoader2Parser', OBJLoader2Parser_js.OBJLoader2Parser );
-				let codeObjectManipulator = CodeSerializer_js.CodeSerializer.serializeObject( 'ObjectManipulator', WorkerRunner_js.ObjectManipulator );
-				let codeParserPayloadHandler = CodeSerializer_js.CodeSerializer.serializeClass( 'DefaultWorkerPayloadHandler', WorkerRunner_js.DefaultWorkerPayloadHandler );
-				let codeWorkerRunner = CodeSerializer_js.CodeSerializer.serializeClass( 'WorkerRunner', WorkerRunner_js.WorkerRunner );
+				const codeOBJLoader2Parser = CodeSerializer_js.CodeSerializer.serializeClass( 'OBJLoader2Parser', OBJLoader2Parser_js.OBJLoader2Parser );
+				const codeObjectManipulator = CodeSerializer_js.CodeSerializer.serializeObject( 'ObjectManipulator', WorkerRunner_js.ObjectManipulator );
+				const codeParserPayloadHandler = CodeSerializer_js.CodeSerializer.serializeClass( 'DefaultWorkerPayloadHandler', WorkerRunner_js.DefaultWorkerPayloadHandler );
+				const codeWorkerRunner = CodeSerializer_js.CodeSerializer.serializeClass( 'WorkerRunner', WorkerRunner_js.WorkerRunner );
 
 				codeBuilderInstructions.addCodeFragment( codeOBJLoader2Parser );
 				codeBuilderInstructions.addCodeFragment( codeObjectManipulator );
@@ -101,6 +106,7 @@
 				codeBuilderInstructions.addStartCode( 'new WorkerRunner( new DefaultWorkerPayloadHandler( new OBJLoader2Parser() ) );' );
 
 			}
+
 			return codeBuilderInstructions;
 
 		},
@@ -110,7 +116,7 @@
 		 */
 		load: function ( content, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
-	 		let scope = this;
+	 		const scope = this;
 			function interceptOnLoad( object3d, message ) {
 
 				if ( object3d.name === 'OBJLoader2ParallelDummy' ) {
@@ -144,20 +150,22 @@
 
 				if ( this.parser.callbacks.onLoad === this.parser._onLoad ) {
 
-					throw "No callback other than the default callback was provided! Aborting!";
+					throw 'No callback other than the default callback was provided! Aborting!';
 
 				}
+
 				// check if worker has been initialize before. If yes, skip init
 				if ( ! this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) {
 
 					this.workerExecutionSupport.buildWorker( this.buildWorkerCode() );
 
-					let scope = this;
-					let scopedOnAssetAvailable = function ( payload ) {
+					const scope = this;
+					const scopedOnAssetAvailable = function ( payload ) {
 
 						scope._onAssetAvailable( payload );
 
 					};
+
 					function scopedOnLoad( message ) {
 
 						scope.parser.callbacks.onLoad( scope.baseObject3d, message );
@@ -192,7 +200,7 @@
 						}
 					} );
 
-				let dummy = new THREE.Object3D();
+				const dummy = new THREE.Object3D();
 				dummy.name = 'OBJLoader2ParallelDummy';
 				return dummy;
 
@@ -208,4 +216,4 @@
 
 	exports.OBJLoader2Parallel = OBJLoader2Parallel;
 
-})));
+} ) ) );

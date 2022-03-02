@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/RTTNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, NodeBuilder_js, NodeMaterial_js, TextureNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeBuilder.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, NodeBuilder_js, NodeMaterial_js, TextureNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -39,7 +43,7 @@
 
 	RTTNode.prototype = Object.create( TextureNode_js.TextureNode.prototype );
 	RTTNode.prototype.constructor = RTTNode;
-	RTTNode.prototype.nodeType = "RTT";
+	RTTNode.prototype.nodeType = 'RTT';
 
 	RTTNode.prototype.build = function ( builder, output, uuid ) {
 
@@ -121,7 +125,7 @@
 
 		} else {
 
-			console.warn( "RTTNode need a renderer in NodeFrame" );
+			console.warn( 'RTTNode need a renderer in NodeFrame' );
 
 		}
 
@@ -155,4 +159,4 @@
 
 	exports.RTTNode = RTTNode;
 
-})));
+} ) ) );

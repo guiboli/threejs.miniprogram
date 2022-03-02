@@ -1,48 +1,58 @@
 ( function () {
 
-	/**
- * Film grain & scanlines shader
- *
- * - ported from HLSL to WebGL / GLSL
- * https://web.archive.org/web/20210226214859/http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
- *
- * Screen Space Static Postprocessor
- *
- * Produces an analogue noise overlay similar to a film grain / TV static
- *
- * Original implementation and noise algorithm
- * Pat 'Hawthorne' Shearon
- *
- * Optimized scanlines + noise version with intensity scaling
- * Georg 'Leviathan' Steinrohder
- *
- * This version is provided under a Creative Commons Attribution 3.0 License
- * http://creativecommons.org/licenses/by/3.0/
- */
-	const FilmShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'time': {
-				value: 0.0
-			},
-			'nIntensity': {
-				value: 0.5
-			},
-			'sIntensity': {
-				value: 0.05
-			},
-			'sCount': {
-				value: 4096
-			},
-			'grayscale': {
-				value: 1
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Film grain & scanlines shader
+	 *
+	 * - ported from HLSL to WebGL / GLSL
+	 * https://web.archive.org/web/20210226214859/http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
+	 *
+	 * Screen Space Static Postprocessor
+	 *
+	 * Produces an analogue noise overlay similar to a film grain / TV static
+	 *
+	 * Original implementation and noise algorithm
+	 * Pat 'Hawthorne' Shearon
+	 *
+	 * Optimized scanlines + noise version with intensity scaling
+	 * Georg 'Leviathan' Steinrohder
+	 *
+	 * This version is provided under a Creative Commons Attribution 3.0 License
+	 * http://creativecommons.org/licenses/by/3.0/
+	 */
+		const FilmShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'time': {
+	      value: 0.0
+	    },
+	    'nIntensity': {
+	      value: 0.5
+	    },
+	    'sIntensity': {
+	      value: 0.05
+	    },
+	    'sCount': {
+	      value: 4096
+	    },
+	    'grayscale': {
+	      value: 1
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -52,9 +62,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		#include <common>
 
@@ -106,8 +116,12 @@
 			gl_FragColor =  vec4( cResult, cTextureScreen.a );
 
 		}`
-	};
+		};
 
-	THREE.FilmShader = FilmShader;
+		exports.FilmShader = FilmShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

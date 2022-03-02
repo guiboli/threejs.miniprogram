@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/materials/StandardNodeMaterial.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, StandardNode_js, NodeMaterial_js, NodeUtils_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, StandardNode_js, NodeMaterial_js, NodeUtils_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -18,7 +22,7 @@
 
 		NodeMaterial_js.NodeMaterial.call( this, node, node );
 
-		this.type = "StandardNodeMaterial";
+		this.type = 'StandardNodeMaterial';
 
 	}
 
@@ -48,4 +52,4 @@
 
 	exports.StandardNodeMaterial = StandardNodeMaterial;
 
-})));
+} ) ) );

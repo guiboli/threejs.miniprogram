@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/utils/MaxMIPLevelNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, FloatNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, FloatNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -24,7 +28,7 @@
 
 	MaxMIPLevelNode.prototype = Object.create( FloatNode_js.FloatNode.prototype );
 	MaxMIPLevelNode.prototype.constructor = MaxMIPLevelNode;
-	MaxMIPLevelNode.prototype.nodeType = "MaxMIPLevel";
+	MaxMIPLevelNode.prototype.nodeType = 'MaxMIPLevel';
 
 	Object.defineProperties( MaxMIPLevelNode.prototype, {
 
@@ -70,4 +74,4 @@
 
 	exports.MaxMIPLevelNode = MaxMIPLevelNode;
 
-})));
+} ) ) );

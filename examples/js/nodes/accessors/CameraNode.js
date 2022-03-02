@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/accessors/CameraNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, FunctionNode_js, FloatNode_js, PositionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, FunctionNode_js, FloatNode_js, PositionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -24,22 +28,22 @@
 	CameraNode.Nodes = ( function () {
 
 		var depthColor = new FunctionNode_js.FunctionNode( [
-			"float depthColor( float mNear, float mFar ) {",
+			'float depthColor( float mNear, float mFar ) {',
 
-			"	#ifdef USE_LOGDEPTHBUF_EXT",
+			'	#ifdef USE_LOGDEPTHBUF_EXT',
 
-			"		float depth = gl_FragDepthEXT / gl_FragCoord.w;",
+			'		float depth = gl_FragDepthEXT / gl_FragCoord.w;',
 
-			"	#else",
+			'	#else',
 
-			"		float depth = gl_FragCoord.z / gl_FragCoord.w;",
+			'		float depth = gl_FragCoord.z / gl_FragCoord.w;',
 
-			"	#endif",
+			'	#endif',
 
-			"	return 1.0 - smoothstep( mNear, mFar, depth );",
+			'	return 1.0 - smoothstep( mNear, mFar, depth );',
 
-			"}"
-		].join( "\n" ) );
+			'}'
+		].join( '\n' ) );
 
 		return {
 			depthColor: depthColor
@@ -53,7 +57,7 @@
 
 	CameraNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	CameraNode.prototype.constructor = CameraNode;
-	CameraNode.prototype.nodeType = "Camera";
+	CameraNode.prototype.nodeType = 'Camera';
 
 	CameraNode.prototype.setCamera = function ( camera ) {
 
@@ -242,4 +246,4 @@
 
 	exports.CameraNode = CameraNode;
 
-})));
+} ) ) );

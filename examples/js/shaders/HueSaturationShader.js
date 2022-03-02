@@ -1,26 +1,36 @@
 ( function () {
 
-	/**
- * Hue and saturation adjustment
- * https://github.com/evanw/glfx.js
- * hue: -1 to 1 (-1 is 180 degrees in the negative direction, 0 is no change, etc.
- * saturation: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
- */
-	const HueSaturationShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'hue': {
-				value: 0
-			},
-			'saturation': {
-				value: 0
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Hue and saturation adjustment
+	 * https://github.com/evanw/glfx.js
+	 * hue: -1 to 1 (-1 is 180 degrees in the negative direction, 0 is no change, etc.
+	 * saturation: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
+	 */
+		const HueSaturationShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'hue': {
+	      value: 0
+	    },
+	    'saturation': {
+	      value: 0
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -31,9 +41,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDiffuse;
 		uniform float hue;
@@ -65,8 +75,12 @@
 			}
 
 		}`
-	};
+		};
 
-	THREE.HueSaturationShader = HueSaturationShader;
+		exports.HueSaturationShader = HueSaturationShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

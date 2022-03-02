@@ -1,82 +1,96 @@
 ( function () {
 
-	class LineGeometry extends THREE.LineSegmentsGeometry {
+	( function ( global, factory ) {
 
-		constructor() {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( './LineSegmentsGeometry.js' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', './LineSegmentsGeometry' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-			super();
-			this.type = 'LineGeometry';
+	} )( this, ( function ( exports, LineSegmentsGeometry_js ) {
 
-		}
+		'use strict';
 
-		setPositions( array ) {
+		class LineGeometry extends LineSegmentsGeometry_js.LineSegmentsGeometry {
 
-			// converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
-			const length = array.length - 3;
-			const points = new Float32Array( 2 * length );
+	  constructor() {
 
-			for ( let i = 0; i < length; i += 3 ) {
-
-				points[ 2 * i ] = array[ i ];
-				points[ 2 * i + 1 ] = array[ i + 1 ];
-				points[ 2 * i + 2 ] = array[ i + 2 ];
-				points[ 2 * i + 3 ] = array[ i + 3 ];
-				points[ 2 * i + 4 ] = array[ i + 4 ];
-				points[ 2 * i + 5 ] = array[ i + 5 ];
+	    super();
+	    this.type = 'LineGeometry';
 
 			}
 
-			super.setPositions( points );
-			return this;
+	  setPositions( array ) {
 
-		}
+	    // converts [ x1, y1, z1,  x2, y2, z2, ... ] to pairs format
+	    const length = array.length - 3;
+	    const points = new Float32Array( 2 * length );
 
-		setColors( array ) {
+	    for ( let i = 0; i < length; i += 3 ) {
 
-			// converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
-			const length = array.length - 3;
-			const colors = new Float32Array( 2 * length );
+	      points[ 2 * i ] = array[ i ];
+	      points[ 2 * i + 1 ] = array[ i + 1 ];
+	      points[ 2 * i + 2 ] = array[ i + 2 ];
+	      points[ 2 * i + 3 ] = array[ i + 3 ];
+	      points[ 2 * i + 4 ] = array[ i + 4 ];
+	      points[ 2 * i + 5 ] = array[ i + 5 ];
 
-			for ( let i = 0; i < length; i += 3 ) {
+				}
 
-				colors[ 2 * i ] = array[ i ];
-				colors[ 2 * i + 1 ] = array[ i + 1 ];
-				colors[ 2 * i + 2 ] = array[ i + 2 ];
-				colors[ 2 * i + 3 ] = array[ i + 3 ];
-				colors[ 2 * i + 4 ] = array[ i + 4 ];
-				colors[ 2 * i + 5 ] = array[ i + 5 ];
+	    super.setPositions( points );
+	    return this;
 
 			}
 
-			super.setColors( colors );
-			return this;
+	  setColors( array ) {
+
+	    // converts [ r1, g1, b1,  r2, g2, b2, ... ] to pairs format
+	    const length = array.length - 3;
+	    const colors = new Float32Array( 2 * length );
+
+	    for ( let i = 0; i < length; i += 3 ) {
+
+	      colors[ 2 * i ] = array[ i ];
+	      colors[ 2 * i + 1 ] = array[ i + 1 ];
+	      colors[ 2 * i + 2 ] = array[ i + 2 ];
+	      colors[ 2 * i + 3 ] = array[ i + 3 ];
+	      colors[ 2 * i + 4 ] = array[ i + 4 ];
+	      colors[ 2 * i + 5 ] = array[ i + 5 ];
+
+				}
+
+	    super.setColors( colors );
+	    return this;
+
+			}
+
+	  fromLine( line ) {
+
+	    const geometry = line.geometry;
+
+	    if ( geometry.isGeometry ) {
+
+	      console.error( 'THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+	      return;
+
+				} else if ( geometry.isBufferGeometry ) {
+
+	      this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+
+				} // set colors, maybe
+
+
+	    return this;
+
+			}
 
 		}
 
-		fromLine( line ) {
+		LineGeometry.prototype.isLineGeometry = true;
 
-			const geometry = line.geometry;
+		exports.LineGeometry = LineGeometry;
 
-			if ( geometry.isGeometry ) {
+		Object.defineProperty( exports, '__esModule', { value: true } );
 
-				console.error( 'THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-				return;
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-			} // set colors, maybe
-
-
-			return this;
-
-		}
-
-	}
-
-	LineGeometry.prototype.isLineGeometry = true;
-
-	THREE.LineGeometry = LineGeometry;
+	} ) );
 
 } )();

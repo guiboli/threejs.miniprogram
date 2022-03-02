@@ -1,20 +1,30 @@
 ( function () {
 
-	/**
- * MMD Toon Shader
- *
- * This shader is extended from MeshPhongMaterial, and merged algorithms with
- * MeshToonMaterial and MeshMetcapMaterial.
- * Ideas came from https://github.com/mrdoob/three.js/issues/19609
- *
- * Combining steps:
- *  * Declare matcap uniform.
- *  * Add gradientmap_pars_fragment.
- *  * Use gradient irradiances instead of dotNL irradiance from MeshPhongMaterial.
- *    (Replace lights_phong_pars_fragment with lights_mmd_toon_pars_fragment)
- *  * Add mmd_toon_matcap_fragment.
- */
-	const lights_mmd_toon_pars_fragment = `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		/**
+	 * MMD Toon Shader
+	 *
+	 * This shader is extended from MeshPhongMaterial, and merged algorithms with
+	 * MeshToonMaterial and MeshMetcapMaterial.
+	 * Ideas came from https://github.com/mrdoob/three.js/issues/19609
+	 *
+	 * Combining steps:
+	 *  * Declare matcap uniform.
+	 *  * Add gradientmap_pars_fragment.
+	 *  * Use gradient irradiances instead of dotNL irradiance from MeshPhongMaterial.
+	 *    (Replace lights_phong_pars_fragment with lights_mmd_toon_pars_fragment)
+	 *  * Add mmd_toon_matcap_fragment.
+	 */
+		const lights_mmd_toon_pars_fragment = `
 varying vec3 vViewPosition;
 
 struct BlinnPhongMaterial {
@@ -47,7 +57,7 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 
 #define Material_LightProbeLOD( material )	(0)
 `;
-	const mmd_toon_matcap_fragment = `
+		const mmd_toon_matcap_fragment = `
 #ifdef USE_MATCAP
 
 	vec3 viewDir = normalize( vViewPosition );
@@ -68,15 +78,15 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 
 #endif
 `;
-	const MMDToonShader = {
-		defines: {
-			TOON: true,
-			MATCAP: true,
-			MATCAP_BLENDING_ADD: true
-		},
-		uniforms: THREE.UniformsUtils.merge( [ THREE.ShaderLib.toon.uniforms, THREE.ShaderLib.phong.uniforms, THREE.ShaderLib.matcap.uniforms ] ),
-		vertexShader: THREE.ShaderLib.phong.vertexShader,
-		fragmentShader: THREE.ShaderLib.phong.fragmentShader.replace( '#include <common>', `
+		const MMDToonShader = {
+	  defines: {
+	    TOON: true,
+	    MATCAP: true,
+	    MATCAP_BLENDING_ADD: true
+	  },
+	  uniforms: three.UniformsUtils.merge( [ three.ShaderLib.toon.uniforms, three.ShaderLib.phong.uniforms, three.ShaderLib.matcap.uniforms ] ),
+	  vertexShader: three.ShaderLib.phong.vertexShader,
+	  fragmentShader: three.ShaderLib.phong.fragmentShader.replace( '#include <common>', `
 					#ifdef USE_MATCAP
 						uniform sampler2D matcap;
 					#endif
@@ -89,8 +99,12 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 					#include <envmap_fragment>
 					${mmd_toon_matcap_fragment}
 				` )
-	};
+		};
 
-	THREE.MMDToonShader = MMDToonShader;
+		exports.MMDToonShader = MMDToonShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

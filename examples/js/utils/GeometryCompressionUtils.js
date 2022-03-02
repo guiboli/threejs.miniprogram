@@ -1,574 +1,587 @@
 ( function () {
 
-	/**
- * Octahedron and Quantization encodings based on work by:
- *
- * @link https://github.com/tsherif/mesh-quantization-example
- *
- */
-	/**
- * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
- * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data.
- *
- * @param {THREE.Mesh} mesh
- * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
- *
- */
+	( function ( global, factory ) {
 
-	function compressNormals( mesh, encodeMethod ) {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( './PackedPhongMaterial.js' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', './PackedPhongMaterial' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
 
-		if ( ! mesh.geometry ) {
+	} )( this, ( function ( exports, three, PackedPhongMaterial_js ) {
 
-			console.error( 'Mesh must contain geometry. ' );
+		'use strict';
 
-		}
+		/**
+	 * Octahedron and Quantization encodings based on work by:
+	 *
+	 * @link https://github.com/tsherif/mesh-quantization-example
+	 *
+	 */
+		/**
+	 * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
+	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data.
+	 *
+	 * @param {THREE.Mesh} mesh
+	 * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
+	 *
+	 */
 
-		const normal = mesh.geometry.attributes.normal;
+		function compressNormals( mesh, encodeMethod ) {
 
-		if ( ! normal ) {
+	  if ( ! mesh.geometry ) {
 
-			console.error( 'Geometry must contain normal attribute. ' );
-
-		}
-
-		if ( normal.isPacked ) return;
-
-		if ( normal.itemSize != 3 ) {
-
-			console.error( 'normal.itemSize is not 3, which cannot be encoded. ' );
-
-		}
-
-		const array = normal.array;
-		const count = normal.count;
-		let result;
-
-		if ( encodeMethod == 'DEFAULT' ) {
-
-			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
-			result = new Uint8Array( count * 3 );
-
-			for ( let idx = 0; idx < array.length; idx += 3 ) {
-
-				const encoded = defaultEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
-				result[ idx + 0 ] = encoded[ 0 ];
-				result[ idx + 1 ] = encoded[ 1 ];
-				result[ idx + 2 ] = encoded[ 2 ];
+	    console.error( 'Mesh must contain geometry. ' );
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 3, true ) );
-			mesh.geometry.attributes.normal.bytes = result.length * 1;
+	  const normal = mesh.geometry.attributes.normal;
 
-		} else if ( encodeMethod == 'OCT1Byte' ) {
+	  if ( ! normal ) {
 
-			/**
-    * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
-    * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
-    * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
-    */
-			result = new Int8Array( count * 2 );
-
-			for ( let idx = 0; idx < array.length; idx += 3 ) {
-
-				const encoded = octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
-				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
-				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+	    console.error( 'Geometry must contain normal attribute. ' );
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
-			mesh.geometry.attributes.normal.bytes = result.length * 1;
+	  if ( normal.isPacked ) return;
 
-		} else if ( encodeMethod == 'OCT2Byte' ) {
+	  if ( normal.itemSize != 3 ) {
 
-			result = new Int16Array( count * 2 );
-
-			for ( let idx = 0; idx < array.length; idx += 3 ) {
-
-				const encoded = octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 2 );
-				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
-				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+	    console.error( 'normal.itemSize is not 3, which cannot be encoded. ' );
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
-			mesh.geometry.attributes.normal.bytes = result.length * 2;
+	  const array = normal.array;
+	  const count = normal.count;
+	  let result;
 
-		} else if ( encodeMethod == 'ANGLES' ) {
+	  if ( encodeMethod == 'DEFAULT' ) {
 
-			result = new Uint16Array( count * 2 );
+	    // TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
+	    result = new Uint8Array( count * 3 );
 
-			for ( let idx = 0; idx < array.length; idx += 3 ) {
+	    for ( let idx = 0; idx < array.length; idx += 3 ) {
 
-				const encoded = anglesEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ] );
-				result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
-				result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+	      const encoded = defaultEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
+	      result[ idx + 0 ] = encoded[ 0 ];
+	      result[ idx + 1 ] = encoded[ 1 ];
+	      result[ idx + 2 ] = encoded[ 2 ];
+
+				}
+
+	    mesh.geometry.setAttribute( 'normal', new three.BufferAttribute( result, 3, true ) );
+	    mesh.geometry.attributes.normal.bytes = result.length * 1;
+
+			} else if ( encodeMethod == 'OCT1Byte' ) {
+
+	    /**
+	    * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
+	    * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
+	    * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
+	    */
+	    result = new Int8Array( count * 2 );
+
+	    for ( let idx = 0; idx < array.length; idx += 3 ) {
+
+	      const encoded = octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 1 );
+	      result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
+	      result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+
+				}
+
+	    mesh.geometry.setAttribute( 'normal', new three.BufferAttribute( result, 2, true ) );
+	    mesh.geometry.attributes.normal.bytes = result.length * 1;
+
+			} else if ( encodeMethod == 'OCT2Byte' ) {
+
+	    result = new Int16Array( count * 2 );
+
+	    for ( let idx = 0; idx < array.length; idx += 3 ) {
+
+	      const encoded = octEncodeBest( array[ idx ], array[ idx + 1 ], array[ idx + 2 ], 2 );
+	      result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
+	      result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+
+				}
+
+	    mesh.geometry.setAttribute( 'normal', new three.BufferAttribute( result, 2, true ) );
+	    mesh.geometry.attributes.normal.bytes = result.length * 2;
+
+			} else if ( encodeMethod == 'ANGLES' ) {
+
+	    result = new Uint16Array( count * 2 );
+
+	    for ( let idx = 0; idx < array.length; idx += 3 ) {
+
+	      const encoded = anglesEncode( array[ idx ], array[ idx + 1 ], array[ idx + 2 ] );
+	      result[ idx / 3 * 2 + 0 ] = encoded[ 0 ];
+	      result[ idx / 3 * 2 + 1 ] = encoded[ 1 ];
+
+				}
+
+	    mesh.geometry.setAttribute( 'normal', new three.BufferAttribute( result, 2, true ) );
+	    mesh.geometry.attributes.normal.bytes = result.length * 2;
+
+			} else {
+
+	    console.error( 'Unrecognized encoding method, should be `DEFAULT` or `ANGLES` or `OCT`. ' );
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
-			mesh.geometry.attributes.normal.bytes = result.length * 2;
+	  mesh.geometry.attributes.normal.needsUpdate = true;
+	  mesh.geometry.attributes.normal.isPacked = true;
+	  mesh.geometry.attributes.normal.packingMethod = encodeMethod; // modify material
 
-		} else {
+	  if ( ! ( mesh.material instanceof PackedPhongMaterial_js.PackedPhongMaterial ) ) {
 
-			console.error( 'Unrecognized encoding method, should be `DEFAULT` or `ANGLES` or `OCT`. ' );
+	    mesh.material = new PackedPhongMaterial_js.PackedPhongMaterial().copy( mesh.material );
 
-		}
+			}
 
-		mesh.geometry.attributes.normal.needsUpdate = true;
-		mesh.geometry.attributes.normal.isPacked = true;
-		mesh.geometry.attributes.normal.packingMethod = encodeMethod; // modify material
+	  if ( encodeMethod == 'ANGLES' ) {
 
-		if ( ! ( mesh.material instanceof THREE.PackedPhongMaterial ) ) {
+	    mesh.material.defines.USE_PACKED_NORMAL = 0;
 
-			mesh.material = new THREE.PackedPhongMaterial().copy( mesh.material );
+			}
 
-		}
+	  if ( encodeMethod == 'OCT1Byte' ) {
 
-		if ( encodeMethod == 'ANGLES' ) {
+	    mesh.material.defines.USE_PACKED_NORMAL = 1;
 
-			mesh.material.defines.USE_PACKED_NORMAL = 0;
+			}
 
-		}
+	  if ( encodeMethod == 'OCT2Byte' ) {
 
-		if ( encodeMethod == 'OCT1Byte' ) {
+	    mesh.material.defines.USE_PACKED_NORMAL = 1;
 
-			mesh.material.defines.USE_PACKED_NORMAL = 1;
+			}
 
-		}
+	  if ( encodeMethod == 'DEFAULT' ) {
 
-		if ( encodeMethod == 'OCT2Byte' ) {
+	    mesh.material.defines.USE_PACKED_NORMAL = 2;
 
-			mesh.material.defines.USE_PACKED_NORMAL = 1;
-
-		}
-
-		if ( encodeMethod == 'DEFAULT' ) {
-
-			mesh.material.defines.USE_PACKED_NORMAL = 2;
+			}
 
 		}
+		/**
+		 * Make the input mesh.geometry's position attribute encoded and compressed.
+		 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data.
+		 *
+		 * @param {THREE.Mesh} mesh
+		 *
+		 */
 
-	}
-	/**
-	 * Make the input mesh.geometry's position attribute encoded and compressed.
-	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data.
+
+		function compressPositions( mesh ) {
+
+	  if ( ! mesh.geometry ) {
+
+	    console.error( 'Mesh must contain geometry. ' );
+
+			}
+
+	  const position = mesh.geometry.attributes.position;
+
+	  if ( ! position ) {
+
+	    console.error( 'Geometry must contain position attribute. ' );
+
+			}
+
+	  if ( position.isPacked ) return;
+
+	  if ( position.itemSize != 3 ) {
+
+	    console.error( 'position.itemSize is not 3, which cannot be packed. ' );
+
+			}
+
+	  const array = position.array;
+	  const encodingBytes = 2;
+	  const result = quantizedEncode( array, encodingBytes );
+	  const quantized = result.quantized;
+	  const decodeMat = result.decodeMat; // IMPORTANT: calculate original geometry bounding info first, before updating packed positions
+
+	  if ( mesh.geometry.boundingBox == null ) mesh.geometry.computeBoundingBox();
+	  if ( mesh.geometry.boundingSphere == null ) mesh.geometry.computeBoundingSphere();
+	  mesh.geometry.setAttribute( 'position', new three.BufferAttribute( quantized, 3 ) );
+	  mesh.geometry.attributes.position.isPacked = true;
+	  mesh.geometry.attributes.position.needsUpdate = true;
+	  mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes; // modify material
+
+	  if ( ! ( mesh.material instanceof PackedPhongMaterial_js.PackedPhongMaterial ) ) {
+
+	    mesh.material = new PackedPhongMaterial_js.PackedPhongMaterial().copy( mesh.material );
+
+			}
+
+	  mesh.material.defines.USE_PACKED_POSITION = 0;
+	  mesh.material.uniforms.quantizeMatPos.value = decodeMat;
+	  mesh.material.uniforms.quantizeMatPos.needsUpdate = true;
+
+		}
+		/**
+	 * Make the input mesh.geometry's uv attribute encoded and compressed.
+	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data.
 	 *
 	 * @param {THREE.Mesh} mesh
 	 *
 	 */
 
 
-	function compressPositions( mesh ) {
+		function compressUvs( mesh ) {
 
-		if ( ! mesh.geometry ) {
+	  if ( ! mesh.geometry ) {
 
-			console.error( 'Mesh must contain geometry. ' );
-
-		}
-
-		const position = mesh.geometry.attributes.position;
-
-		if ( ! position ) {
-
-			console.error( 'Geometry must contain position attribute. ' );
-
-		}
-
-		if ( position.isPacked ) return;
-
-		if ( position.itemSize != 3 ) {
-
-			console.error( 'position.itemSize is not 3, which cannot be packed. ' );
-
-		}
-
-		const array = position.array;
-		const encodingBytes = 2;
-		const result = quantizedEncode( array, encodingBytes );
-		const quantized = result.quantized;
-		const decodeMat = result.decodeMat; // IMPORTANT: calculate original geometry bounding info first, before updating packed positions
-
-		if ( mesh.geometry.boundingBox == null ) mesh.geometry.computeBoundingBox();
-		if ( mesh.geometry.boundingSphere == null ) mesh.geometry.computeBoundingSphere();
-		mesh.geometry.setAttribute( 'position', new THREE.BufferAttribute( quantized, 3 ) );
-		mesh.geometry.attributes.position.isPacked = true;
-		mesh.geometry.attributes.position.needsUpdate = true;
-		mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes; // modify material
-
-		if ( ! ( mesh.material instanceof THREE.PackedPhongMaterial ) ) {
-
-			mesh.material = new THREE.PackedPhongMaterial().copy( mesh.material );
-
-		}
-
-		mesh.material.defines.USE_PACKED_POSITION = 0;
-		mesh.material.uniforms.quantizeMatPos.value = decodeMat;
-		mesh.material.uniforms.quantizeMatPos.needsUpdate = true;
-
-	}
-	/**
- * Make the input mesh.geometry's uv attribute encoded and compressed.
- * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data.
- *
- * @param {THREE.Mesh} mesh
- *
- */
-
-
-	function compressUvs( mesh ) {
-
-		if ( ! mesh.geometry ) {
-
-			console.error( 'Mesh must contain geometry property. ' );
-
-		}
-
-		const uvs = mesh.geometry.attributes.uv;
-
-		if ( ! uvs ) {
-
-			console.error( 'Geometry must contain uv attribute. ' );
-
-		}
-
-		if ( uvs.isPacked ) return;
-		const range = {
-			min: Infinity,
-			max: - Infinity
-		};
-		const array = uvs.array;
-
-		for ( let i = 0; i < array.length; i ++ ) {
-
-			range.min = Math.min( range.min, array[ i ] );
-			range.max = Math.max( range.max, array[ i ] );
-
-		}
-
-		let result;
-
-		if ( range.min >= - 1.0 && range.max <= 1.0 ) {
-
-			// use default encoding method
-			result = new Uint16Array( array.length );
-
-			for ( let i = 0; i < array.length; i += 2 ) {
-
-				const encoded = defaultEncode( array[ i ], array[ i + 1 ], 0, 2 );
-				result[ i ] = encoded[ 0 ];
-				result[ i + 1 ] = encoded[ 1 ];
+	    console.error( 'Mesh must contain geometry property. ' );
 
 			}
 
-			mesh.geometry.setAttribute( 'uv', new THREE.BufferAttribute( result, 2, true ) );
-			mesh.geometry.attributes.uv.isPacked = true;
-			mesh.geometry.attributes.uv.needsUpdate = true;
-			mesh.geometry.attributes.uv.bytes = result.length * 2;
+	  const uvs = mesh.geometry.attributes.uv;
 
-			if ( ! ( mesh.material instanceof THREE.PackedPhongMaterial ) ) {
+	  if ( ! uvs ) {
 
-				mesh.material = new THREE.PackedPhongMaterial().copy( mesh.material );
+	    console.error( 'Geometry must contain uv attribute. ' );
 
 			}
 
-			mesh.material.defines.USE_PACKED_UV = 0;
+	  if ( uvs.isPacked ) return;
+	  const range = {
+	    min: Infinity,
+	    max: - Infinity
+	  };
+	  const array = uvs.array;
 
-		} else {
+	  for ( let i = 0; i < array.length; i ++ ) {
 
-			// use quantized encoding method
-			result = quantizedEncodeUV( array, 2 );
-			mesh.geometry.setAttribute( 'uv', new THREE.BufferAttribute( result.quantized, 2 ) );
-			mesh.geometry.attributes.uv.isPacked = true;
-			mesh.geometry.attributes.uv.needsUpdate = true;
-			mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
-
-			if ( ! ( mesh.material instanceof THREE.PackedPhongMaterial ) ) {
-
-				mesh.material = new THREE.PackedPhongMaterial().copy( mesh.material );
+	    range.min = Math.min( range.min, array[ i ] );
+	    range.max = Math.max( range.max, array[ i ] );
 
 			}
 
-			mesh.material.defines.USE_PACKED_UV = 1;
-			mesh.material.uniforms.quantizeMatUV.value = result.decodeMat;
-			mesh.material.uniforms.quantizeMatUV.needsUpdate = true;
+	  let result;
 
-		}
+	  if ( range.min >= - 1.0 && range.max <= 1.0 ) {
 
-	} // Encoding functions
+	    // use default encoding method
+	    result = new Uint16Array( array.length );
+
+	    for ( let i = 0; i < array.length; i += 2 ) {
+
+	      const encoded = defaultEncode( array[ i ], array[ i + 1 ], 0, 2 );
+	      result[ i ] = encoded[ 0 ];
+	      result[ i + 1 ] = encoded[ 1 ];
+
+				}
+
+	    mesh.geometry.setAttribute( 'uv', new three.BufferAttribute( result, 2, true ) );
+	    mesh.geometry.attributes.uv.isPacked = true;
+	    mesh.geometry.attributes.uv.needsUpdate = true;
+	    mesh.geometry.attributes.uv.bytes = result.length * 2;
+
+	    if ( ! ( mesh.material instanceof PackedPhongMaterial_js.PackedPhongMaterial ) ) {
+
+	      mesh.material = new PackedPhongMaterial_js.PackedPhongMaterial().copy( mesh.material );
+
+				}
+
+	    mesh.material.defines.USE_PACKED_UV = 0;
+
+			} else {
+
+	    // use quantized encoding method
+	    result = quantizedEncodeUV( array, 2 );
+	    mesh.geometry.setAttribute( 'uv', new three.BufferAttribute( result.quantized, 2 ) );
+	    mesh.geometry.attributes.uv.isPacked = true;
+	    mesh.geometry.attributes.uv.needsUpdate = true;
+	    mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
+
+	    if ( ! ( mesh.material instanceof PackedPhongMaterial_js.PackedPhongMaterial ) ) {
+
+	      mesh.material = new PackedPhongMaterial_js.PackedPhongMaterial().copy( mesh.material );
+
+				}
+
+	    mesh.material.defines.USE_PACKED_UV = 1;
+	    mesh.material.uniforms.quantizeMatUV.value = result.decodeMat;
+	    mesh.material.uniforms.quantizeMatUV.needsUpdate = true;
+
+			}
+
+		} // Encoding functions
 
 
-	function defaultEncode( x, y, z, bytes ) {
+		function defaultEncode( x, y, z, bytes ) {
 
-		if ( bytes == 1 ) {
+	  if ( bytes == 1 ) {
 
-			const tmpx = Math.round( ( x + 1 ) * 0.5 * 255 );
-			const tmpy = Math.round( ( y + 1 ) * 0.5 * 255 );
-			const tmpz = Math.round( ( z + 1 ) * 0.5 * 255 );
-			return new Uint8Array( [ tmpx, tmpy, tmpz ] );
+	    const tmpx = Math.round( ( x + 1 ) * 0.5 * 255 );
+	    const tmpy = Math.round( ( y + 1 ) * 0.5 * 255 );
+	    const tmpz = Math.round( ( z + 1 ) * 0.5 * 255 );
+	    return new Uint8Array( [ tmpx, tmpy, tmpz ] );
 
-		} else if ( bytes == 2 ) {
+			} else if ( bytes == 2 ) {
 
-			const tmpx = Math.round( ( x + 1 ) * 0.5 * 65535 );
-			const tmpy = Math.round( ( y + 1 ) * 0.5 * 65535 );
-			const tmpz = Math.round( ( z + 1 ) * 0.5 * 65535 );
-			return new Uint16Array( [ tmpx, tmpy, tmpz ] );
+	    const tmpx = Math.round( ( x + 1 ) * 0.5 * 65535 );
+	    const tmpy = Math.round( ( y + 1 ) * 0.5 * 65535 );
+	    const tmpz = Math.round( ( z + 1 ) * 0.5 * 65535 );
+	    return new Uint16Array( [ tmpx, tmpy, tmpz ] );
 
-		} else {
+			} else {
 
-			console.error( 'number of bytes must be 1 or 2' );
+	    console.error( 'number of bytes must be 1 or 2' );
 
-		}
+			}
 
-	} // for `Angles` encoding
-
-
-	function anglesEncode( x, y, z ) {
-
-		const normal0 = parseInt( 0.5 * ( 1.0 + Math.atan2( y, x ) / Math.PI ) * 65535 );
-		const normal1 = parseInt( 0.5 * ( 1.0 + z ) * 65535 );
-		return new Uint16Array( [ normal0, normal1 ] );
-
-	} // for `Octahedron` encoding
+		} // for `Angles` encoding
 
 
-	function octEncodeBest( x, y, z, bytes ) {
+		function anglesEncode( x, y, z ) {
 
-		let oct, dec, best, currentCos, bestCos; // Test various combinations of ceil and floor
-		// to minimize rounding errors
+	  const normal0 = parseInt( 0.5 * ( 1.0 + Math.atan2( y, x ) / Math.PI ) * 65535 );
+	  const normal1 = parseInt( 0.5 * ( 1.0 + z ) * 65535 );
+	  return new Uint16Array( [ normal0, normal1 ] );
 
-		best = oct = octEncodeVec3( x, y, z, 'floor', 'floor' );
-		dec = octDecodeVec2( oct );
-		bestCos = dot( x, y, z, dec );
-		oct = octEncodeVec3( x, y, z, 'ceil', 'floor' );
-		dec = octDecodeVec2( oct );
-		currentCos = dot( x, y, z, dec );
+		} // for `Octahedron` encoding
 
-		if ( currentCos > bestCos ) {
 
-			best = oct;
-			bestCos = currentCos;
+		function octEncodeBest( x, y, z, bytes ) {
 
-		}
+	  let oct, dec, best, currentCos, bestCos; // Test various combinations of ceil and floor
+	  // to minimize rounding errors
 
-		oct = octEncodeVec3( x, y, z, 'floor', 'ceil' );
-		dec = octDecodeVec2( oct );
-		currentCos = dot( x, y, z, dec );
+	  best = oct = octEncodeVec3( x, y, z, 'floor', 'floor' );
+	  dec = octDecodeVec2( oct );
+	  bestCos = dot( x, y, z, dec );
+	  oct = octEncodeVec3( x, y, z, 'ceil', 'floor' );
+	  dec = octDecodeVec2( oct );
+	  currentCos = dot( x, y, z, dec );
 
-		if ( currentCos > bestCos ) {
+	  if ( currentCos > bestCos ) {
 
-			best = oct;
-			bestCos = currentCos;
+	    best = oct;
+	    bestCos = currentCos;
 
-		}
+			}
 
-		oct = octEncodeVec3( x, y, z, 'ceil', 'ceil' );
-		dec = octDecodeVec2( oct );
-		currentCos = dot( x, y, z, dec );
+	  oct = octEncodeVec3( x, y, z, 'floor', 'ceil' );
+	  dec = octDecodeVec2( oct );
+	  currentCos = dot( x, y, z, dec );
 
-		if ( currentCos > bestCos ) {
+	  if ( currentCos > bestCos ) {
 
-			best = oct;
+	    best = oct;
+	    bestCos = currentCos;
 
-		}
+			}
 
-		return best;
+	  oct = octEncodeVec3( x, y, z, 'ceil', 'ceil' );
+	  dec = octDecodeVec2( oct );
+	  currentCos = dot( x, y, z, dec );
 
-		function octEncodeVec3( x0, y0, z0, xfunc, yfunc ) {
+	  if ( currentCos > bestCos ) {
 
-			let x = x0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
-			let y = y0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
+	    best = oct;
 
-			if ( z < 0 ) {
+			}
 
-				const tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-				const tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
-				x = tempx;
-				y = tempy;
-				let diff = 1 - Math.abs( x ) - Math.abs( y );
+	  return best;
 
-				if ( diff > 0 ) {
+	  function octEncodeVec3( x0, y0, z0, xfunc, yfunc ) {
 
-					diff += 0.001;
-					x += x > 0 ? diff / 2 : - diff / 2;
-					y += y > 0 ? diff / 2 : - diff / 2;
+	    let x = x0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
+	    let y = y0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
+
+	    if ( z < 0 ) {
+
+	      const tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+	      const tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+	      x = tempx;
+	      y = tempy;
+	      let diff = 1 - Math.abs( x ) - Math.abs( y );
+
+	      if ( diff > 0 ) {
+
+	        diff += 0.001;
+	        x += x > 0 ? diff / 2 : - diff / 2;
+	        y += y > 0 ? diff / 2 : - diff / 2;
+
+					}
+
+				}
+
+	    if ( bytes == 1 ) {
+
+	      return new Int8Array( [ Math[ xfunc ]( x * 127.5 + ( x < 0 ? 1 : 0 ) ), Math[ yfunc ]( y * 127.5 + ( y < 0 ? 1 : 0 ) ) ] );
+
+				}
+
+	    if ( bytes == 2 ) {
+
+	      return new Int16Array( [ Math[ xfunc ]( x * 32767.5 + ( x < 0 ? 1 : 0 ) ), Math[ yfunc ]( y * 32767.5 + ( y < 0 ? 1 : 0 ) ) ] );
 
 				}
 
 			}
 
-			if ( bytes == 1 ) {
+	  function octDecodeVec2( oct ) {
 
-				return new Int8Array( [ Math[ xfunc ]( x * 127.5 + ( x < 0 ? 1 : 0 ) ), Math[ yfunc ]( y * 127.5 + ( y < 0 ? 1 : 0 ) ) ] );
+	    let x = oct[ 0 ];
+	    let y = oct[ 1 ];
+
+	    if ( bytes == 1 ) {
+
+	      x /= x < 0 ? 127 : 128;
+	      y /= y < 0 ? 127 : 128;
+
+				} else if ( bytes == 2 ) {
+
+	      x /= x < 0 ? 32767 : 32768;
+	      y /= y < 0 ? 32767 : 32768;
+
+				}
+
+	    const z = 1 - Math.abs( x ) - Math.abs( y );
+
+	    if ( z < 0 ) {
+
+	      const tmpx = x;
+	      x = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+	      y = ( 1 - Math.abs( tmpx ) ) * ( y >= 0 ? 1 : - 1 );
+
+				}
+
+	    const length = Math.sqrt( x * x + y * y + z * z );
+	    return [ x / length, y / length, z / length ];
 
 			}
 
-			if ( bytes == 2 ) {
+	  function dot( x, y, z, vec3 ) {
 
-				return new Int16Array( [ Math[ xfunc ]( x * 32767.5 + ( x < 0 ? 1 : 0 ) ), Math[ yfunc ]( y * 32767.5 + ( y < 0 ? 1 : 0 ) ) ] );
+	    return x * vec3[ 0 ] + y * vec3[ 1 ] + z * vec3[ 2 ];
 
 			}
 
 		}
 
-		function octDecodeVec2( oct ) {
+		function quantizedEncode( array, bytes ) {
 
-			let x = oct[ 0 ];
-			let y = oct[ 1 ];
+	  let quantized, segments;
 
-			if ( bytes == 1 ) {
+	  if ( bytes == 1 ) {
 
-				x /= x < 0 ? 127 : 128;
-				y /= y < 0 ? 127 : 128;
+	    quantized = new Uint8Array( array.length );
+	    segments = 255;
 
 			} else if ( bytes == 2 ) {
 
-				x /= x < 0 ? 32767 : 32768;
-				y /= y < 0 ? 32767 : 32768;
+	    quantized = new Uint16Array( array.length );
+	    segments = 65535;
+
+			} else {
+
+	    console.error( 'number of bytes error! ' );
 
 			}
 
-			const z = 1 - Math.abs( x ) - Math.abs( y );
+	  const decodeMat = new three.Matrix4();
+	  const min = new Float32Array( 3 );
+	  const max = new Float32Array( 3 );
+	  min[ 0 ] = min[ 1 ] = min[ 2 ] = Number.MAX_VALUE;
+	  max[ 0 ] = max[ 1 ] = max[ 2 ] = - Number.MAX_VALUE;
 
-			if ( z < 0 ) {
+	  for ( let i = 0; i < array.length; i += 3 ) {
 
-				const tmpx = x;
-				x = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-				y = ( 1 - Math.abs( tmpx ) ) * ( y >= 0 ? 1 : - 1 );
+	    min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
+	    min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
+	    min[ 2 ] = Math.min( min[ 2 ], array[ i + 2 ] );
+	    max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
+	    max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
+	    max[ 2 ] = Math.max( max[ 2 ], array[ i + 2 ] );
 
 			}
 
-			const length = Math.sqrt( x * x + y * y + z * z );
-			return [ x / length, y / length, z / length ];
+	  decodeMat.scale( new three.Vector3( ( max[ 0 ] - min[ 0 ] ) / segments, ( max[ 1 ] - min[ 1 ] ) / segments, ( max[ 2 ] - min[ 2 ] ) / segments ) );
+	  decodeMat.elements[ 12 ] = min[ 0 ];
+	  decodeMat.elements[ 13 ] = min[ 1 ];
+	  decodeMat.elements[ 14 ] = min[ 2 ];
+	  decodeMat.transpose();
+	  const multiplier = new Float32Array( [ max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0, max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0, max[ 2 ] !== min[ 2 ] ? segments / ( max[ 2 ] - min[ 2 ] ) : 0 ] );
+
+	  for ( let i = 0; i < array.length; i += 3 ) {
+
+	    quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
+	    quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
+	    quantized[ i + 2 ] = Math.floor( ( array[ i + 2 ] - min[ 2 ] ) * multiplier[ 2 ] );
+
+			}
+
+	  return {
+	    quantized: quantized,
+	    decodeMat: decodeMat
+	  };
 
 		}
 
-		function dot( x, y, z, vec3 ) {
+		function quantizedEncodeUV( array, bytes ) {
 
-			return x * vec3[ 0 ] + y * vec3[ 1 ] + z * vec3[ 2 ];
+	  let quantized, segments;
 
-		}
+	  if ( bytes == 1 ) {
 
-	}
+	    quantized = new Uint8Array( array.length );
+	    segments = 255;
 
-	function quantizedEncode( array, bytes ) {
+			} else if ( bytes == 2 ) {
 
-		let quantized, segments;
+	    quantized = new Uint16Array( array.length );
+	    segments = 65535;
 
-		if ( bytes == 1 ) {
+			} else {
 
-			quantized = new Uint8Array( array.length );
-			segments = 255;
+	    console.error( 'number of bytes error! ' );
 
-		} else if ( bytes == 2 ) {
+			}
 
-			quantized = new Uint16Array( array.length );
-			segments = 65535;
+	  const decodeMat = new three.Matrix3();
+	  const min = new Float32Array( 2 );
+	  const max = new Float32Array( 2 );
+	  min[ 0 ] = min[ 1 ] = Number.MAX_VALUE;
+	  max[ 0 ] = max[ 1 ] = - Number.MAX_VALUE;
 
-		} else {
+	  for ( let i = 0; i < array.length; i += 2 ) {
 
-			console.error( 'number of bytes error! ' );
+	    min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
+	    min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
+	    max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
+	    max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
 
-		}
+			}
 
-		const decodeMat = new THREE.Matrix4();
-		const min = new Float32Array( 3 );
-		const max = new Float32Array( 3 );
-		min[ 0 ] = min[ 1 ] = min[ 2 ] = Number.MAX_VALUE;
-		max[ 0 ] = max[ 1 ] = max[ 2 ] = - Number.MAX_VALUE;
+	  decodeMat.scale( ( max[ 0 ] - min[ 0 ] ) / segments, ( max[ 1 ] - min[ 1 ] ) / segments );
+	  decodeMat.elements[ 6 ] = min[ 0 ];
+	  decodeMat.elements[ 7 ] = min[ 1 ];
+	  decodeMat.transpose();
+	  const multiplier = new Float32Array( [ max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0, max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0 ] );
 
-		for ( let i = 0; i < array.length; i += 3 ) {
+	  for ( let i = 0; i < array.length; i += 2 ) {
 
-			min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
-			min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
-			min[ 2 ] = Math.min( min[ 2 ], array[ i + 2 ] );
-			max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
-			max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
-			max[ 2 ] = Math.max( max[ 2 ], array[ i + 2 ] );
+	    quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
+	    quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
 
-		}
+			}
 
-		decodeMat.scale( new THREE.Vector3( ( max[ 0 ] - min[ 0 ] ) / segments, ( max[ 1 ] - min[ 1 ] ) / segments, ( max[ 2 ] - min[ 2 ] ) / segments ) );
-		decodeMat.elements[ 12 ] = min[ 0 ];
-		decodeMat.elements[ 13 ] = min[ 1 ];
-		decodeMat.elements[ 14 ] = min[ 2 ];
-		decodeMat.transpose();
-		const multiplier = new Float32Array( [ max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0, max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0, max[ 2 ] !== min[ 2 ] ? segments / ( max[ 2 ] - min[ 2 ] ) : 0 ] );
-
-		for ( let i = 0; i < array.length; i += 3 ) {
-
-			quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
-			quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
-			quantized[ i + 2 ] = Math.floor( ( array[ i + 2 ] - min[ 2 ] ) * multiplier[ 2 ] );
+	  return {
+	    quantized: quantized,
+	    decodeMat: decodeMat
+	  };
 
 		}
 
-		return {
-			quantized: quantized,
-			decodeMat: decodeMat
-		};
+		exports.compressNormals = compressNormals;
+		exports.compressPositions = compressPositions;
+		exports.compressUvs = compressUvs;
 
-	}
+		Object.defineProperty( exports, '__esModule', { value: true } );
 
-	function quantizedEncodeUV( array, bytes ) {
-
-		let quantized, segments;
-
-		if ( bytes == 1 ) {
-
-			quantized = new Uint8Array( array.length );
-			segments = 255;
-
-		} else if ( bytes == 2 ) {
-
-			quantized = new Uint16Array( array.length );
-			segments = 65535;
-
-		} else {
-
-			console.error( 'number of bytes error! ' );
-
-		}
-
-		const decodeMat = new THREE.Matrix3();
-		const min = new Float32Array( 2 );
-		const max = new Float32Array( 2 );
-		min[ 0 ] = min[ 1 ] = Number.MAX_VALUE;
-		max[ 0 ] = max[ 1 ] = - Number.MAX_VALUE;
-
-		for ( let i = 0; i < array.length; i += 2 ) {
-
-			min[ 0 ] = Math.min( min[ 0 ], array[ i + 0 ] );
-			min[ 1 ] = Math.min( min[ 1 ], array[ i + 1 ] );
-			max[ 0 ] = Math.max( max[ 0 ], array[ i + 0 ] );
-			max[ 1 ] = Math.max( max[ 1 ], array[ i + 1 ] );
-
-		}
-
-		decodeMat.scale( ( max[ 0 ] - min[ 0 ] ) / segments, ( max[ 1 ] - min[ 1 ] ) / segments );
-		decodeMat.elements[ 6 ] = min[ 0 ];
-		decodeMat.elements[ 7 ] = min[ 1 ];
-		decodeMat.transpose();
-		const multiplier = new Float32Array( [ max[ 0 ] !== min[ 0 ] ? segments / ( max[ 0 ] - min[ 0 ] ) : 0, max[ 1 ] !== min[ 1 ] ? segments / ( max[ 1 ] - min[ 1 ] ) : 0 ] );
-
-		for ( let i = 0; i < array.length; i += 2 ) {
-
-			quantized[ i + 0 ] = Math.floor( ( array[ i + 0 ] - min[ 0 ] ) * multiplier[ 0 ] );
-			quantized[ i + 1 ] = Math.floor( ( array[ i + 1 ] - min[ 1 ] ) * multiplier[ 1 ] );
-
-		}
-
-		return {
-			quantized: quantized,
-			decodeMat: decodeMat
-		};
-
-	}
-
-	THREE.GeometryCompressionUtils = {};
-	THREE.GeometryCompressionUtils.compressNormals = compressNormals;
-	THREE.GeometryCompressionUtils.compressPositions = compressPositions;
-	THREE.GeometryCompressionUtils.compressUvs = compressUvs;
+	} ) );
 
 } )();

@@ -1,95 +1,109 @@
 ( function () {
 
-	/**
- * MDD is a special format that stores a position for every vertex in a model for every frame in an animation.
- * Similar to BVH, it can be used to transfer animation data between different 3D applications or engines.
- *
- * MDD stores its data in binary format (big endian) in the following way:
- *
- * number of frames (a single uint32)
- * number of vertices (a single uint32)
- * time values for each frame (sequence of float32)
- * vertex data for each frame (sequence of float32)
- */
+	( function ( global, factory ) {
 
-	class MDDLoader extends THREE.Loader {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-		constructor( manager ) {
+	} )( this, ( function ( exports, three ) {
 
-			super( manager );
+		'use strict';
 
-		}
+		/**
+	 * MDD is a special format that stores a position for every vertex in a model for every frame in an animation.
+	 * Similar to BVH, it can be used to transfer animation data between different 3D applications or engines.
+	 *
+	 * MDD stores its data in binary format (big endian) in the following way:
+	 *
+	 * number of frames (a single uint32)
+	 * number of vertices (a single uint32)
+	 * time values for each frame (sequence of float32)
+	 * vertex data for each frame (sequence of float32)
+	 */
 
-		load( url, onLoad, onProgress, onError ) {
+		class MDDLoader extends three.Loader {
 
-			const scope = this;
-			const loader = new THREE.FileLoader( this.manager );
-			loader.setPath( this.path );
-			loader.setResponseType( 'arraybuffer' );
-			loader.load( url, function ( data ) {
+	  constructor( manager ) {
 
-				onLoad( scope.parse( data ) );
-
-			}, onProgress, onError );
-
-		}
-
-		parse( data ) {
-
-			const view = new DataView( data );
-			const totalFrames = view.getUint32( 0 );
-			const totalPoints = view.getUint32( 4 );
-			let offset = 8; // animation clip
-
-			const times = new Float32Array( totalFrames );
-			const values = new Float32Array( totalFrames * totalFrames ).fill( 0 );
-
-			for ( let i = 0; i < totalFrames; i ++ ) {
-
-				times[ i ] = view.getFloat32( offset );
-				offset += 4;
-				values[ totalFrames * i + i ] = 1;
+	    super( manager );
 
 			}
 
-			const track = new THREE.NumberKeyframeTrack( '.morphTargetInfluences', times, values );
-			const clip = new THREE.AnimationClip( 'default', times[ times.length - 1 ], [ track ] ); // morph targets
+	  load( url, onLoad, onProgress, onError ) {
 
-			const morphTargets = [];
+	    const scope = this;
+	    const loader = new three.FileLoader( this.manager );
+	    loader.setPath( this.path );
+	    loader.setResponseType( 'arraybuffer' );
+	    loader.load( url, function ( data ) {
 
-			for ( let i = 0; i < totalFrames; i ++ ) {
+	      onLoad( scope.parse( data ) );
 
-				const morphTarget = new Float32Array( totalPoints * 3 );
+				}, onProgress, onError );
 
-				for ( let j = 0; j < totalPoints; j ++ ) {
+			}
 
-					const stride = j * 3;
-					morphTarget[ stride + 0 ] = view.getFloat32( offset );
-					offset += 4; // x
+	  parse( data ) {
 
-					morphTarget[ stride + 1 ] = view.getFloat32( offset );
-					offset += 4; // y
+	    const view = new DataView( data );
+	    const totalFrames = view.getUint32( 0 );
+	    const totalPoints = view.getUint32( 4 );
+	    let offset = 8; // animation clip
 
-					morphTarget[ stride + 2 ] = view.getFloat32( offset );
-					offset += 4; // z
+	    const times = new Float32Array( totalFrames );
+	    const values = new Float32Array( totalFrames * totalFrames ).fill( 0 );
+
+	    for ( let i = 0; i < totalFrames; i ++ ) {
+
+	      times[ i ] = view.getFloat32( offset );
+	      offset += 4;
+	      values[ totalFrames * i + i ] = 1;
 
 				}
 
-				const attribute = new THREE.BufferAttribute( morphTarget, 3 );
-				attribute.name = 'morph_' + i;
-				morphTargets.push( attribute );
+	    const track = new three.NumberKeyframeTrack( '.morphTargetInfluences', times, values );
+	    const clip = new three.AnimationClip( 'default', times[ times.length - 1 ], [ track ] ); // morph targets
+
+	    const morphTargets = [];
+
+	    for ( let i = 0; i < totalFrames; i ++ ) {
+
+	      const morphTarget = new Float32Array( totalPoints * 3 );
+
+	      for ( let j = 0; j < totalPoints; j ++ ) {
+
+	        const stride = j * 3;
+	        morphTarget[ stride + 0 ] = view.getFloat32( offset );
+	        offset += 4; // x
+
+	        morphTarget[ stride + 1 ] = view.getFloat32( offset );
+	        offset += 4; // y
+
+	        morphTarget[ stride + 2 ] = view.getFloat32( offset );
+	        offset += 4; // z
+
+					}
+
+	      const attribute = new three.BufferAttribute( morphTarget, 3 );
+	      attribute.name = 'morph_' + i;
+	      morphTargets.push( attribute );
+
+				}
+
+	    return {
+	      morphTargets: morphTargets,
+	      clip: clip
+	    };
 
 			}
 
-			return {
-				morphTargets: morphTargets,
-				clip: clip
-			};
-
 		}
 
-	}
+		exports.MDDLoader = MDDLoader;
 
-	THREE.MDDLoader = MDDLoader;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

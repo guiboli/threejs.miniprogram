@@ -1,46 +1,56 @@
 ( function () {
 
-	/**
- * parameters = {
- *  color: <hex>,
- *  linewidth: <float>,
- *  dashed: <boolean>,
- *  dashScale: <float>,
- *  dashSize: <float>,
- *  dashOffset: <float>,
- *  gapSize: <float>,
- *  resolution: <Vector2>, // to be set by renderer
- * }
- */
-	THREE.UniformsLib.line = {
-		worldUnits: {
-			value: 1
-		},
-		linewidth: {
-			value: 1
-		},
-		resolution: {
-			value: new THREE.Vector2( 1, 1 )
-		},
-		dashOffset: {
-			value: 0
-		},
-		dashScale: {
-			value: 1
-		},
-		dashSize: {
-			value: 1
-		},
-		gapSize: {
-			value: 1
-		} // todo FIX - maybe change to totalSize
+	( function ( global, factory ) {
 
-	};
-	THREE.ShaderLib[ 'line' ] = {
-		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.fog, THREE.UniformsLib.line ] ),
-		vertexShader:
-  /* glsl */
-  `
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		/**
+	 * parameters = {
+	 *  color: <hex>,
+	 *  linewidth: <float>,
+	 *  dashed: <boolean>,
+	 *  dashScale: <float>,
+	 *  dashSize: <float>,
+	 *  dashOffset: <float>,
+	 *  gapSize: <float>,
+	 *  resolution: <Vector2>, // to be set by renderer
+	 * }
+	 */
+		three.UniformsLib.line = {
+	  worldUnits: {
+	    value: 1
+	  },
+	  linewidth: {
+	    value: 1
+	  },
+	  resolution: {
+	    value: new three.Vector2( 1, 1 )
+	  },
+	  dashOffset: {
+	    value: 0
+	  },
+	  dashScale: {
+	    value: 1
+	  },
+	  dashSize: {
+	    value: 1
+	  },
+	  gapSize: {
+	    value: 1
+	  } // todo FIX - maybe change to totalSize
+
+		};
+		three.ShaderLib[ 'line' ] = {
+	  uniforms: three.UniformsUtils.merge( [ three.UniformsLib.common, three.UniformsLib.fog, three.UniformsLib.line ] ),
+	  vertexShader:
+	  /* glsl */
+	  `
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -269,9 +279,9 @@
 
 		}
 		`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 		uniform vec3 diffuse;
 		uniform float opacity;
 		uniform float linewidth;
@@ -431,213 +441,217 @@
 
 		}
 		`
-	};
+		};
 
-	class LineMaterial extends THREE.ShaderMaterial {
+		class LineMaterial extends three.ShaderMaterial {
 
-		constructor( parameters ) {
+	  constructor( parameters ) {
 
-			super( {
-				type: 'LineMaterial',
-				uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'line' ].uniforms ),
-				vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
-				fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
-				clipping: true // required for clipping support
+	    super( {
+	      type: 'LineMaterial',
+	      uniforms: three.UniformsUtils.clone( three.ShaderLib[ 'line' ].uniforms ),
+	      vertexShader: three.ShaderLib[ 'line' ].vertexShader,
+	      fragmentShader: three.ShaderLib[ 'line' ].fragmentShader,
+	      clipping: true // required for clipping support
 
-			} );
-			Object.defineProperties( this, {
-				color: {
-					enumerable: true,
-					get: function () {
+	    } );
+	    Object.defineProperties( this, {
+	      color: {
+	        enumerable: true,
+	        get: function () {
 
-						return this.uniforms.diffuse.value;
+	          return this.uniforms.diffuse.value;
 
-					},
-					set: function ( value ) {
+						},
+	        set: function ( value ) {
 
-						this.uniforms.diffuse.value = value;
+	          this.uniforms.diffuse.value = value;
 
-					}
-				},
-				worldUnits: {
-					enumerable: true,
-					get: function () {
+						}
+	      },
+	      worldUnits: {
+	        enumerable: true,
+	        get: function () {
 
-						return 'WORLD_UNITS' in this.defines;
+	          return 'WORLD_UNITS' in this.defines;
 
-					},
-					set: function ( value ) {
+						},
+	        set: function ( value ) {
 
-						if ( value === true ) {
+	          if ( value === true ) {
 
-							this.defines.WORLD_UNITS = '';
+	            this.defines.WORLD_UNITS = '';
 
-						} else {
+							} else {
 
-							delete this.defines.WORLD_UNITS;
+	            delete this.defines.WORLD_UNITS;
+
+							}
+
+						}
+	      },
+	      linewidth: {
+	        enumerable: true,
+	        get: function () {
+
+	          return this.uniforms.linewidth.value;
+
+						},
+	        set: function ( value ) {
+
+	          this.uniforms.linewidth.value = value;
+
+						}
+	      },
+	      dashed: {
+	        enumerable: true,
+	        get: function () {
+
+	          return Boolean( 'USE_DASH' in this.defines );
+
+						},
+
+	        set( value ) {
+
+	          if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
+
+	            this.needsUpdate = true;
+
+							}
+
+	          if ( value === true ) {
+
+	            this.defines.USE_DASH = '';
+
+							} else {
+
+	            delete this.defines.USE_DASH;
+
+							}
 
 						}
 
-					}
-				},
-				linewidth: {
-					enumerable: true,
-					get: function () {
+	      },
+	      dashScale: {
+	        enumerable: true,
+	        get: function () {
 
-						return this.uniforms.linewidth.value;
+	          return this.uniforms.dashScale.value;
 
-					},
-					set: function ( value ) {
+						},
+	        set: function ( value ) {
 
-						this.uniforms.linewidth.value = value;
-
-					}
-				},
-				dashed: {
-					enumerable: true,
-					get: function () {
-
-						return Boolean( 'USE_DASH' in this.defines );
-
-					},
-
-					set( value ) {
-
-						if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
-
-							this.needsUpdate = true;
+	          this.uniforms.dashScale.value = value;
 
 						}
+	      },
+	      dashSize: {
+	        enumerable: true,
+	        get: function () {
 
-						if ( value === true ) {
+	          return this.uniforms.dashSize.value;
 
-							this.defines.USE_DASH = '';
+						},
+	        set: function ( value ) {
 
-						} else {
-
-							delete this.defines.USE_DASH;
-
-						}
-
-					}
-
-				},
-				dashScale: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.dashScale.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.dashScale.value = value;
-
-					}
-				},
-				dashSize: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.dashSize.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.dashSize.value = value;
-
-					}
-				},
-				dashOffset: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.dashOffset.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.dashOffset.value = value;
-
-					}
-				},
-				gapSize: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.gapSize.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.gapSize.value = value;
-
-					}
-				},
-				opacity: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.opacity.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.opacity.value = value;
-
-					}
-				},
-				resolution: {
-					enumerable: true,
-					get: function () {
-
-						return this.uniforms.resolution.value;
-
-					},
-					set: function ( value ) {
-
-						this.uniforms.resolution.value.copy( value );
-
-					}
-				},
-				alphaToCoverage: {
-					enumerable: true,
-					get: function () {
-
-						return Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines );
-
-					},
-					set: function ( value ) {
-
-						if ( Boolean( value ) !== Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines ) ) {
-
-							this.needsUpdate = true;
+	          this.uniforms.dashSize.value = value;
 
 						}
+	      },
+	      dashOffset: {
+	        enumerable: true,
+	        get: function () {
 
-						if ( value === true ) {
+	          return this.uniforms.dashOffset.value;
 
-							this.defines.USE_ALPHA_TO_COVERAGE = '';
-							this.extensions.derivatives = true;
+						},
+	        set: function ( value ) {
 
-						} else {
-
-							delete this.defines.USE_ALPHA_TO_COVERAGE;
-							this.extensions.derivatives = false;
+	          this.uniforms.dashOffset.value = value;
 
 						}
+	      },
+	      gapSize: {
+	        enumerable: true,
+	        get: function () {
 
-					}
-				}
-			} );
-			this.setValues( parameters );
+	          return this.uniforms.gapSize.value;
+
+						},
+	        set: function ( value ) {
+
+	          this.uniforms.gapSize.value = value;
+
+						}
+	      },
+	      opacity: {
+	        enumerable: true,
+	        get: function () {
+
+	          return this.uniforms.opacity.value;
+
+						},
+	        set: function ( value ) {
+
+	          this.uniforms.opacity.value = value;
+
+						}
+	      },
+	      resolution: {
+	        enumerable: true,
+	        get: function () {
+
+	          return this.uniforms.resolution.value;
+
+						},
+	        set: function ( value ) {
+
+	          this.uniforms.resolution.value.copy( value );
+
+						}
+	      },
+	      alphaToCoverage: {
+	        enumerable: true,
+	        get: function () {
+
+	          return Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines );
+
+						},
+	        set: function ( value ) {
+
+	          if ( Boolean( value ) !== Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines ) ) {
+
+	            this.needsUpdate = true;
+
+							}
+
+	          if ( value === true ) {
+
+	            this.defines.USE_ALPHA_TO_COVERAGE = '';
+	            this.extensions.derivatives = true;
+
+							} else {
+
+	            delete this.defines.USE_ALPHA_TO_COVERAGE;
+	            this.extensions.derivatives = false;
+
+							}
+
+						}
+	      }
+	    } );
+	    this.setValues( parameters );
+
+			}
 
 		}
 
-	}
+		LineMaterial.prototype.isLineMaterial = true;
 
-	LineMaterial.prototype.isLineMaterial = true;
+		exports.LineMaterial = LineMaterial;
 
-	THREE.LineMaterial = LineMaterial;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

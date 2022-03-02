@@ -1,29 +1,39 @@
 ( function () {
 
-	/**
- * Kaleidoscope Shader
- * Radial reflection around center point
- * Ported from: http://pixelshaders.com/editor/
- * by Toby Schachman / http://tobyschachman.com/
- *
- * sides: number of reflections
- * angle: initial angle in radians
- */
-	const KaleidoShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'sides': {
-				value: 6.0
-			},
-			'angle': {
-				value: 0.0
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Kaleidoscope Shader
+	 * Radial reflection around center point
+	 * Ported from: http://pixelshaders.com/editor/
+	 * by Toby Schachman / http://tobyschachman.com/
+	 *
+	 * sides: number of reflections
+	 * angle: initial angle in radians
+	 */
+		const KaleidoShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'sides': {
+	      value: 6.0
+	    },
+	    'angle': {
+	      value: 0.0
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -33,9 +43,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDiffuse;
 		uniform float sides;
@@ -56,8 +66,12 @@
 			gl_FragColor = color;
 
 		}`
-	};
+		};
 
-	THREE.KaleidoShader = KaleidoShader;
+		exports.KaleidoShader = KaleidoShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

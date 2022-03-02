@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/accessors/ScreenUVNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ResolutionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ResolutionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, ResolutionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ResolutionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ResolutionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, ResolutionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,7 +26,7 @@
 
 	ScreenUVNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	ScreenUVNode.prototype.constructor = ScreenUVNode;
-	ScreenUVNode.prototype.nodeType = "ScreenUV";
+	ScreenUVNode.prototype.nodeType = 'ScreenUV';
 
 	ScreenUVNode.prototype.generate = function ( builder, output ) {
 
@@ -34,7 +38,7 @@
 
 		} else {
 
-			console.warn( "THREE.ScreenUVNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.ScreenUVNode is not compatible with ' + builder.shader + ' shader.' );
 
 			result = 'vec2( 0.0 )';
 
@@ -72,4 +76,4 @@
 
 	exports.ScreenUVNode = ScreenUVNode;
 
-})));
+} ) ) );

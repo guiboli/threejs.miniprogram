@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/CubeTextureNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, InputNode_js, ReflectNode_js, ColorSpaceNode_js, ExpressionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, InputNode_js, ReflectNode_js, ColorSpaceNode_js, ExpressionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -24,7 +28,7 @@
 
 	CubeTextureNode.prototype = Object.create( InputNode_js.InputNode.prototype );
 	CubeTextureNode.prototype.constructor = CubeTextureNode;
-	CubeTextureNode.prototype.nodeType = "CubeTexture";
+	CubeTextureNode.prototype.nodeType = 'CubeTexture';
 
 	CubeTextureNode.prototype.getTexture = function ( builder, output ) {
 
@@ -114,4 +118,4 @@
 
 	exports.CubeTextureNode = CubeTextureNode;
 
-})));
+} ) ) );

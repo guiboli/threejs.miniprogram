@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/Vector3Node.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, InputNode_js, NodeUtils_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, InputNode_js, NodeUtils_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,13 +26,13 @@
 
 	Vector3Node.prototype = Object.create( InputNode_js.InputNode.prototype );
 	Vector3Node.prototype.constructor = Vector3Node;
-	Vector3Node.prototype.nodeType = "Vector3";
+	Vector3Node.prototype.nodeType = 'Vector3';
 
 	NodeUtils_js.NodeUtils.addShortcuts( Vector3Node.prototype, 'value', [ 'x', 'y', 'z' ] );
 
 	Vector3Node.prototype.generateReadonly = function ( builder, output, uuid, type/*, ns, needsUpdate*/ ) {
 
-		return builder.format( "vec3( " + this.x + ", " + this.y + ", " + this.z + " )", type, output );
+		return builder.format( 'vec3( ' + this.x + ', ' + this.y + ', ' + this.z + ' )', type, output );
 
 	};
 
@@ -64,4 +68,4 @@
 
 	exports.Vector3Node = Vector3Node;
 
-})));
+} ) ) );

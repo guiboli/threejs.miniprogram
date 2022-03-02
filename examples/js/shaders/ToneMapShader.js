@@ -1,32 +1,42 @@
 ( function () {
 
-	/**
- * Full-screen tone-mapping shader based on http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
- */
-	const ToneMapShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'averageLuminance': {
-				value: 1.0
-			},
-			'luminanceMap': {
-				value: null
-			},
-			'maxLuminance': {
-				value: 16.0
-			},
-			'minLuminance': {
-				value: 0.01
-			},
-			'middleGrey': {
-				value: 0.6
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Full-screen tone-mapping shader based on http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
+	 */
+		const ToneMapShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'averageLuminance': {
+	      value: 1.0
+	    },
+	    'luminanceMap': {
+	      value: null
+	    },
+	    'maxLuminance': {
+	      value: 16.0
+	    },
+	    'minLuminance': {
+	      value: 0.01
+	    },
+	    'middleGrey': {
+	      value: 0.6
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -36,9 +46,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		#include <common>
 
@@ -80,8 +90,12 @@
 			gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );
 
 		}`
-	};
+		};
 
-	THREE.ToneMapShader = ToneMapShader;
+		exports.ToneMapShader = ToneMapShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

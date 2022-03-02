@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/OBJLoader2.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MeshReceiver.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MaterialHandler.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MeshReceiver.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MaterialHandler.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, OBJLoader2Parser_js, MeshReceiver_js, MaterialHandler_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MeshReceiver.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MaterialHandler.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/worker/parallel/OBJLoader2Parser.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MeshReceiver.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/loaders/obj2/shared/MaterialHandler.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, OBJLoader2Parser_js, MeshReceiver_js, MaterialHandler_js ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -33,12 +37,13 @@
 		this.meshReceiver = new MeshReceiver_js.MeshReceiver( this.materialHandler );
 
 		// as OBJLoader2 is no longer derived from OBJLoader2Parser, we need to override the default onAssetAvailable callback
-		let scope = this;
-		let defaultOnAssetAvailable = function ( payload ) {
+		const scope = this;
+		const defaultOnAssetAvailable = function ( payload ) {
 
 			scope._onAssetAvailable( payload );
 
 		};
+
 		this.parser.setCallbackOnAssetAvailable( defaultOnAssetAvailable );
 
 	};
@@ -227,10 +232,10 @@
 		 */
 		load: function ( url, onLoad, onFileLoadProgress, onError, onMeshAlter ) {
 
-			let scope = this;
+			const scope = this;
 			if ( onLoad === null || onLoad === undefined || ! ( onLoad instanceof Function ) ) {
 
-				let errorMessage = 'onLoad is not a function! Aborting...';
+				const errorMessage = 'onLoad is not a function! Aborting...';
 				scope.parser.callbacks.onError( errorMessage );
 				throw errorMessage;
 
@@ -239,6 +244,7 @@
 				this.parser.setCallbackOnLoad( onLoad );
 
 			}
+
 			if ( onError === null || onError === undefined || ! ( onError instanceof Function ) ) {
 
 				onError = function ( event ) {
@@ -249,26 +255,30 @@
 						errorMessage = 'Error occurred while downloading!\nurl: ' + event.currentTarget.responseURL + '\nstatus: ' + event.currentTarget.statusText;
 
 					}
+
 					scope.parser.callbacks.onError( errorMessage );
 
 				};
 
 			}
+
 			if ( ! url ) {
 
 				onError( 'An invalid url was provided. Unable to continue!' );
 
 			}
-			let urlFull = new URL( url, window.location.href ).href;
+
+			const urlFull = new URL( url, window.location.href ).href;
 			let filename = urlFull;
-			let urlParts = urlFull.split( '/' );
+			const urlParts = urlFull.split( '/' );
 			if ( urlParts.length > 2 ) {
 
 				filename = urlParts[ urlParts.length - 1 ];
-				let urlPartsPath = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
+				const urlPartsPath = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
 				if ( urlPartsPath !== undefined && urlPartsPath !== null ) this.path = urlPartsPath;
 
 			}
+
 			if ( onFileLoadProgress === null || onFileLoadProgress === undefined || ! ( onFileLoadProgress instanceof Function ) ) {
 
 				let numericalValueRef = 0;
@@ -281,7 +291,7 @@
 					if ( numericalValue > numericalValueRef ) {
 
 						numericalValueRef = numericalValue;
-						let output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
+						const output = 'Download of "' + url + '": ' + ( numericalValue * 100 ).toFixed( 2 ) + '%';
 						scope.parser.callbacks.onProgress( 'progressLoad', output, numericalValue );
 
 					}
@@ -291,12 +301,13 @@
 			}
 
 			this.setCallbackOnMeshAlter( onMeshAlter );
-			let fileLoaderOnLoad = function ( content ) {
+			const fileLoaderOnLoad = function ( content ) {
 
-				scope.parser.callbacks.onLoad( scope.parse( content ), "OBJLoader2#load: Parsing completed" );
+				scope.parser.callbacks.onLoad( scope.parse( content ), 'OBJLoader2#load: Parsing completed' );
 
 			};
-			let fileLoader = new THREE.FileLoader( this.manager );
+
+			const fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path || this.resourcePath );
 			fileLoader.setResponseType( 'arraybuffer' );
 			fileLoader.load( filename, fileLoaderOnLoad, onFileLoadProgress, onError );
@@ -317,6 +328,7 @@
 				throw 'Provided content is not a valid ArrayBuffer or String. Unable to continue parsing';
 
 			}
+
 			if ( this.parser.logging.enabled ) {
 
 				console.time( 'OBJLoader parse: ' + this.modelName );
@@ -344,11 +356,13 @@
 				this.parser.callbacks.onError( 'Provided content was neither of type String nor Uint8Array! Aborting...' );
 
 			}
+
 			if ( this.parser.logging.enabled ) {
 
 				console.timeEnd( 'OBJLoader parse: ' + this.modelName );
 
 			}
+
 			return this.baseObject3d;
 
 		},
@@ -359,8 +373,8 @@
 
 			if ( payload.type === 'mesh' ) {
 
-				let meshes = this.meshReceiver.buildMeshes( payload );
-				for ( let mesh of meshes ) {
+				const meshes = this.meshReceiver.buildMeshes( payload );
+				for ( const mesh of meshes ) {
 
 					this.baseObject3d.add( mesh );
 
@@ -378,4 +392,4 @@
 
 	exports.OBJLoader2 = OBJLoader2;
 
-})));
+} ) ) );

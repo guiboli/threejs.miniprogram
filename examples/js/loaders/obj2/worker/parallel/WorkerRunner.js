@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/worker/parallel/WorkerRunner.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {} ) );
+
+}( this, ( function ( exports ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -21,24 +25,24 @@
 		 * @param {Object} objToAlter The objToAlter instance
 		 * @param {Object} params The parameter object
 		 */
-		applyProperties: function (objToAlter, params, forceCreation) {
+		applyProperties: function ( objToAlter, params, forceCreation ) {
 
 			// fast-fail
-			if (objToAlter === undefined || objToAlter === null || params === undefined || params === null) return;
+			if ( objToAlter === undefined || objToAlter === null || params === undefined || params === null ) return;
 
 			let property, funcName, values;
-			for (property in params) {
+			for ( property in params ) {
 
-				funcName = 'set' + property.substring(0, 1).toLocaleUpperCase() + property.substring(1);
-				values = params[property];
+				funcName = 'set' + property.substring( 0, 1 ).toLocaleUpperCase() + property.substring( 1 );
+				values = params[ property ];
 
-				if (typeof objToAlter[funcName] === 'function') {
+				if ( typeof objToAlter[ funcName ] === 'function' ) {
 
-					objToAlter[funcName](values);
+					objToAlter[ funcName ]( values );
 
-				} else if (objToAlter.hasOwnProperty(property) || forceCreation) {
+				} else if ( objToAlter.hasOwnProperty( property ) || forceCreation ) {
 
-					objToAlter[property] = values;
+					objToAlter[ property ] = values;
 
 				}
 
@@ -69,10 +73,11 @@
 				this.logging.debug = payload.logging.debug === true;
 
 			}
+
 			if ( payload.cmd === 'parse' ) {
 
-				let scope = this;
-				let callbacks = {
+				const scope = this;
+				const callbacks = {
 					callbackOnAssetAvailable: function ( payload ) {
 
 						self.postMessage( payload );
@@ -85,16 +90,17 @@
 					}
 				};
 
-				let parser = this.parser;
+				const parser = this.parser;
 				if ( typeof parser[ 'setLogging' ] === 'function' ) {
 
 					parser.setLogging( this.logging.enabled, this.logging.debug );
 
 				}
+
 				ObjectManipulator.applyProperties( parser, payload.params, false );
 				ObjectManipulator.applyProperties( parser, callbacks, false );
 
-				let arraybuffer = payload.data.input;
+				const arraybuffer = payload.data.input;
 				let executeFunctionName = 'execute';
 				if ( typeof parser.getParseFunctionName === 'function' ) executeFunctionName = parser.getParseFunctionName();
 				if ( payload.usesMeshDisassembler ) {
@@ -106,6 +112,7 @@
 					parser[ executeFunctionName ]( arraybuffer, payload.data.options );
 
 				}
+
 				if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
 
 				self.postMessage( {
@@ -131,12 +138,13 @@
 
 		this.payloadHandler = payloadHandler;
 
-		let scope = this;
-		let scopedRunner = function ( event ) {
+		const scope = this;
+		const scopedRunner = function ( event ) {
 
 			scope.processMessage( event.data );
 
 		};
+
 		self.addEventListener( 'message', scopedRunner, false );
 
 	};
@@ -162,4 +170,4 @@
 	exports.ObjectManipulator = ObjectManipulator;
 	exports.WorkerRunner = WorkerRunner;
 
-})));
+} ) ) );

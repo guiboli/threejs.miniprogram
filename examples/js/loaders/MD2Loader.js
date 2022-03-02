@@ -1,249 +1,263 @@
 ( function () {
 
-	const _normalData = [[ - 0.525731, 0.000000, 0.850651 ], [ - 0.442863, 0.238856, 0.864188 ], [ - 0.295242, 0.000000, 0.955423 ], [ - 0.309017, 0.500000, 0.809017 ], [ - 0.162460, 0.262866, 0.951056 ], [ 0.000000, 0.000000, 1.000000 ], [ 0.000000, 0.850651, 0.525731 ], [ - 0.147621, 0.716567, 0.681718 ], [ 0.147621, 0.716567, 0.681718 ], [ 0.000000, 0.525731, 0.850651 ], [ 0.309017, 0.500000, 0.809017 ], [ 0.525731, 0.000000, 0.850651 ], [ 0.295242, 0.000000, 0.955423 ], [ 0.442863, 0.238856, 0.864188 ], [ 0.162460, 0.262866, 0.951056 ], [ - 0.681718, 0.147621, 0.716567 ], [ - 0.809017, 0.309017, 0.500000 ], [ - 0.587785, 0.425325, 0.688191 ], [ - 0.850651, 0.525731, 0.000000 ], [ - 0.864188, 0.442863, 0.238856 ], [ - 0.716567, 0.681718, 0.147621 ], [ - 0.688191, 0.587785, 0.425325 ], [ - 0.500000, 0.809017, 0.309017 ], [ - 0.238856, 0.864188, 0.442863 ], [ - 0.425325, 0.688191, 0.587785 ], [ - 0.716567, 0.681718, - 0.147621 ], [ - 0.500000, 0.809017, - 0.309017 ], [ - 0.525731, 0.850651, 0.000000 ], [ 0.000000, 0.850651, - 0.525731 ], [ - 0.238856, 0.864188, - 0.442863 ], [ 0.000000, 0.955423, - 0.295242 ], [ - 0.262866, 0.951056, - 0.162460 ], [ 0.000000, 1.000000, 0.000000 ], [ 0.000000, 0.955423, 0.295242 ], [ - 0.262866, 0.951056, 0.162460 ], [ 0.238856, 0.864188, 0.442863 ], [ 0.262866, 0.951056, 0.162460 ], [ 0.500000, 0.809017, 0.309017 ], [ 0.238856, 0.864188, - 0.442863 ], [ 0.262866, 0.951056, - 0.162460 ], [ 0.500000, 0.809017, - 0.309017 ], [ 0.850651, 0.525731, 0.000000 ], [ 0.716567, 0.681718, 0.147621 ], [ 0.716567, 0.681718, - 0.147621 ], [ 0.525731, 0.850651, 0.000000 ], [ 0.425325, 0.688191, 0.587785 ], [ 0.864188, 0.442863, 0.238856 ], [ 0.688191, 0.587785, 0.425325 ], [ 0.809017, 0.309017, 0.500000 ], [ 0.681718, 0.147621, 0.716567 ], [ 0.587785, 0.425325, 0.688191 ], [ 0.955423, 0.295242, 0.000000 ], [ 1.000000, 0.000000, 0.000000 ], [ 0.951056, 0.162460, 0.262866 ], [ 0.850651, - 0.525731, 0.000000 ], [ 0.955423, - 0.295242, 0.000000 ], [ 0.864188, - 0.442863, 0.238856 ], [ 0.951056, - 0.162460, 0.262866 ], [ 0.809017, - 0.309017, 0.500000 ], [ 0.681718, - 0.147621, 0.716567 ], [ 0.850651, 0.000000, 0.525731 ], [ 0.864188, 0.442863, - 0.238856 ], [ 0.809017, 0.309017, - 0.500000 ], [ 0.951056, 0.162460, - 0.262866 ], [ 0.525731, 0.000000, - 0.850651 ], [ 0.681718, 0.147621, - 0.716567 ], [ 0.681718, - 0.147621, - 0.716567 ], [ 0.850651, 0.000000, - 0.525731 ], [ 0.809017, - 0.309017, - 0.500000 ], [ 0.864188, - 0.442863, - 0.238856 ], [ 0.951056, - 0.162460, - 0.262866 ], [ 0.147621, 0.716567, - 0.681718 ], [ 0.309017, 0.500000, - 0.809017 ], [ 0.425325, 0.688191, - 0.587785 ], [ 0.442863, 0.238856, - 0.864188 ], [ 0.587785, 0.425325, - 0.688191 ], [ 0.688191, 0.587785, - 0.425325 ], [ - 0.147621, 0.716567, - 0.681718 ], [ - 0.309017, 0.500000, - 0.809017 ], [ 0.000000, 0.525731, - 0.850651 ], [ - 0.525731, 0.000000, - 0.850651 ], [ - 0.442863, 0.238856, - 0.864188 ], [ - 0.295242, 0.000000, - 0.955423 ], [ - 0.162460, 0.262866, - 0.951056 ], [ 0.000000, 0.000000, - 1.000000 ], [ 0.295242, 0.000000, - 0.955423 ], [ 0.162460, 0.262866, - 0.951056 ], [ - 0.442863, - 0.238856, - 0.864188 ], [ - 0.309017, - 0.500000, - 0.809017 ], [ - 0.162460, - 0.262866, - 0.951056 ], [ 0.000000, - 0.850651, - 0.525731 ], [ - 0.147621, - 0.716567, - 0.681718 ], [ 0.147621, - 0.716567, - 0.681718 ], [ 0.000000, - 0.525731, - 0.850651 ], [ 0.309017, - 0.500000, - 0.809017 ], [ 0.442863, - 0.238856, - 0.864188 ], [ 0.162460, - 0.262866, - 0.951056 ], [ 0.238856, - 0.864188, - 0.442863 ], [ 0.500000, - 0.809017, - 0.309017 ], [ 0.425325, - 0.688191, - 0.587785 ], [ 0.716567, - 0.681718, - 0.147621 ], [ 0.688191, - 0.587785, - 0.425325 ], [ 0.587785, - 0.425325, - 0.688191 ], [ 0.000000, - 0.955423, - 0.295242 ], [ 0.000000, - 1.000000, 0.000000 ], [ 0.262866, - 0.951056, - 0.162460 ], [ 0.000000, - 0.850651, 0.525731 ], [ 0.000000, - 0.955423, 0.295242 ], [ 0.238856, - 0.864188, 0.442863 ], [ 0.262866, - 0.951056, 0.162460 ], [ 0.500000, - 0.809017, 0.309017 ], [ 0.716567, - 0.681718, 0.147621 ], [ 0.525731, - 0.850651, 0.000000 ], [ - 0.238856, - 0.864188, - 0.442863 ], [ - 0.500000, - 0.809017, - 0.309017 ], [ - 0.262866, - 0.951056, - 0.162460 ], [ - 0.850651, - 0.525731, 0.000000 ], [ - 0.716567, - 0.681718, - 0.147621 ], [ - 0.716567, - 0.681718, 0.147621 ], [ - 0.525731, - 0.850651, 0.000000 ], [ - 0.500000, - 0.809017, 0.309017 ], [ - 0.238856, - 0.864188, 0.442863 ], [ - 0.262866, - 0.951056, 0.162460 ], [ - 0.864188, - 0.442863, 0.238856 ], [ - 0.809017, - 0.309017, 0.500000 ], [ - 0.688191, - 0.587785, 0.425325 ], [ - 0.681718, - 0.147621, 0.716567 ], [ - 0.442863, - 0.238856, 0.864188 ], [ - 0.587785, - 0.425325, 0.688191 ], [ - 0.309017, - 0.500000, 0.809017 ], [ - 0.147621, - 0.716567, 0.681718 ], [ - 0.425325, - 0.688191, 0.587785 ], [ - 0.162460, - 0.262866, 0.951056 ], [ 0.442863, - 0.238856, 0.864188 ], [ 0.162460, - 0.262866, 0.951056 ], [ 0.309017, - 0.500000, 0.809017 ], [ 0.147621, - 0.716567, 0.681718 ], [ 0.000000, - 0.525731, 0.850651 ], [ 0.425325, - 0.688191, 0.587785 ], [ 0.587785, - 0.425325, 0.688191 ], [ 0.688191, - 0.587785, 0.425325 ], [ - 0.955423, 0.295242, 0.000000 ], [ - 0.951056, 0.162460, 0.262866 ], [ - 1.000000, 0.000000, 0.000000 ], [ - 0.850651, 0.000000, 0.525731 ], [ - 0.955423, - 0.295242, 0.000000 ], [ - 0.951056, - 0.162460, 0.262866 ], [ - 0.864188, 0.442863, - 0.238856 ], [ - 0.951056, 0.162460, - 0.262866 ], [ - 0.809017, 0.309017, - 0.500000 ], [ - 0.864188, - 0.442863, - 0.238856 ], [ - 0.951056, - 0.162460, - 0.262866 ], [ - 0.809017, - 0.309017, - 0.500000 ], [ - 0.681718, 0.147621, - 0.716567 ], [ - 0.681718, - 0.147621, - 0.716567 ], [ - 0.850651, 0.000000, - 0.525731 ], [ - 0.688191, 0.587785, - 0.425325 ], [ - 0.587785, 0.425325, - 0.688191 ], [ - 0.425325, 0.688191, - 0.587785 ], [ - 0.425325, - 0.688191, - 0.587785 ], [ - 0.587785, - 0.425325, - 0.688191 ], [ - 0.688191, - 0.587785, - 0.425325 ]];
+	( function ( global, factory ) {
 
-	class MD2Loader extends THREE.Loader {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-		constructor( manager ) {
+	} )( this, ( function ( exports, three ) {
 
-			super( manager );
+		'use strict';
 
-		}
+		const _normalData = [[ - 0.525731, 0.000000, 0.850651 ], [ - 0.442863, 0.238856, 0.864188 ], [ - 0.295242, 0.000000, 0.955423 ], [ - 0.309017, 0.500000, 0.809017 ], [ - 0.162460, 0.262866, 0.951056 ], [ 0.000000, 0.000000, 1.000000 ], [ 0.000000, 0.850651, 0.525731 ], [ - 0.147621, 0.716567, 0.681718 ], [ 0.147621, 0.716567, 0.681718 ], [ 0.000000, 0.525731, 0.850651 ], [ 0.309017, 0.500000, 0.809017 ], [ 0.525731, 0.000000, 0.850651 ], [ 0.295242, 0.000000, 0.955423 ], [ 0.442863, 0.238856, 0.864188 ], [ 0.162460, 0.262866, 0.951056 ], [ - 0.681718, 0.147621, 0.716567 ], [ - 0.809017, 0.309017, 0.500000 ], [ - 0.587785, 0.425325, 0.688191 ], [ - 0.850651, 0.525731, 0.000000 ], [ - 0.864188, 0.442863, 0.238856 ], [ - 0.716567, 0.681718, 0.147621 ], [ - 0.688191, 0.587785, 0.425325 ], [ - 0.500000, 0.809017, 0.309017 ], [ - 0.238856, 0.864188, 0.442863 ], [ - 0.425325, 0.688191, 0.587785 ], [ - 0.716567, 0.681718, - 0.147621 ], [ - 0.500000, 0.809017, - 0.309017 ], [ - 0.525731, 0.850651, 0.000000 ], [ 0.000000, 0.850651, - 0.525731 ], [ - 0.238856, 0.864188, - 0.442863 ], [ 0.000000, 0.955423, - 0.295242 ], [ - 0.262866, 0.951056, - 0.162460 ], [ 0.000000, 1.000000, 0.000000 ], [ 0.000000, 0.955423, 0.295242 ], [ - 0.262866, 0.951056, 0.162460 ], [ 0.238856, 0.864188, 0.442863 ], [ 0.262866, 0.951056, 0.162460 ], [ 0.500000, 0.809017, 0.309017 ], [ 0.238856, 0.864188, - 0.442863 ], [ 0.262866, 0.951056, - 0.162460 ], [ 0.500000, 0.809017, - 0.309017 ], [ 0.850651, 0.525731, 0.000000 ], [ 0.716567, 0.681718, 0.147621 ], [ 0.716567, 0.681718, - 0.147621 ], [ 0.525731, 0.850651, 0.000000 ], [ 0.425325, 0.688191, 0.587785 ], [ 0.864188, 0.442863, 0.238856 ], [ 0.688191, 0.587785, 0.425325 ], [ 0.809017, 0.309017, 0.500000 ], [ 0.681718, 0.147621, 0.716567 ], [ 0.587785, 0.425325, 0.688191 ], [ 0.955423, 0.295242, 0.000000 ], [ 1.000000, 0.000000, 0.000000 ], [ 0.951056, 0.162460, 0.262866 ], [ 0.850651, - 0.525731, 0.000000 ], [ 0.955423, - 0.295242, 0.000000 ], [ 0.864188, - 0.442863, 0.238856 ], [ 0.951056, - 0.162460, 0.262866 ], [ 0.809017, - 0.309017, 0.500000 ], [ 0.681718, - 0.147621, 0.716567 ], [ 0.850651, 0.000000, 0.525731 ], [ 0.864188, 0.442863, - 0.238856 ], [ 0.809017, 0.309017, - 0.500000 ], [ 0.951056, 0.162460, - 0.262866 ], [ 0.525731, 0.000000, - 0.850651 ], [ 0.681718, 0.147621, - 0.716567 ], [ 0.681718, - 0.147621, - 0.716567 ], [ 0.850651, 0.000000, - 0.525731 ], [ 0.809017, - 0.309017, - 0.500000 ], [ 0.864188, - 0.442863, - 0.238856 ], [ 0.951056, - 0.162460, - 0.262866 ], [ 0.147621, 0.716567, - 0.681718 ], [ 0.309017, 0.500000, - 0.809017 ], [ 0.425325, 0.688191, - 0.587785 ], [ 0.442863, 0.238856, - 0.864188 ], [ 0.587785, 0.425325, - 0.688191 ], [ 0.688191, 0.587785, - 0.425325 ], [ - 0.147621, 0.716567, - 0.681718 ], [ - 0.309017, 0.500000, - 0.809017 ], [ 0.000000, 0.525731, - 0.850651 ], [ - 0.525731, 0.000000, - 0.850651 ], [ - 0.442863, 0.238856, - 0.864188 ], [ - 0.295242, 0.000000, - 0.955423 ], [ - 0.162460, 0.262866, - 0.951056 ], [ 0.000000, 0.000000, - 1.000000 ], [ 0.295242, 0.000000, - 0.955423 ], [ 0.162460, 0.262866, - 0.951056 ], [ - 0.442863, - 0.238856, - 0.864188 ], [ - 0.309017, - 0.500000, - 0.809017 ], [ - 0.162460, - 0.262866, - 0.951056 ], [ 0.000000, - 0.850651, - 0.525731 ], [ - 0.147621, - 0.716567, - 0.681718 ], [ 0.147621, - 0.716567, - 0.681718 ], [ 0.000000, - 0.525731, - 0.850651 ], [ 0.309017, - 0.500000, - 0.809017 ], [ 0.442863, - 0.238856, - 0.864188 ], [ 0.162460, - 0.262866, - 0.951056 ], [ 0.238856, - 0.864188, - 0.442863 ], [ 0.500000, - 0.809017, - 0.309017 ], [ 0.425325, - 0.688191, - 0.587785 ], [ 0.716567, - 0.681718, - 0.147621 ], [ 0.688191, - 0.587785, - 0.425325 ], [ 0.587785, - 0.425325, - 0.688191 ], [ 0.000000, - 0.955423, - 0.295242 ], [ 0.000000, - 1.000000, 0.000000 ], [ 0.262866, - 0.951056, - 0.162460 ], [ 0.000000, - 0.850651, 0.525731 ], [ 0.000000, - 0.955423, 0.295242 ], [ 0.238856, - 0.864188, 0.442863 ], [ 0.262866, - 0.951056, 0.162460 ], [ 0.500000, - 0.809017, 0.309017 ], [ 0.716567, - 0.681718, 0.147621 ], [ 0.525731, - 0.850651, 0.000000 ], [ - 0.238856, - 0.864188, - 0.442863 ], [ - 0.500000, - 0.809017, - 0.309017 ], [ - 0.262866, - 0.951056, - 0.162460 ], [ - 0.850651, - 0.525731, 0.000000 ], [ - 0.716567, - 0.681718, - 0.147621 ], [ - 0.716567, - 0.681718, 0.147621 ], [ - 0.525731, - 0.850651, 0.000000 ], [ - 0.500000, - 0.809017, 0.309017 ], [ - 0.238856, - 0.864188, 0.442863 ], [ - 0.262866, - 0.951056, 0.162460 ], [ - 0.864188, - 0.442863, 0.238856 ], [ - 0.809017, - 0.309017, 0.500000 ], [ - 0.688191, - 0.587785, 0.425325 ], [ - 0.681718, - 0.147621, 0.716567 ], [ - 0.442863, - 0.238856, 0.864188 ], [ - 0.587785, - 0.425325, 0.688191 ], [ - 0.309017, - 0.500000, 0.809017 ], [ - 0.147621, - 0.716567, 0.681718 ], [ - 0.425325, - 0.688191, 0.587785 ], [ - 0.162460, - 0.262866, 0.951056 ], [ 0.442863, - 0.238856, 0.864188 ], [ 0.162460, - 0.262866, 0.951056 ], [ 0.309017, - 0.500000, 0.809017 ], [ 0.147621, - 0.716567, 0.681718 ], [ 0.000000, - 0.525731, 0.850651 ], [ 0.425325, - 0.688191, 0.587785 ], [ 0.587785, - 0.425325, 0.688191 ], [ 0.688191, - 0.587785, 0.425325 ], [ - 0.955423, 0.295242, 0.000000 ], [ - 0.951056, 0.162460, 0.262866 ], [ - 1.000000, 0.000000, 0.000000 ], [ - 0.850651, 0.000000, 0.525731 ], [ - 0.955423, - 0.295242, 0.000000 ], [ - 0.951056, - 0.162460, 0.262866 ], [ - 0.864188, 0.442863, - 0.238856 ], [ - 0.951056, 0.162460, - 0.262866 ], [ - 0.809017, 0.309017, - 0.500000 ], [ - 0.864188, - 0.442863, - 0.238856 ], [ - 0.951056, - 0.162460, - 0.262866 ], [ - 0.809017, - 0.309017, - 0.500000 ], [ - 0.681718, 0.147621, - 0.716567 ], [ - 0.681718, - 0.147621, - 0.716567 ], [ - 0.850651, 0.000000, - 0.525731 ], [ - 0.688191, 0.587785, - 0.425325 ], [ - 0.587785, 0.425325, - 0.688191 ], [ - 0.425325, 0.688191, - 0.587785 ], [ - 0.425325, - 0.688191, - 0.587785 ], [ - 0.587785, - 0.425325, - 0.688191 ], [ - 0.688191, - 0.587785, - 0.425325 ]];
 
-		load( url, onLoad, onProgress, onError ) {
+		class MD2Loader extends three.Loader {
 
-			const scope = this;
-			const loader = new THREE.FileLoader( scope.manager );
-			loader.setPath( scope.path );
-			loader.setResponseType( 'arraybuffer' );
-			loader.setRequestHeader( scope.requestHeader );
-			loader.setWithCredentials( scope.withCredentials );
-			loader.load( url, function ( buffer ) {
+	  constructor( manager ) {
 
-				try {
+	    super( manager );
 
-					onLoad( scope.parse( buffer ) );
+			}
 
-				} catch ( e ) {
+	  load( url, onLoad, onProgress, onError ) {
 
-					if ( onError ) {
+	    const scope = this;
+	    const loader = new three.FileLoader( scope.manager );
+	    loader.setPath( scope.path );
+	    loader.setResponseType( 'arraybuffer' );
+	    loader.setRequestHeader( scope.requestHeader );
+	    loader.setWithCredentials( scope.withCredentials );
+	    loader.load( url, function ( buffer ) {
 
-						onError( e );
+	      try {
 
-					} else {
+	        onLoad( scope.parse( buffer ) );
 
-						console.error( e );
+					} catch ( e ) {
+
+	        if ( onError ) {
+
+	          onError( e );
+
+						} else {
+
+	          console.error( e );
+
+						}
+
+	        scope.manager.itemError( url );
 
 					}
 
-					scope.manager.itemError( url );
-
-				}
-
-			}, onProgress, onError );
-
-		}
-
-		parse( buffer ) {
-
-			const data = new DataView( buffer ); // http://tfc.duke.free.fr/coding/md2-specs-en.html
-
-			const header = {};
-			const headerNames = [ 'ident', 'version', 'skinwidth', 'skinheight', 'framesize', 'num_skins', 'num_vertices', 'num_st', 'num_tris', 'num_glcmds', 'num_frames', 'offset_skins', 'offset_st', 'offset_tris', 'offset_frames', 'offset_glcmds', 'offset_end' ];
-
-			for ( let i = 0; i < headerNames.length; i ++ ) {
-
-				header[ headerNames[ i ] ] = data.getInt32( i * 4, true );
+				}, onProgress, onError );
 
 			}
 
-			if ( header.ident !== 844121161 || header.version !== 8 ) {
+	  parse( buffer ) {
 
-				console.error( 'Not a valid MD2 file' );
-				return;
+	    const data = new DataView( buffer ); // http://tfc.duke.free.fr/coding/md2-specs-en.html
 
-			}
+	    const header = {};
+	    const headerNames = [ 'ident', 'version', 'skinwidth', 'skinheight', 'framesize', 'num_skins', 'num_vertices', 'num_st', 'num_tris', 'num_glcmds', 'num_frames', 'offset_skins', 'offset_st', 'offset_tris', 'offset_frames', 'offset_glcmds', 'offset_end' ];
 
-			if ( header.offset_end !== data.byteLength ) {
+	    for ( let i = 0; i < headerNames.length; i ++ ) {
 
-				console.error( 'Corrupted MD2 file' );
-				return;
-
-			} //
-
-
-			const geometry = new THREE.BufferGeometry(); // uvs
-
-			const uvsTemp = [];
-			let offset = header.offset_st;
-
-			for ( let i = 0, l = header.num_st; i < l; i ++ ) {
-
-				const u = data.getInt16( offset + 0, true );
-				const v = data.getInt16( offset + 2, true );
-				uvsTemp.push( u / header.skinwidth, 1 - v / header.skinheight );
-				offset += 4;
-
-			} // triangles
-
-
-			offset = header.offset_tris;
-			const vertexIndices = [];
-			const uvIndices = [];
-
-			for ( let i = 0, l = header.num_tris; i < l; i ++ ) {
-
-				vertexIndices.push( data.getUint16( offset + 0, true ), data.getUint16( offset + 2, true ), data.getUint16( offset + 4, true ) );
-				uvIndices.push( data.getUint16( offset + 6, true ), data.getUint16( offset + 8, true ), data.getUint16( offset + 10, true ) );
-				offset += 12;
-
-			} // frames
-
-
-			const translation = new THREE.Vector3();
-			const scale = new THREE.Vector3();
-			const frames = [];
-			offset = header.offset_frames;
-
-			for ( let i = 0, l = header.num_frames; i < l; i ++ ) {
-
-				scale.set( data.getFloat32( offset + 0, true ), data.getFloat32( offset + 4, true ), data.getFloat32( offset + 8, true ) );
-				translation.set( data.getFloat32( offset + 12, true ), data.getFloat32( offset + 16, true ), data.getFloat32( offset + 20, true ) );
-				offset += 24;
-				const string = [];
-
-				for ( let j = 0; j < 16; j ++ ) {
-
-					const character = data.getUint8( offset + j );
-					if ( character === 0 ) break;
-					string[ j ] = character;
+	      header[ headerNames[ i ] ] = data.getInt32( i * 4, true );
 
 				}
 
-				const frame = {
-					name: String.fromCharCode.apply( null, string ),
-					vertices: [],
-					normals: []
-				};
-				offset += 16;
+	    if ( header.ident !== 844121161 || header.version !== 8 ) {
 
-				for ( let j = 0; j < header.num_vertices; j ++ ) {
-
-					let x = data.getUint8( offset ++ );
-					let y = data.getUint8( offset ++ );
-					let z = data.getUint8( offset ++ );
-
-					const n = _normalData[ data.getUint8( offset ++ ) ];
-
-					x = x * scale.x + translation.x;
-					y = y * scale.y + translation.y;
-					z = z * scale.z + translation.z;
-					frame.vertices.push( x, z, y ); // convert to Y-up
-
-					frame.normals.push( n[ 0 ], n[ 2 ], n[ 1 ] ); // convert to Y-up
+	      console.error( 'Not a valid MD2 file' );
+	      return;
 
 				}
 
-				frames.push( frame );
+	    if ( header.offset_end !== data.byteLength ) {
 
-			} // static
+	      console.error( 'Corrupted MD2 file' );
+	      return;
+
+				} //
 
 
-			const positions = [];
-			const normals = [];
-			const uvs = [];
-			const verticesTemp = frames[ 0 ].vertices;
-			const normalsTemp = frames[ 0 ].normals;
+	    const geometry = new three.BufferGeometry(); // uvs
 
-			for ( let i = 0, l = vertexIndices.length; i < l; i ++ ) {
+	    const uvsTemp = [];
+	    let offset = header.offset_st;
 
-				const vertexIndex = vertexIndices[ i ];
-				let stride = vertexIndex * 3; //
+	    for ( let i = 0, l = header.num_st; i < l; i ++ ) {
 
-				const x = verticesTemp[ stride ];
-				const y = verticesTemp[ stride + 1 ];
-				const z = verticesTemp[ stride + 2 ];
-				positions.push( x, y, z ); //
+	      const u = data.getInt16( offset + 0, true );
+	      const v = data.getInt16( offset + 2, true );
+	      uvsTemp.push( u / header.skinwidth, 1 - v / header.skinheight );
+	      offset += 4;
 
-				const nx = normalsTemp[ stride ];
-				const ny = normalsTemp[ stride + 1 ];
-				const nz = normalsTemp[ stride + 2 ];
-				normals.push( nx, ny, nz ); //
+				} // triangles
 
-				const uvIndex = uvIndices[ i ];
-				stride = uvIndex * 2;
-				const u = uvsTemp[ stride ];
-				const v = uvsTemp[ stride + 1 ];
-				uvs.push( u, v );
 
-			}
+	    offset = header.offset_tris;
+	    const vertexIndices = [];
+	    const uvIndices = [];
 
-			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-			geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-			geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) ); // animation
+	    for ( let i = 0, l = header.num_tris; i < l; i ++ ) {
 
-			const morphPositions = [];
-			const morphNormals = [];
+	      vertexIndices.push( data.getUint16( offset + 0, true ), data.getUint16( offset + 2, true ), data.getUint16( offset + 4, true ) );
+	      uvIndices.push( data.getUint16( offset + 6, true ), data.getUint16( offset + 8, true ), data.getUint16( offset + 10, true ) );
+	      offset += 12;
 
-			for ( let i = 0, l = frames.length; i < l; i ++ ) {
+				} // frames
 
-				const frame = frames[ i ];
-				const attributeName = frame.name;
 
-				if ( frame.vertices.length > 0 ) {
+	    const translation = new three.Vector3();
+	    const scale = new three.Vector3();
+	    const frames = [];
+	    offset = header.offset_frames;
 
-					const positions = [];
+	    for ( let i = 0, l = header.num_frames; i < l; i ++ ) {
 
-					for ( let j = 0, jl = vertexIndices.length; j < jl; j ++ ) {
+	      scale.set( data.getFloat32( offset + 0, true ), data.getFloat32( offset + 4, true ), data.getFloat32( offset + 8, true ) );
+	      translation.set( data.getFloat32( offset + 12, true ), data.getFloat32( offset + 16, true ), data.getFloat32( offset + 20, true ) );
+	      offset += 24;
+	      const string = [];
 
-						const vertexIndex = vertexIndices[ j ];
-						const stride = vertexIndex * 3;
-						const x = frame.vertices[ stride ];
-						const y = frame.vertices[ stride + 1 ];
-						const z = frame.vertices[ stride + 2 ];
-						positions.push( x, y, z );
+	      for ( let j = 0; j < 16; j ++ ) {
+
+	        const character = data.getUint8( offset + j );
+	        if ( character === 0 ) break;
+	        string[ j ] = character;
 
 					}
 
-					const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-					positionAttribute.name = attributeName;
-					morphPositions.push( positionAttribute );
+	      const frame = {
+	        name: String.fromCharCode.apply( null, string ),
+	        vertices: [],
+	        normals: []
+	      };
+	      offset += 16;
 
-				}
+	      for ( let j = 0; j < header.num_vertices; j ++ ) {
 
-				if ( frame.normals.length > 0 ) {
+	        let x = data.getUint8( offset ++ );
+	        let y = data.getUint8( offset ++ );
+	        let z = data.getUint8( offset ++ );
 
-					const normals = [];
+	        const n = _normalData[ data.getUint8( offset ++ ) ];
 
-					for ( let j = 0, jl = vertexIndices.length; j < jl; j ++ ) {
+	        x = x * scale.x + translation.x;
+	        y = y * scale.y + translation.y;
+	        z = z * scale.z + translation.z;
+	        frame.vertices.push( x, z, y ); // convert to Y-up
 
-						const vertexIndex = vertexIndices[ j ];
-						const stride = vertexIndex * 3;
-						const nx = frame.normals[ stride ];
-						const ny = frame.normals[ stride + 1 ];
-						const nz = frame.normals[ stride + 2 ];
-						normals.push( nx, ny, nz );
+	        frame.normals.push( n[ 0 ], n[ 2 ], n[ 1 ] ); // convert to Y-up
 
 					}
 
-					const normalAttribute = new THREE.Float32BufferAttribute( normals, 3 );
-					normalAttribute.name = attributeName;
-					morphNormals.push( normalAttribute );
+	      frames.push( frame );
+
+				} // static
+
+
+	    const positions = [];
+	    const normals = [];
+	    const uvs = [];
+	    const verticesTemp = frames[ 0 ].vertices;
+	    const normalsTemp = frames[ 0 ].normals;
+
+	    for ( let i = 0, l = vertexIndices.length; i < l; i ++ ) {
+
+	      const vertexIndex = vertexIndices[ i ];
+	      let stride = vertexIndex * 3; //
+
+	      const x = verticesTemp[ stride ];
+	      const y = verticesTemp[ stride + 1 ];
+	      const z = verticesTemp[ stride + 2 ];
+	      positions.push( x, y, z ); //
+
+	      const nx = normalsTemp[ stride ];
+	      const ny = normalsTemp[ stride + 1 ];
+	      const nz = normalsTemp[ stride + 2 ];
+	      normals.push( nx, ny, nz ); //
+
+	      const uvIndex = uvIndices[ i ];
+	      stride = uvIndex * 2;
+	      const u = uvsTemp[ stride ];
+	      const v = uvsTemp[ stride + 1 ];
+	      uvs.push( u, v );
 
 				}
 
-			}
+	    geometry.setAttribute( 'position', new three.Float32BufferAttribute( positions, 3 ) );
+	    geometry.setAttribute( 'normal', new three.Float32BufferAttribute( normals, 3 ) );
+	    geometry.setAttribute( 'uv', new three.Float32BufferAttribute( uvs, 2 ) ); // animation
 
-			geometry.morphAttributes.position = morphPositions;
-			geometry.morphAttributes.normal = morphNormals;
-			geometry.morphTargetsRelative = false;
-			geometry.animations = THREE.AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
-			return geometry;
+	    const morphPositions = [];
+	    const morphNormals = [];
+
+	    for ( let i = 0, l = frames.length; i < l; i ++ ) {
+
+	      const frame = frames[ i ];
+	      const attributeName = frame.name;
+
+	      if ( frame.vertices.length > 0 ) {
+
+	        const positions = [];
+
+	        for ( let j = 0, jl = vertexIndices.length; j < jl; j ++ ) {
+
+	          const vertexIndex = vertexIndices[ j ];
+	          const stride = vertexIndex * 3;
+	          const x = frame.vertices[ stride ];
+	          const y = frame.vertices[ stride + 1 ];
+	          const z = frame.vertices[ stride + 2 ];
+	          positions.push( x, y, z );
+
+						}
+
+	        const positionAttribute = new three.Float32BufferAttribute( positions, 3 );
+	        positionAttribute.name = attributeName;
+	        morphPositions.push( positionAttribute );
+
+					}
+
+	      if ( frame.normals.length > 0 ) {
+
+	        const normals = [];
+
+	        for ( let j = 0, jl = vertexIndices.length; j < jl; j ++ ) {
+
+	          const vertexIndex = vertexIndices[ j ];
+	          const stride = vertexIndex * 3;
+	          const nx = frame.normals[ stride ];
+	          const ny = frame.normals[ stride + 1 ];
+	          const nz = frame.normals[ stride + 2 ];
+	          normals.push( nx, ny, nz );
+
+						}
+
+	        const normalAttribute = new three.Float32BufferAttribute( normals, 3 );
+	        normalAttribute.name = attributeName;
+	        morphNormals.push( normalAttribute );
+
+					}
+
+				}
+
+	    geometry.morphAttributes.position = morphPositions;
+	    geometry.morphAttributes.normal = morphNormals;
+	    geometry.morphTargetsRelative = false;
+	    geometry.animations = three.AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
+	    return geometry;
+
+			}
 
 		}
 
-	}
+		exports.MD2Loader = MD2Loader;
 
-	THREE.MD2Loader = MD2Loader;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/utils/CodeSerializer.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {} ) );
+
+}( this, ( function ( exports ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -26,7 +30,7 @@
 
 			let objectString = fullObjectName + ' = {\n\n';
 			let part;
-			for ( let name in serializationTarget ) {
+			for ( const name in serializationTarget ) {
 
 				part = serializationTarget[ name ];
 				if ( typeof ( part ) === 'string' || part instanceof String ) {
@@ -51,6 +55,7 @@
 				}
 
 			}
+
 			objectString += '}\n\n';
 
 			return objectString;
@@ -70,14 +75,14 @@
 		serializeClass: function ( fullObjectName, serializationTarget, basePrototypeName, overrideFunctions ) {
 
 			let objectPart, constructorString, i, funcInstructions, funcTemp;
-			let prototypeFunctions = [];
-			let objectProperties = [];
-			let objectFunctions = [];
-			let isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
+			const prototypeFunctions = [];
+			const objectProperties = [];
+			const objectFunctions = [];
+			const isExtended = ( basePrototypeName !== null && basePrototypeName !== undefined );
 
 			if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
-			for ( let name in serializationTarget.prototype ) {
+			for ( const name in serializationTarget.prototype ) {
 
 				objectPart = serializationTarget.prototype[ name ];
 				funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.prototype.' + name );
@@ -99,6 +104,7 @@
 						funcInstructions = funcTemp;
 
 					}
+
 					if ( ! funcInstructions.isRemoveCode() ) {
 
 						if ( isExtended ) {
@@ -116,7 +122,8 @@
 				}
 
 			}
-			for ( let name in serializationTarget ) {
+
+			for ( const name in serializationTarget ) {
 
 				objectPart = serializationTarget[ name ];
 				funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.' + name );
@@ -132,6 +139,7 @@
 						funcInstructions.setCode( objectPart.toString() );
 
 					}
+
 					if ( ! funcInstructions.isRemoveCode() ) {
 
 						objectFunctions.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n\n' );
@@ -147,13 +155,14 @@
 					} else if ( typeof objectPart === 'object' ) {
 
 						console.log( 'Omitting object "' + funcInstructions.getName() + '" and replace it with empty object.' );
-						funcInstructions.setCode( "{}" );
+						funcInstructions.setCode( '{}' );
 
 					} else {
 
 						funcInstructions.setCode( objectPart );
 
 					}
+
 					if ( ! funcInstructions.isRemoveCode() ) {
 
 						objectProperties.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n' );
@@ -163,12 +172,14 @@
 				}
 
 			}
+
 			let objectString = constructorString + '\n\n';
 			if ( isExtended ) {
 
 				objectString += fullObjectName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
 
 			}
+
 			objectString += fullObjectName + '.prototype.constructor = ' + fullObjectName + ';\n';
 			objectString += '\n\n';
 
@@ -177,6 +188,7 @@
 				objectString += objectProperties[ i ];
 
 			}
+
 			objectString += '\n\n';
 
 			for ( i = 0; i < objectFunctions.length; i ++ ) {
@@ -184,6 +196,7 @@
 				objectString += objectFunctions[ i ];
 
 			}
+
 			objectString += '\n\n';
 
 			if ( isExtended ) {
@@ -202,9 +215,11 @@
 					objectString += prototypeFunctions[ i ];
 
 				}
+
 				objectString += '\n};';
 
 			}
+
 			objectString += '\n\n';
 
 			return objectString;
@@ -300,4 +315,4 @@
 	exports.CodeSerializationInstruction = CodeSerializationInstruction;
 	exports.CodeSerializer = CodeSerializer;
 
-})));
+} ) ) );

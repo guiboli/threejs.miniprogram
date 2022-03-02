@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/worker/main/WorkerExecutionSupport.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {} ) );
+
+}( this, ( function ( exports ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -97,8 +101,8 @@
 		 */
 		addLibraryImport: function ( libraryPath ) {
 
-			let libraryUrl = new URL( libraryPath, window.location.href ).href;
-			let code = 'importScripts( "' + libraryUrl + '" );';
+			const libraryUrl = new URL( libraryPath, window.location.href ).href;
+			const code = 'importScripts( "' + libraryUrl + '" );';
 			this.importStatements.push(	code );
 
 		},
@@ -130,13 +134,14 @@
 	const WorkerExecutionSupport = function () {
 
 		// check worker support first
-		if ( window.Worker === undefined ) throw "This browser does not support web workers!";
-		if ( window.Blob === undefined ) throw "This browser does not support Blob!";
-		if ( typeof window.URL.createObjectURL !== 'function' ) throw "This browser does not support Object creation from URL!";
+		if ( window.Worker === undefined ) throw 'This browser does not support web workers!';
+		if ( window.Blob === undefined ) throw 'This browser does not support Blob!';
+		if ( typeof window.URL.createObjectURL !== 'function' ) throw 'This browser does not support Object creation from URL!';
 
 		this._reset();
 
 	};
+
 	WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.1.0';
 	console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
@@ -152,12 +157,13 @@
 				debug: false
 			};
 
-			let scope = this;
-			let scopeTerminate = function ( ) {
+			const scope = this;
+			const scopeTerminate = function ( ) {
 
 				scope._terminate();
 
 			};
+
 			this.worker = {
 				native: null,
 				jsmWorker: false,
@@ -223,9 +229,11 @@
 					console.info( 'Worker is terminated immediately as it is not running!' );
 
 				}
+
 				this._terminate();
 
 			}
+
 			return this;
 
 		},
@@ -243,11 +251,13 @@
 				this.worker.callbacks.onAssetAvailable = onAssetAvailable;
 
 			}
+
 			if ( onLoad !== undefined && onLoad !== null ) {
 
 				this.worker.callbacks.onLoad = onLoad;
 
 			}
+
 			this._verifyCallbacks();
 
 		},
@@ -295,14 +305,14 @@
 		_buildWorkerJsm: function ( codeBuilderInstructions ) {
 
 			let jsmSuccess = true;
-			let timeLabel = 'buildWorkerJsm';
-			let workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
+			const timeLabel = 'buildWorkerJsm';
+			const workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
 			if ( ! workerAvailable ) {
 
-				let workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
+				const workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
 				try {
 
-					let worker = new Worker( workerFileUrl, { type: "module" } );
+					const worker = new Worker( workerFileUrl, { type: 'module' } );
 					this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
 				} catch ( e ) {
@@ -311,7 +321,7 @@
 					// Chrome throws this exception, but Firefox currently does not complain, but can't execute the worker afterwards
 					if ( e instanceof TypeError || e instanceof SyntaxError ) {
 
-						console.error( "Modules are not supported in workers." );
+						console.error( 'Modules are not supported in workers.' );
 
 					}
 
@@ -336,8 +346,8 @@
 		 */
 		_buildWorkerStandard: function ( codeBuilderInstructions ) {
 
-			let timeLabel = 'buildWorkerStandard';
-			let workerAvailable = this._buildWorkerCheckPreconditions( false, timeLabel );
+			const timeLabel = 'buildWorkerStandard';
+			const workerAvailable = this._buildWorkerCheckPreconditions( false, timeLabel );
 			if ( ! workerAvailable ) {
 
 				let concatenateCode = '';
@@ -355,8 +365,8 @@
 				concatenateCode += '\n';
 				concatenateCode += codeBuilderInstructions.getStartCode();
 
-				let blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
-				let worker = new Worker( window.URL.createObjectURL( blob ) );
+				const blob = new Blob( [ concatenateCode ], { type: 'application/javascript' } );
+				const worker = new Worker( window.URL.createObjectURL( blob ) );
 
 				this._configureWorkerCommunication( worker, false, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
@@ -381,6 +391,7 @@
 				}
 
 			}
+
 			return workerAvailable;
 
 		},
@@ -390,12 +401,13 @@
 			this.worker.native = worker;
 			this.worker.jsmWorker = haveJsmWorker;
 
-			let scope = this;
-			let scopedReceiveWorkerMessage = function ( event ) {
+			const scope = this;
+			const scopedReceiveWorkerMessage = function ( event ) {
 
 				scope._receiveWorkerMessage( event );
 
 			};
+
 			this.worker.native.onmessage = scopedReceiveWorkerMessage;
 			if ( defaultGeometryType !== undefined && defaultGeometryType !== null ) {
 
@@ -428,8 +440,8 @@
 		 */
 		_receiveWorkerMessage: function ( event ) {
 
-			let payload = event.data;
-			let workerRunnerName = this.worker.workerRunner.name;
+			const payload = event.data;
+			const workerRunnerName = this.worker.workerRunner.name;
 
 			switch ( payload.cmd ) {
 
@@ -445,6 +457,7 @@
 						this.worker.callbacks.onLoad( payload.msg );
 
 					}
+
 					if ( this.worker.terminateWorkerOnLoad ) {
 
 						if ( this.worker.logging.enabled ) {
@@ -452,9 +465,11 @@
 							console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
 
 						}
+
 						this.worker.callbacks.terminate();
 
 					}
+
 					break;
 
 				case 'error':
@@ -466,6 +481,7 @@
 						this.worker.callbacks.onLoad( payload.msg );
 
 					}
+
 					if ( this.worker.terminateWorkerOnLoad ) {
 
 						if ( this.worker.logging.enabled ) {
@@ -473,9 +489,11 @@
 							console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
 
 						}
+
 						this.worker.callbacks.terminate();
 
 					}
+
 					break;
 
 				default:
@@ -520,6 +538,7 @@
 				this.worker.started = true;
 
 			}
+
 			return ready;
 
 		},
@@ -540,11 +559,13 @@
 						transferables.push( this.worker.queuedMessage.payload.data.input );
 
 					}
+
 					if ( this.worker.queuedMessage.transferables.length > 0 ) {
 
 						transferables = transferables.concat( this.worker.queuedMessage.transferables );
 
 					}
+
 					this.worker.native.postMessage( this.worker.queuedMessage.payload, transferables );
 
 				} else {
@@ -568,4 +589,4 @@
 	exports.CodeBuilderInstructions = CodeBuilderInstructions;
 	exports.WorkerExecutionSupport = WorkerExecutionSupport;
 
-})));
+} ) ) );

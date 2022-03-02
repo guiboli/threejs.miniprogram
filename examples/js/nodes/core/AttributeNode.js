@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/AttributeNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, Node_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,7 +26,7 @@
 
 	AttributeNode.prototype = Object.create( Node_js.Node.prototype );
 	AttributeNode.prototype.constructor = AttributeNode;
-	AttributeNode.prototype.nodeType = "Attribute";
+	AttributeNode.prototype.nodeType = 'Attribute';
 
 	AttributeNode.prototype.getAttributeType = function ( builder ) {
 
@@ -77,4 +81,4 @@
 
 	exports.AttributeNode = AttributeNode;
 
-})));
+} ) ) );

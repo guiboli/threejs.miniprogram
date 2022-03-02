@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/utils/VelocityNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Vector3Node_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, Vector3Node_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -27,7 +31,7 @@
 
 	VelocityNode.prototype = Object.create( Vector3Node_js.Vector3Node.prototype );
 	VelocityNode.prototype.constructor = VelocityNode;
-	VelocityNode.prototype.nodeType = "Velocity";
+	VelocityNode.prototype.nodeType = 'Velocity';
 
 	VelocityNode.prototype.getReadonly = function ( /*builder*/ ) {
 
@@ -39,7 +43,7 @@
 
 		switch ( this.params.type ) {
 
-			case "elastic":
+			case 'elastic':
 
 				delete this.moment;
 
@@ -56,7 +60,7 @@
 
 		switch ( this.params.type ) {
 
-			case "elastic":
+			case 'elastic':
 
 				this.moment = new THREE.Vector3();
 
@@ -109,7 +113,7 @@
 
 		switch ( this.params.type ) {
 
-			case "elastic":
+			case 'elastic':
 
 				// convert to real scale: 0 at 1 values
 				var deltaFps = frame.delta * ( this.params.fps || 60 );
@@ -183,4 +187,4 @@
 
 	exports.VelocityNode = VelocityNode;
 
-})));
+} ) ) );

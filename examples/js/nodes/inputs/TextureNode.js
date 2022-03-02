@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/inputs/TextureNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, InputNode_js, UVNode_js, ColorSpaceNode_js, ExpressionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/InputNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, InputNode_js, UVNode_js, ColorSpaceNode_js, ExpressionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -25,7 +29,7 @@
 
 	TextureNode.prototype = Object.create( InputNode_js.InputNode.prototype );
 	TextureNode.prototype.constructor = TextureNode;
-	TextureNode.prototype.nodeType = "Texture";
+	TextureNode.prototype.nodeType = 'Texture';
 
 	TextureNode.prototype.getTexture = function ( builder, output ) {
 
@@ -121,4 +125,4 @@
 
 	exports.TextureNode = TextureNode;
 
-})));
+} ) ) );

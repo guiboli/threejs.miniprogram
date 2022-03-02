@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/math/OperatorNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, TempNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -29,7 +33,7 @@
 
 	OperatorNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	OperatorNode.prototype.constructor = OperatorNode;
-	OperatorNode.prototype.nodeType = "Operator";
+	OperatorNode.prototype.nodeType = 'Operator';
 
 	OperatorNode.prototype.getType = function ( builder ) {
 
@@ -95,4 +99,4 @@
 
 	exports.OperatorNode = OperatorNode;
 
-})));
+} ) ) );

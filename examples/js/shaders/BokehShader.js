@@ -1,44 +1,54 @@
 ( function () {
 
-	/**
- * Depth-of-field shader with bokeh
- * ported from GLSL shader by Martins Upitis
- * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
- */
-	const BokehShader = {
-		defines: {
-			'DEPTH_PACKING': 1,
-			'PERSPECTIVE_CAMERA': 1
-		},
-		uniforms: {
-			'tColor': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'focus': {
-				value: 1.0
-			},
-			'aspect': {
-				value: 1.0
-			},
-			'aperture': {
-				value: 0.025
-			},
-			'maxblur': {
-				value: 0.01
-			},
-			'nearClip': {
-				value: 1.0
-			},
-			'farClip': {
-				value: 1000.0
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Depth-of-field shader with bokeh
+	 * ported from GLSL shader by Martins Upitis
+	 * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
+	 */
+		const BokehShader = {
+	  defines: {
+	    'DEPTH_PACKING': 1,
+	    'PERSPECTIVE_CAMERA': 1
+	  },
+	  uniforms: {
+	    'tColor': {
+	      value: null
+	    },
+	    'tDepth': {
+	      value: null
+	    },
+	    'focus': {
+	      value: 1.0
+	    },
+	    'aspect': {
+	      value: 1.0
+	    },
+	    'aperture': {
+	      value: 0.025
+	    },
+	    'maxblur': {
+	      value: 0.01
+	    },
+	    'nearClip': {
+	      value: 1.0
+	    },
+	    'farClip': {
+	      value: 1000.0
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -48,9 +58,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		#include <common>
 
@@ -152,8 +162,12 @@
 			gl_FragColor.a = 1.0;
 
 		}`
-	};
+		};
 
-	THREE.BokehShader = BokehShader;
+		exports.BokehShader = BokehShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

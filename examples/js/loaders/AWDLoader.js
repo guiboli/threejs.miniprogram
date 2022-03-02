@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/AWDLoader.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, THREE ) {
+
+	'use strict';
 
 	/**
 	 * Author: Pierre Lepers
@@ -250,7 +254,7 @@
 					awdmagic = ( this.readU8() << 16 ) | ( this.readU8() << 8 ) | this.readU8();
 
 				if ( awdmagic != 4282180 )
-					throw new Error( "AWDLoader - bad magic" );
+					throw new Error( 'AWDLoader - bad magic' );
 
 				version[ 0 ] = this.readU8();
 				version[ 1 ] = this.readU8();
@@ -469,6 +473,7 @@
 				} else {
 					// embed texture not supported
 				}
+
 				// Ignore for now
 				this.parseProperties( null );
 
@@ -565,6 +570,7 @@
 						mtx_data = new THREE.Matrix4();
 
 					}
+
 					pose[ joints_parsed ] = mtx_data;
 					joints_parsed ++;
 
@@ -616,6 +622,7 @@
 					return;
 
 				}
+
 				// Ignore attributes for now
 				this.parseUserAttributes();
 				return clip;
@@ -866,7 +873,7 @@
 
 				if ( mesh === null ) {
 
-					console.log( "parseMeshPoseAnimation target mesh not found at:", geoAdress );
+					console.log( 'parseMeshPoseAnimation target mesh not found at:', geoAdress );
 					return;
 
 				}
@@ -891,6 +898,7 @@
 					streamsParsed ++;
 
 				}
+
 				props = this.parseProperties( { 1: BOOL, 2: BOOL } );
 
 				clip.looping = props.get( 1, true );
@@ -1218,6 +1226,7 @@
 					}
 
 				}
+
 				return out.join( '' );
 
 			}
@@ -1230,4 +1239,4 @@
 
 	exports.AWDLoader = AWDLoader;
 
-})));
+} ) ) );

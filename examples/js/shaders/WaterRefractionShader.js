@@ -1,26 +1,36 @@
 ( function () {
 
-	const WaterRefractionShader = {
-		uniforms: {
-			'color': {
-				value: null
-			},
-			'time': {
-				value: 0
-			},
-			'tDiffuse': {
-				value: null
-			},
-			'tDudv': {
-				value: null
-			},
-			'textureMatrix': {
-				value: null
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		const WaterRefractionShader = {
+	  uniforms: {
+	    'color': {
+	      value: null
+	    },
+	    'time': {
+	      value: 0
+	    },
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'tDudv': {
+	      value: null
+	    },
+	    'textureMatrix': {
+	      value: null
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		uniform mat4 textureMatrix;
 
@@ -36,9 +46,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform vec3 color;
 		uniform float time;
@@ -81,8 +91,12 @@
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 		}`
-	};
+		};
 
-	THREE.WaterRefractionShader = WaterRefractionShader;
+		exports.WaterRefractionShader = WaterRefractionShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

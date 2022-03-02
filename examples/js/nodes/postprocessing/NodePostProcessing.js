@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/postprocessing/NodePostProcessing.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ScreenNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ScreenNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, NodeMaterial_js, ScreenNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ScreenNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/NodeMaterial.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/ScreenNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, NodeMaterial_js, ScreenNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -128,11 +132,11 @@
 				var data = {};
 
 				data.uuid = this.uuid;
-				data.type = "NodePostProcessing";
+				data.type = 'NodePostProcessing';
 
 				meta.post[ this.uuid ] = data;
 
-				if ( this.name !== "" ) data.name = this.name;
+				if ( this.name !== '' ) data.name = this.name;
 
 				if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
@@ -150,4 +154,4 @@
 
 	exports.NodePostProcessing = NodePostProcessing;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/materials/nodes/MeshStandardNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/PropertyNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SwitchNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/NormalMapNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/PropertyNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SwitchNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/NormalMapNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, StandardNode_js, PropertyNode_js, OperatorNode_js, SwitchNode_js, NormalMapNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/PropertyNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SwitchNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/NormalMapNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/materials/nodes/StandardNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/PropertyNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/math/OperatorNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/SwitchNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/NormalMapNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, StandardNode_js, PropertyNode_js, OperatorNode_js, SwitchNode_js, NormalMapNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -34,7 +38,7 @@
 
 	MeshStandardNode.prototype = Object.create( StandardNode_js.StandardNode.prototype );
 	MeshStandardNode.prototype.constructor = MeshStandardNode;
-	MeshStandardNode.prototype.nodeType = "MeshStandard";
+	MeshStandardNode.prototype.nodeType = 'MeshStandard';
 
 	MeshStandardNode.prototype.build = function ( builder ) {
 
@@ -59,7 +63,7 @@
 			var roughness = builder.findNode( props.roughness, inputs.roughness ),
 				roughnessMap = builder.resolve( props.roughnessMap );
 
-			this.roughness = roughnessMap ? new OperatorNode_js.OperatorNode( roughness, new SwitchNode_js.SwitchNode( roughnessMap, "g" ), OperatorNode_js.OperatorNode.MUL ) : roughness;
+			this.roughness = roughnessMap ? new OperatorNode_js.OperatorNode( roughness, new SwitchNode_js.SwitchNode( roughnessMap, 'g' ), OperatorNode_js.OperatorNode.MUL ) : roughness;
 
 			// slots
 			// * metalness
@@ -68,7 +72,7 @@
 			var metalness = builder.findNode( props.metalness, inputs.metalness ),
 				metalnessMap = builder.resolve( props.metalnessMap );
 
-			this.metalness = metalnessMap ? new OperatorNode_js.OperatorNode( metalness, new SwitchNode_js.SwitchNode( metalnessMap, "b" ), OperatorNode_js.OperatorNode.MUL ) : metalness;
+			this.metalness = metalnessMap ? new OperatorNode_js.OperatorNode( metalness, new SwitchNode_js.SwitchNode( metalnessMap, 'b' ), OperatorNode_js.OperatorNode.MUL ) : metalness;
 
 			// slots
 			// * normalMap
@@ -106,7 +110,7 @@
 
 			data = this.createJSONNode( meta );
 
-			console.warn( ".toJSON not implemented in", this );
+			console.warn( '.toJSON not implemented in', this );
 
 		}
 
@@ -116,4 +120,4 @@
 
 	exports.MeshStandardNode = MeshStandardNode;
 
-})));
+} ) ) );

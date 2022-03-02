@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/effects/BlurNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, TempNode_js, FunctionNode_js, FloatNode_js, Vector2Node_js, UVNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, TempNode_js, FunctionNode_js, FloatNode_js, Vector2Node_js, UVNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -33,36 +37,36 @@
 	BlurNode.Nodes = ( function () {
 
 		var blurX = new FunctionNode_js.FunctionNode( [
-			"vec4 blurX( sampler2D texture, vec2 uv, float s ) {",
-			"	vec4 sum = vec4( 0.0 );",
-			"	sum += texture2D( texture, vec2( uv.x - 4.0 * s, uv.y ) ) * 0.051;",
-			"	sum += texture2D( texture, vec2( uv.x - 3.0 * s, uv.y ) ) * 0.0918;",
-			"	sum += texture2D( texture, vec2( uv.x - 2.0 * s, uv.y ) ) * 0.12245;",
-			"	sum += texture2D( texture, vec2( uv.x - 1.0 * s, uv.y ) ) * 0.1531;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
-			"	sum += texture2D( texture, vec2( uv.x + 1.0 * s, uv.y ) ) * 0.1531;",
-			"	sum += texture2D( texture, vec2( uv.x + 2.0 * s, uv.y ) ) * 0.12245;",
-			"	sum += texture2D( texture, vec2( uv.x + 3.0 * s, uv.y ) ) * 0.0918;",
-			"	sum += texture2D( texture, vec2( uv.x + 4.0 * s, uv.y ) ) * 0.051;",
-			"	return sum * .667;",
-			"}"
-		].join( "\n" ) );
+			'vec4 blurX( sampler2D texture, vec2 uv, float s ) {',
+			'	vec4 sum = vec4( 0.0 );',
+			'	sum += texture2D( texture, vec2( uv.x - 4.0 * s, uv.y ) ) * 0.051;',
+			'	sum += texture2D( texture, vec2( uv.x - 3.0 * s, uv.y ) ) * 0.0918;',
+			'	sum += texture2D( texture, vec2( uv.x - 2.0 * s, uv.y ) ) * 0.12245;',
+			'	sum += texture2D( texture, vec2( uv.x - 1.0 * s, uv.y ) ) * 0.1531;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;',
+			'	sum += texture2D( texture, vec2( uv.x + 1.0 * s, uv.y ) ) * 0.1531;',
+			'	sum += texture2D( texture, vec2( uv.x + 2.0 * s, uv.y ) ) * 0.12245;',
+			'	sum += texture2D( texture, vec2( uv.x + 3.0 * s, uv.y ) ) * 0.0918;',
+			'	sum += texture2D( texture, vec2( uv.x + 4.0 * s, uv.y ) ) * 0.051;',
+			'	return sum * .667;',
+			'}'
+		].join( '\n' ) );
 
 		var blurY = new FunctionNode_js.FunctionNode( [
-			"vec4 blurY( sampler2D texture, vec2 uv, float s ) {",
-			"	vec4 sum = vec4( 0.0 );",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y - 4.0 * s ) ) * 0.051;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y - 3.0 * s ) ) * 0.0918;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y - 2.0 * s ) ) * 0.12245;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y - 1.0 * s ) ) * 0.1531;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y + 1.0 * s ) ) * 0.1531;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y + 2.0 * s ) ) * 0.12245;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y + 3.0 * s ) ) * 0.0918;",
-			"	sum += texture2D( texture, vec2( uv.x, uv.y + 4.0 * s ) ) * 0.051;",
-			"	return sum * .667;",
-			"}"
-		].join( "\n" ) );
+			'vec4 blurY( sampler2D texture, vec2 uv, float s ) {',
+			'	vec4 sum = vec4( 0.0 );',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y - 4.0 * s ) ) * 0.051;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y - 3.0 * s ) ) * 0.0918;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y - 2.0 * s ) ) * 0.12245;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y - 1.0 * s ) ) * 0.1531;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y ) ) * 0.1633;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y + 1.0 * s ) ) * 0.1531;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y + 2.0 * s ) ) * 0.12245;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y + 3.0 * s ) ) * 0.0918;',
+			'	sum += texture2D( texture, vec2( uv.x, uv.y + 4.0 * s ) ) * 0.051;',
+			'	return sum * .667;',
+			'}'
+		].join( '\n' ) );
 
 		return {
 			blurX: blurX,
@@ -74,7 +78,7 @@
 
 	BlurNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	BlurNode.prototype.constructor = BlurNode;
-	BlurNode.prototype.nodeType = "Blur";
+	BlurNode.prototype.nodeType = 'Blur';
 
 	BlurNode.prototype.updateFrame = function ( /* frame */ ) {
 
@@ -123,7 +127,7 @@
 
 		} else {
 
-			console.warn( "THREE.BlurNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.BlurNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
@@ -173,4 +177,4 @@
 
 	exports.BlurNode = BlurNode;
 
-})));
+} ) ) );

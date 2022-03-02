@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/procedural/NoiseNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, FunctionNode_js, UVNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, FunctionNode_js, UVNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,17 +26,17 @@
 
 	NoiseNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	NoiseNode.prototype.constructor = NoiseNode;
-	NoiseNode.prototype.nodeType = "Noise";
+	NoiseNode.prototype.nodeType = 'Noise';
 
 	NoiseNode.Nodes = ( function () {
 
 		var snoise = new FunctionNode_js.FunctionNode( [
-			"float snoise(vec2 co) {",
+			'float snoise(vec2 co) {',
 
-			"	return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );",
+			'	return fract( sin( dot( co.xy, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );',
 
-			"}"
-		].join( "\n" ) );
+			'}'
+		].join( '\n' ) );
 
 		return {
 			snoise: snoise
@@ -76,4 +80,4 @@
 
 	exports.NoiseNode = NoiseNode;
 
-})));
+} ) ) );

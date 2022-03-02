@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/misc/NormalMapNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, TempNode_js, Vector2Node_js, FunctionNode_js, UVNode_js, NormalNode_js, PositionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, TempNode_js, Vector2Node_js, FunctionNode_js, UVNode_js, NormalNode_js, PositionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -28,7 +32,7 @@
 			// Per-Pixel Tangent Space Normal Mapping
 			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
+			`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
 
 	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
@@ -62,7 +66,7 @@
 	mat3 tsn = mat3( S, T, N );
 	return normalize( tsn * mapN );
 
-}`	, null, { derivatives: true } );
+}`, null, { derivatives: true } );
 
 		return {
 			perturbNormal2Arb: perturbNormal2Arb
@@ -72,7 +76,7 @@
 
 	NormalMapNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	NormalMapNode.prototype.constructor = NormalMapNode;
-	NormalMapNode.prototype.nodeType = "NormalMap";
+	NormalMapNode.prototype.nodeType = 'NormalMap';
 
 	NormalMapNode.prototype.generate = function ( builder, output ) {
 
@@ -100,7 +104,7 @@
 
 		} else {
 
-			console.warn( "THREE.NormalMapNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.NormalMapNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 
@@ -138,4 +142,4 @@
 
 	exports.NormalMapNode = NormalMapNode;
 
-})));
+} ) ) );

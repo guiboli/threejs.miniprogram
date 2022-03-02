@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/misc/BumpMapNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, FloatNode_js, FunctionNode_js, NormalNode_js, PositionNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/PositionNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, FloatNode_js, FunctionNode_js, NormalNode_js, PositionNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -32,62 +36,62 @@
 
 			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
-			"vec2 dHdxy_fwd( sampler2D bumpMap, vec2 vUv, float bumpScale ) {",
+			'vec2 dHdxy_fwd( sampler2D bumpMap, vec2 vUv, float bumpScale ) {',
 
 			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-			"	vec2 dSTdx = dFdx( vUv );",
-			"	vec2 dSTdy = dFdy( vUv );",
+			'	vec2 dSTdx = dFdx( vUv );',
+			'	vec2 dSTdy = dFdy( vUv );',
 
-			"	float Hll = bumpScale * texture2D( bumpMap, vUv ).x;",
-			"	float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;",
-			"	float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;",
+			'	float Hll = bumpScale * texture2D( bumpMap, vUv ).x;',
+			'	float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;',
+			'	float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;',
 
-			"	return vec2( dBx, dBy );",
+			'	return vec2( dBx, dBy );',
 
-			"}"
+			'}'
 
-		].join( "\n" ), null, { derivatives: true } );
+		].join( '\n' ), null, { derivatives: true } );
 
 		var perturbNormalArb = new FunctionNode_js.FunctionNode( [
 
-			"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
+			'vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {',
 
 			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-			"	vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );",
-			"	vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );",
-			"	vec3 vN = surf_norm;", // normalized
+			'	vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );',
+			'	vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );',
+			'	vec3 vN = surf_norm;', // normalized
 
-			"	vec3 R1 = cross( vSigmaY, vN );",
-			"	vec3 R2 = cross( vN, vSigmaX );",
+			'	vec3 R1 = cross( vSigmaY, vN );',
+			'	vec3 R2 = cross( vN, vSigmaX );',
 
-			"	float fDet = dot( vSigmaX, R1 );",
+			'	float fDet = dot( vSigmaX, R1 );',
 
-			"	fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );",
+			'	fDet *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );',
 
-			"	vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
+			'	vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );',
 
-			"	return normalize( abs( fDet ) * surf_norm - vGrad );",
+			'	return normalize( abs( fDet ) * surf_norm - vGrad );',
 
-			"}"
+			'}'
 
-		].join( "\n" ), [ dHdxy_fwd ], { derivatives: true } );
+		].join( '\n' ), [ dHdxy_fwd ], { derivatives: true } );
 
 		var bumpToNormal = new FunctionNode_js.FunctionNode( [
-			"vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {",
+			'vec3 bumpToNormal( sampler2D bumpMap, vec2 uv, float scale ) {',
 
-			"	vec2 dSTdx = dFdx( uv );",
-			"	vec2 dSTdy = dFdy( uv );",
+			'	vec2 dSTdx = dFdx( uv );',
+			'	vec2 dSTdy = dFdy( uv );',
 
-			"	float Hll = texture2D( bumpMap, uv ).x;",
-			"	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;",
-			"	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;",
+			'	float Hll = texture2D( bumpMap, uv ).x;',
+			'	float dBx = texture2D( bumpMap, uv + dSTdx ).x - Hll;',
+			'	float dBy = texture2D( bumpMap, uv + dSTdy ).x - Hll;',
 
-			"	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );",
+			'	return vec3( .5 - ( dBx * scale ), .5 - ( dBy * scale ), 1.0 );',
 
-			"}"
-		].join( "\n" ), null, { derivatives: true } );
+			'}'
+		].join( '\n' ), null, { derivatives: true } );
 
 		return {
 			dHdxy_fwd: dHdxy_fwd,
@@ -99,7 +103,7 @@
 
 	BumpMapNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	BumpMapNode.prototype.constructor = BumpMapNode;
-	BumpMapNode.prototype.nodeType = "BumpMap";
+	BumpMapNode.prototype.nodeType = 'BumpMap';
 
 	BumpMapNode.prototype.generate = function ( builder, output ) {
 
@@ -133,7 +137,7 @@
 
 		} else {
 
-			console.warn( "THREE.BumpMapNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.BumpMapNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec3( 0.0 )', this.getType( builder ), output );
 
@@ -171,4 +175,4 @@
 
 	exports.BumpMapNode = BumpMapNode;
 
-})));
+} ) ) );

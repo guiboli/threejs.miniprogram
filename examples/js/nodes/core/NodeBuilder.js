@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/NodeBuilder.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUniform.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ConstNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/StructNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector4Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/CubeTextureNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUniform.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ConstNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/StructNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector4Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/CubeTextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, THREE, NodeUniform_js, NodeUtils_js, NodeLib_js, FunctionNode_js, ConstNode_js, StructNode_js, Vector2Node_js, Vector3Node_js, Vector4Node_js, TextureNode_js, CubeTextureNode_js, TextureCubeNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUniform.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ConstNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/StructNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector4Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/CubeTextureNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUniform.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeUtils.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ConstNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/StructNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector2Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector3Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Vector4Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/TextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/CubeTextureNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, NodeUniform_js, NodeUtils_js, NodeLib_js, FunctionNode_js, ConstNode_js, StructNode_js, Vector2Node_js, Vector3Node_js, Vector4Node_js, TextureNode_js, CubeTextureNode_js, TextureCubeNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -64,28 +68,28 @@
 		this.attributes = {};
 
 		this.prefixCode = [
-			"#ifdef TEXTURE_LOD_EXT",
+			'#ifdef TEXTURE_LOD_EXT',
 
-			"	#define texCube(a, b) textureCube(a, b)",
-			"	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)",
+			'	#define texCube(a, b) textureCube(a, b)',
+			'	#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)',
 
-			"	#define tex2D(a, b) texture2D(a, b)",
-			"	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)",
+			'	#define tex2D(a, b) texture2D(a, b)',
+			'	#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)',
 
-			"#else",
+			'#else',
 
-			"	#define texCube(a, b) textureCube(a, b)",
-			"	#define texCubeBias(a, b, c) textureCube(a, b, c)",
+			'	#define texCube(a, b) textureCube(a, b)',
+			'	#define texCubeBias(a, b, c) textureCube(a, b, c)',
 
-			"	#define tex2D(a, b) texture2D(a, b)",
-			"	#define tex2DBias(a, b, c) texture2D(a, b, c)",
+			'	#define tex2D(a, b) texture2D(a, b)',
+			'	#define tex2DBias(a, b, c) texture2D(a, b, c)',
 
-			"#endif",
+			'#endif',
 
-			"#include <packing>",
-			"#include <common>"
+			'#include <packing>',
+			'#include <common>'
 
-		].join( "\n" );
+		].join( '\n' );
 
 		this.parsCode = {
 			vertex: '',
@@ -509,7 +513,7 @@
 				this.resultCode[ shader ],
 				this.finalCode[ shader ],
 				'}'
-			].join( "\n" );
+			].join( '\n' );
 
 		},
 
@@ -529,7 +533,7 @@
 
 				if ( formatType === undefined ) {
 
-					throw new Error( "Node pars " + formatType + " not found." );
+					throw new Error( 'Node pars ' + formatType + ' not found.' );
 
 				}
 
@@ -664,7 +668,7 @@
 
 			} else {
 
-				throw new Error( "Include not found." );
+				throw new Error( 'Include not found.' );
 
 			}
 
@@ -953,7 +957,7 @@
 
 			} else if ( map.isWebGLRenderTarget ) {
 
-				console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
+				console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 				encoding = map.texture.encoding;
 
 			}
@@ -973,4 +977,4 @@
 
 	exports.NodeBuilder = NodeBuilder;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/Node.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, THREE ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -16,7 +20,7 @@
 
 		this.uuid = THREE.Math.generateUUID();
 
-		this.name = "";
+		this.name = '';
 
 		this.type = type;
 
@@ -165,12 +169,12 @@
 
 			var data = {};
 
-			if ( typeof this.nodeType !== "string" ) throw new Error( "Node does not allow serialization." );
+			if ( typeof this.nodeType !== 'string' ) throw new Error( 'Node does not allow serialization.' );
 
 			data.uuid = this.uuid;
 			data.nodeType = this.nodeType;
 
-			if ( this.name !== "" ) data.name = this.name;
+			if ( this.name !== '' ) data.name = this.name;
 
 			if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
@@ -194,4 +198,4 @@
 
 	exports.Node = Node;
 
-})));
+} ) ) );

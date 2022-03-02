@@ -1,23 +1,33 @@
 ( function () {
 
-	/**
- * Mirror Shader
- * Copies half the input to the other half
- *
- * side: side of input to mirror (0 = left, 1 = right, 2 = top, 3 = bottom)
- */
-	const MirrorShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'side': {
-				value: 1
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
+
+	} )( this, ( function ( exports ) {
+
+		'use strict';
+
+		/**
+	 * Mirror Shader
+	 * Copies half the input to the other half
+	 *
+	 * side: side of input to mirror (0 = left, 1 = right, 2 = top, 3 = bottom)
+	 */
+		const MirrorShader = {
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'side': {
+	      value: 1
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -27,9 +37,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDiffuse;
 		uniform int side;
@@ -52,8 +62,12 @@
 			gl_FragColor = color;
 
 		}`
-	};
+		};
 
-	THREE.MirrorShader = MirrorShader;
+		exports.MirrorShader = MirrorShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

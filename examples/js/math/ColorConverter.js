@@ -1,83 +1,97 @@
 ( function () {
 
-	const _hsl = {};
+	( function ( global, factory ) {
 
-	class ColorConverter {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-		static setHSV( color, h, s, v ) {
+	} )( this, ( function ( exports, three ) {
 
-			// https://gist.github.com/xpansive/1337890#file-index-js
-			h = THREE.MathUtils.euclideanModulo( h, 1 );
-			s = THREE.MathUtils.clamp( s, 0, 1 );
-			v = THREE.MathUtils.clamp( v, 0, 1 );
-			return color.setHSL( h, s * v / ( ( h = ( 2 - s ) * v ) < 1 ? h : 2 - h ), h * 0.5 );
+		'use strict';
 
-		}
+		const _hsl = {};
 
-		static getHSV( color, target ) {
+		class ColorConverter {
 
-			if ( target === undefined ) {
+	  static setHSV( color, h, s, v ) {
 
-				console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
-				target = {
-					h: 0,
-					s: 0,
-					l: 0
-				};
+	    // https://gist.github.com/xpansive/1337890#file-index-js
+	    h = three.MathUtils.euclideanModulo( h, 1 );
+	    s = three.MathUtils.clamp( s, 0, 1 );
+	    v = three.MathUtils.clamp( v, 0, 1 );
+	    return color.setHSL( h, s * v / ( ( h = ( 2 - s ) * v ) < 1 ? h : 2 - h ), h * 0.5 );
 
 			}
 
-			color.getHSL( _hsl ); // based on https://gist.github.com/xpansive/1337890#file-index-js
+	  static getHSV( color, target ) {
 
-			_hsl.s *= _hsl.l < 0.5 ? _hsl.l : 1 - _hsl.l;
-			target.h = _hsl.h;
-			target.s = 2 * _hsl.s / ( _hsl.l + _hsl.s );
-			target.v = _hsl.l + _hsl.s;
-			return target;
+	    if ( target === undefined ) {
 
-		} // where c, m, y, k is between 0 and 1
+	      console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
+	      target = {
+	        h: 0,
+	        s: 0,
+	        l: 0
+	      };
+
+				}
+
+	    color.getHSL( _hsl ); // based on https://gist.github.com/xpansive/1337890#file-index-js
+
+	    _hsl.s *= _hsl.l < 0.5 ? _hsl.l : 1 - _hsl.l;
+	    target.h = _hsl.h;
+	    target.s = 2 * _hsl.s / ( _hsl.l + _hsl.s );
+	    target.v = _hsl.l + _hsl.s;
+	    return target;
+
+			} // where c, m, y, k is between 0 and 1
 
 
-		static setCMYK( color, c, m, y, k ) {
+	  static setCMYK( color, c, m, y, k ) {
 
-			const r = ( 1 - c ) * ( 1 - k );
-			const g = ( 1 - m ) * ( 1 - k );
-			const b = ( 1 - y ) * ( 1 - k );
-			return color.setRGB( r, g, b );
-
-		}
-
-		static getCMYK( color, target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
-				target = {
-					c: 0,
-					m: 0,
-					y: 0,
-					k: 0
-				};
+	    const r = ( 1 - c ) * ( 1 - k );
+	    const g = ( 1 - m ) * ( 1 - k );
+	    const b = ( 1 - y ) * ( 1 - k );
+	    return color.setRGB( r, g, b );
 
 			}
 
-			const r = color.r;
-			const g = color.g;
-			const b = color.b;
-			const k = 1 - Math.max( r, g, b );
-			const c = ( 1 - r - k ) / ( 1 - k );
-			const m = ( 1 - g - k ) / ( 1 - k );
-			const y = ( 1 - b - k ) / ( 1 - k );
-			target.c = c;
-			target.m = m;
-			target.y = y;
-			target.k = k;
-			return target;
+	  static getCMYK( color, target ) {
+
+	    if ( target === undefined ) {
+
+	      console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
+	      target = {
+	        c: 0,
+	        m: 0,
+	        y: 0,
+	        k: 0
+	      };
+
+				}
+
+	    const r = color.r;
+	    const g = color.g;
+	    const b = color.b;
+	    const k = 1 - Math.max( r, g, b );
+	    const c = ( 1 - r - k ) / ( 1 - k );
+	    const m = ( 1 - g - k ) / ( 1 - k );
+	    const y = ( 1 - b - k ) / ( 1 - k );
+	    target.c = c;
+	    target.m = m;
+	    target.y = y;
+	    target.k = k;
+	    return target;
+
+			}
 
 		}
 
-	}
+		exports.ColorConverter = ColorConverter;
 
-	THREE.ColorConverter = ColorConverter;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/utils/UVTransformNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix3Node.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix3Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, ExpressionNode_js, Matrix3Node_js, UVNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix3Node.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/Matrix3Node.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, ExpressionNode_js, Matrix3Node_js, UVNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -14,7 +18,7 @@
 
 	function UVTransformNode( uv, position ) {
 
-		ExpressionNode_js.ExpressionNode.call( this, "( uvTransform * vec3( uvNode, 1 ) ).xy", "vec2" );
+		ExpressionNode_js.ExpressionNode.call( this, '( uvTransform * vec3( uvNode, 1 ) ).xy', 'vec2' );
 
 		this.uv = uv || new UVNode_js.UVNode();
 		this.position = position || new Matrix3Node_js.Matrix3Node();
@@ -23,12 +27,12 @@
 
 	UVTransformNode.prototype = Object.create( ExpressionNode_js.ExpressionNode.prototype );
 	UVTransformNode.prototype.constructor = UVTransformNode;
-	UVTransformNode.prototype.nodeType = "UVTransform";
+	UVTransformNode.prototype.nodeType = 'UVTransform';
 
 	UVTransformNode.prototype.generate = function ( builder, output ) {
 
-		this.keywords[ "uvNode" ] = this.uv;
-		this.keywords[ "uvTransform" ] = this.position;
+		this.keywords[ 'uvNode' ] = this.uv;
+		this.keywords[ 'uvTransform' ] = this.position;
 
 		return ExpressionNode_js.ExpressionNode.prototype.generate.call( this, builder, output );
 
@@ -73,4 +77,4 @@
 
 	exports.UVTransformNode = UVTransformNode;
 
-})));
+} ) ) );

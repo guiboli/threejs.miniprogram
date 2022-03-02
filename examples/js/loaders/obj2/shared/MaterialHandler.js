@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/obj2/shared/MaterialHandler.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, THREE) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, THREE ) {
+
+	'use strict';
 
 	/**
 	 * @author Kai Salmen / https://kaisalmen.de
@@ -62,20 +66,20 @@
 		 */
 		createDefaultMaterials: function ( overrideExisting ) {
 
-			let defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
+			const defaultMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
 			defaultMaterial.name = 'defaultMaterial';
 
-			let defaultVertexColorMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
+			const defaultVertexColorMaterial = new THREE.MeshStandardMaterial( { color: 0xDCF1FF } );
 			defaultVertexColorMaterial.name = 'defaultVertexColorMaterial';
 			defaultVertexColorMaterial.vertexColors = THREE.VertexColors;
 
-			let defaultLineMaterial = new THREE.LineBasicMaterial();
+			const defaultLineMaterial = new THREE.LineBasicMaterial();
 			defaultLineMaterial.name = 'defaultLineMaterial';
 
-			let defaultPointMaterial = new THREE.PointsMaterial( { size: 0.1 } );
+			const defaultPointMaterial = new THREE.PointsMaterial( { size: 0.1 } );
 			defaultPointMaterial.name = 'defaultPointMaterial';
 
-			let runtimeMaterials = {};
+			const runtimeMaterials = {};
 			runtimeMaterials[ defaultMaterial.name ] = defaultMaterial;
 			runtimeMaterials[ defaultVertexColorMaterial.name ] = defaultVertexColorMaterial;
 			runtimeMaterials[ defaultLineMaterial.name ] = defaultLineMaterial;
@@ -94,14 +98,14 @@
 		addPayloadMaterials: function ( materialPayload ) {
 
 			let material, materialName;
-			let materialCloneInstructions = materialPayload.materials.materialCloneInstructions;
+			const materialCloneInstructions = materialPayload.materials.materialCloneInstructions;
 			let newMaterials = {};
 
 			if ( materialCloneInstructions !== undefined && materialCloneInstructions !== null ) {
 
 				let materialNameOrg = materialCloneInstructions.materialNameOrg;
-				materialNameOrg = ( materialNameOrg !== undefined && materialNameOrg !== null ) ? materialNameOrg : "";
-				let materialOrg = this.materials[ materialNameOrg ];
+				materialNameOrg = ( materialNameOrg !== undefined && materialNameOrg !== null ) ? materialNameOrg : '';
+				const materialOrg = this.materials[ materialNameOrg ];
 				if ( materialOrg ) {
 
 					material = materialOrg.clone();
@@ -129,7 +133,7 @@
 			let materials = materialPayload.materials.serializedMaterials;
 			if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) {
 
-				let loader = new THREE.MaterialLoader();
+				const loader = new THREE.MaterialLoader();
 				let materialJson;
 				for ( materialName in materials ) {
 
@@ -142,6 +146,7 @@
 							console.info( 'De-serialized material with name "' + materialName + '" will be added.' );
 
 						}
+
 						this.materials[ materialName ] = material;
 						newMaterials[ materialName ] = material;
 
@@ -150,6 +155,7 @@
 				}
 
 			}
+
 			materials = materialPayload.materials.runtimeMaterials;
 			newMaterials = this.addMaterials( materials, true, newMaterials );
 
@@ -171,12 +177,13 @@
 				newMaterials = {};
 
 			}
+
 			if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) {
 
 				let material;
 				let existingMaterial;
 				let add;
-				for ( let materialName in materials ) {
+				for ( const materialName in materials ) {
 
 					material = materials[ materialName ];
 					add = overrideExisting === true;
@@ -186,12 +193,14 @@
 						add = ( existingMaterial === null || existingMaterial === undefined );
 
 					}
+
 					if ( add ) {
 
 						this.materials[ materialName ] = material;
 						newMaterials[ materialName ] = material;
 
 					}
+
 					if ( this.logging.enabled && this.logging.debug ) {
 
 						console.info( 'Material with name "' + materialName + '" was added.' );
@@ -207,6 +216,7 @@
 				this.callbacks.onLoadMaterials( newMaterials );
 
 			}
+
 			return newMaterials;
 
 		},
@@ -240,9 +250,9 @@
 		 */
 		getMaterialsJSON: function () {
 
-			let materialsJSON = {};
+			const materialsJSON = {};
 			let material;
-			for ( let materialName in this.materials ) {
+			for ( const materialName in this.materials ) {
 
 				material = this.materials[ materialName ];
 				materialsJSON[ materialName ] = material.toJSON();
@@ -266,4 +276,4 @@
 
 	exports.MaterialHandler = MaterialHandler;
 
-})));
+} ) ) );

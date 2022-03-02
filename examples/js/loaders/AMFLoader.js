@@ -1,529 +1,576 @@
 ( function () {
 
-	/**
- * Description: Early release of an AMF THREE.Loader following the pattern of the
- * example loaders in the three.js project.
- *
- * Usage:
- *	const loader = new AMFLoader();
- *	loader.load('/path/to/project.amf', function(objecttree) {
- *		scene.add(objecttree);
- *	});
- *
- * Materials now supported, material colors supported
- * Zip support, requires fflate
- * No constellation support (yet)!
- *
- */
+	( function ( global, factory ) {
 
-	class AMFLoader extends THREE.Loader {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '../libs/fflate.module.js' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '../libs/fflate.module' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
 
-		constructor( manager ) {
+	} )( this, ( function ( exports, three, fflate ) {
 
-			super( manager );
+		'use strict';
 
-		}
+		function _interopNamespace( e ) {
 
-		load( url, onLoad, onProgress, onError ) {
+			if ( e && e.__esModule ) return e;
+			var n = Object.create( null );
+			if ( e ) {
 
-			const scope = this;
-			const loader = new THREE.FileLoader( scope.manager );
-			loader.setPath( scope.path );
-			loader.setResponseType( 'arraybuffer' );
-			loader.setRequestHeader( scope.requestHeader );
-			loader.setWithCredentials( scope.withCredentials );
-			loader.load( url, function ( text ) {
+				Object.keys( e ).forEach( function ( k ) {
 
-				try {
+					if ( k !== 'default' ) {
 
-					onLoad( scope.parse( text ) );
+						var d = Object.getOwnPropertyDescriptor( e, k );
+						Object.defineProperty( n, k, d.get ? d : {
+							enumerable: true,
+							get: function () {
 
-				} catch ( e ) {
+								return e[ k ];
 
-					if ( onError ) {
-
-						onError( e );
-
-					} else {
-
-						console.error( e );
+							}
+						} );
 
 					}
 
-					scope.manager.itemError( url );
+				} );
 
-				}
+			}
 
-			}, onProgress, onError );
+			n[ 'default' ] = e;
+			return Object.freeze( n );
 
 		}
 
-		parse( data ) {
+		var fflate__namespace = /*#__PURE__*/_interopNamespace( fflate );
 
-			function loadDocument( data ) {
+		/**
+	 * Description: Early release of an AMF Loader following the pattern of the
+	 * example loaders in the three.js project.
+	 *
+	 * Usage:
+	 *	const loader = new AMFLoader();
+	 *	loader.load('/path/to/project.amf', function(objecttree) {
+	 *		scene.add(objecttree);
+	 *	});
+	 *
+	 * Materials now supported, material colors supported
+	 * Zip support, requires fflate
+	 * No constellation support (yet)!
+	 *
+	 */
 
-				let view = new DataView( data );
-				const magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
+		class AMFLoader extends three.Loader {
 
-				if ( magic === 'PK' ) {
+	  constructor( manager ) {
 
-					let zip = null;
-					let file = null;
-					console.log( 'THREE.AMFLoader: Loading Zip' );
+	    super( manager );
 
-					try {
+			}
 
-						zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+	  load( url, onLoad, onProgress, onError ) {
+
+	    const scope = this;
+	    const loader = new three.FileLoader( scope.manager );
+	    loader.setPath( scope.path );
+	    loader.setResponseType( 'arraybuffer' );
+	    loader.setRequestHeader( scope.requestHeader );
+	    loader.setWithCredentials( scope.withCredentials );
+	    loader.load( url, function ( text ) {
+
+	      try {
+
+	        onLoad( scope.parse( text ) );
 
 					} catch ( e ) {
 
-						if ( e instanceof ReferenceError ) {
+	        if ( onError ) {
 
-							console.log( 'THREE.AMFLoader: fflate missing and file is compressed.' );
-							return null;
+	          onError( e );
 
-						}
+						} else {
 
-					}
-
-					for ( file in zip ) {
-
-						if ( file.toLowerCase().slice( - 4 ) === '.amf' ) {
-
-							break;
+	          console.error( e );
 
 						}
 
-					}
-
-					console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
-					view = new DataView( zip[ file ].buffer );
-
-				}
-
-				const fileText = THREE.LoaderUtils.decodeText( view );
-				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
-
-				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
-
-					console.log( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
-					return null;
-
-				}
-
-				return xmlData;
-
-			}
-
-			function loadDocumentScale( node ) {
-
-				let scale = 1.0;
-				let unit = 'millimeter';
-
-				if ( node.documentElement.attributes.unit !== undefined ) {
-
-					unit = node.documentElement.attributes.unit.value.toLowerCase();
-
-				}
-
-				const scaleUnits = {
-					millimeter: 1.0,
-					inch: 25.4,
-					feet: 304.8,
-					meter: 1000.0,
-					micron: 0.001
-				};
-
-				if ( scaleUnits[ unit ] !== undefined ) {
-
-					scale = scaleUnits[ unit ];
-
-				}
-
-				console.log( 'THREE.AMFLoader: Unit scale: ' + scale );
-				return scale;
-
-			}
-
-			function loadMaterials( node ) {
-
-				let matName = 'AMF Material';
-				const matId = node.attributes.id.textContent;
-				let color = {
-					r: 1.0,
-					g: 1.0,
-					b: 1.0,
-					a: 1.0
-				};
-				let loadedMaterial = null;
-
-				for ( let i = 0; i < node.childNodes.length; i ++ ) {
-
-					const matChildEl = node.childNodes[ i ];
-
-					if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
-
-						if ( matChildEl.attributes.type.value === 'name' ) {
-
-							matName = matChildEl.textContent;
-
-						}
-
-					} else if ( matChildEl.nodeName === 'color' ) {
-
-						color = loadColor( matChildEl );
+	        scope.manager.itemError( url );
 
 					}
 
-				}
-
-				loadedMaterial = new THREE.MeshPhongMaterial( {
-					flatShading: true,
-					color: new THREE.Color( color.r, color.g, color.b ),
-					name: matName
-				} );
-
-				if ( color.a !== 1.0 ) {
-
-					loadedMaterial.transparent = true;
-					loadedMaterial.opacity = color.a;
-
-				}
-
-				return {
-					id: matId,
-					material: loadedMaterial
-				};
+				}, onProgress, onError );
 
 			}
 
-			function loadColor( node ) {
+	  parse( data ) {
 
-				const color = {
-					r: 1.0,
-					g: 1.0,
-					b: 1.0,
-					a: 1.0
-				};
+	    function loadDocument( data ) {
 
-				for ( let i = 0; i < node.childNodes.length; i ++ ) {
+	      let view = new DataView( data );
+	      const magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
 
-					const matColor = node.childNodes[ i ];
+	      if ( magic === 'PK' ) {
 
-					if ( matColor.nodeName === 'r' ) {
+	        let zip = null;
+	        let file = null;
+	        console.log( 'THREE.AMFLoader: Loading Zip' );
 
-						color.r = matColor.textContent;
+	        try {
 
-					} else if ( matColor.nodeName === 'g' ) {
+	          zip = fflate__namespace.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
-						color.g = matColor.textContent;
+						} catch ( e ) {
 
-					} else if ( matColor.nodeName === 'b' ) {
+	          if ( e instanceof ReferenceError ) {
 
-						color.b = matColor.textContent;
-
-					} else if ( matColor.nodeName === 'a' ) {
-
-						color.a = matColor.textContent;
-
-					}
-
-				}
-
-				return color;
-
-			}
-
-			function loadMeshVolume( node ) {
-
-				const volume = {
-					name: '',
-					triangles: [],
-					materialid: null
-				};
-				let currVolumeNode = node.firstElementChild;
-
-				if ( node.attributes.materialid !== undefined ) {
-
-					volume.materialId = node.attributes.materialid.nodeValue;
-
-				}
-
-				while ( currVolumeNode ) {
-
-					if ( currVolumeNode.nodeName === 'metadata' ) {
-
-						if ( currVolumeNode.attributes.type !== undefined ) {
-
-							if ( currVolumeNode.attributes.type.value === 'name' ) {
-
-								volume.name = currVolumeNode.textContent;
+	            console.log( 'THREE.AMFLoader: fflate missing and file is compressed.' );
+	            return null;
 
 							}
 
 						}
 
-					} else if ( currVolumeNode.nodeName === 'triangle' ) {
+	        for ( file in zip ) {
 
-						const v1 = currVolumeNode.getElementsByTagName( 'v1' )[ 0 ].textContent;
-						const v2 = currVolumeNode.getElementsByTagName( 'v2' )[ 0 ].textContent;
-						const v3 = currVolumeNode.getElementsByTagName( 'v3' )[ 0 ].textContent;
-						volume.triangles.push( v1, v2, v3 );
+	          if ( file.toLowerCase().slice( - 4 ) === '.amf' ) {
 
-					}
-
-					currVolumeNode = currVolumeNode.nextElementSibling;
-
-				}
-
-				return volume;
-
-			}
-
-			function loadMeshVertices( node ) {
-
-				const vertArray = [];
-				const normalArray = [];
-				let currVerticesNode = node.firstElementChild;
-
-				while ( currVerticesNode ) {
-
-					if ( currVerticesNode.nodeName === 'vertex' ) {
-
-						let vNode = currVerticesNode.firstElementChild;
-
-						while ( vNode ) {
-
-							if ( vNode.nodeName === 'coordinates' ) {
-
-								const x = vNode.getElementsByTagName( 'x' )[ 0 ].textContent;
-								const y = vNode.getElementsByTagName( 'y' )[ 0 ].textContent;
-								const z = vNode.getElementsByTagName( 'z' )[ 0 ].textContent;
-								vertArray.push( x, y, z );
-
-							} else if ( vNode.nodeName === 'normal' ) {
-
-								const nx = vNode.getElementsByTagName( 'nx' )[ 0 ].textContent;
-								const ny = vNode.getElementsByTagName( 'ny' )[ 0 ].textContent;
-								const nz = vNode.getElementsByTagName( 'nz' )[ 0 ].textContent;
-								normalArray.push( nx, ny, nz );
-
-							}
-
-							vNode = vNode.nextElementSibling;
-
-						}
-
-					}
-
-					currVerticesNode = currVerticesNode.nextElementSibling;
-
-				}
-
-				return {
-					'vertices': vertArray,
-					'normals': normalArray
-				};
-
-			}
-
-			function loadObject( node ) {
-
-				const objId = node.attributes.id.textContent;
-				const loadedObject = {
-					name: 'amfobject',
-					meshes: []
-				};
-				let currColor = null;
-				let currObjNode = node.firstElementChild;
-
-				while ( currObjNode ) {
-
-					if ( currObjNode.nodeName === 'metadata' ) {
-
-						if ( currObjNode.attributes.type !== undefined ) {
-
-							if ( currObjNode.attributes.type.value === 'name' ) {
-
-								loadedObject.name = currObjNode.textContent;
+	            break;
 
 							}
 
 						}
 
-					} else if ( currObjNode.nodeName === 'color' ) {
+	        console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
+	        view = new DataView( zip[ file ].buffer );
 
-						currColor = loadColor( currObjNode );
+					}
 
-					} else if ( currObjNode.nodeName === 'mesh' ) {
+	      const fileText = three.LoaderUtils.decodeText( view );
+	      const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
-						let currMeshNode = currObjNode.firstElementChild;
-						const mesh = {
-							vertices: [],
-							normals: [],
-							volumes: [],
-							color: currColor
-						};
+	      if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
-						while ( currMeshNode ) {
+	        console.log( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
+	        return null;
 
-							if ( currMeshNode.nodeName === 'vertices' ) {
+					}
 
-								const loadedVertices = loadMeshVertices( currMeshNode );
-								mesh.normals = mesh.normals.concat( loadedVertices.normals );
-								mesh.vertices = mesh.vertices.concat( loadedVertices.vertices );
+	      return xmlData;
 
-							} else if ( currMeshNode.nodeName === 'volume' ) {
+				}
 
-								mesh.volumes.push( loadMeshVolume( currMeshNode ) );
+	    function loadDocumentScale( node ) {
+
+	      let scale = 1.0;
+	      let unit = 'millimeter';
+
+	      if ( node.documentElement.attributes.unit !== undefined ) {
+
+	        unit = node.documentElement.attributes.unit.value.toLowerCase();
+
+					}
+
+	      const scaleUnits = {
+	        millimeter: 1.0,
+	        inch: 25.4,
+	        feet: 304.8,
+	        meter: 1000.0,
+	        micron: 0.001
+	      };
+
+	      if ( scaleUnits[ unit ] !== undefined ) {
+
+	        scale = scaleUnits[ unit ];
+
+					}
+
+	      console.log( 'THREE.AMFLoader: Unit scale: ' + scale );
+	      return scale;
+
+				}
+
+	    function loadMaterials( node ) {
+
+	      let matName = 'AMF Material';
+	      const matId = node.attributes.id.textContent;
+	      let color = {
+	        r: 1.0,
+	        g: 1.0,
+	        b: 1.0,
+	        a: 1.0
+	      };
+	      let loadedMaterial = null;
+
+	      for ( let i = 0; i < node.childNodes.length; i ++ ) {
+
+	        const matChildEl = node.childNodes[ i ];
+
+	        if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
+
+	          if ( matChildEl.attributes.type.value === 'name' ) {
+
+	            matName = matChildEl.textContent;
 
 							}
 
-							currMeshNode = currMeshNode.nextElementSibling;
+						} else if ( matChildEl.nodeName === 'color' ) {
+
+	          color = loadColor( matChildEl );
 
 						}
 
-						loadedObject.meshes.push( mesh );
+					}
+
+	      loadedMaterial = new three.MeshPhongMaterial( {
+	        flatShading: true,
+	        color: new three.Color( color.r, color.g, color.b ),
+	        name: matName
+	      } );
+
+	      if ( color.a !== 1.0 ) {
+
+	        loadedMaterial.transparent = true;
+	        loadedMaterial.opacity = color.a;
 
 					}
 
-					currObjNode = currObjNode.nextElementSibling;
+	      return {
+	        id: matId,
+	        material: loadedMaterial
+	      };
 
 				}
 
-				return {
-					'id': objId,
-					'obj': loadedObject
-				};
+	    function loadColor( node ) {
 
-			}
+	      const color = {
+	        r: 1.0,
+	        g: 1.0,
+	        b: 1.0,
+	        a: 1.0
+	      };
 
-			const xmlData = loadDocument( data );
-			let amfName = '';
-			let amfAuthor = '';
-			const amfScale = loadDocumentScale( xmlData );
-			const amfMaterials = {};
-			const amfObjects = {};
-			const childNodes = xmlData.documentElement.childNodes;
-			let i, j;
+	      for ( let i = 0; i < node.childNodes.length; i ++ ) {
 
-			for ( i = 0; i < childNodes.length; i ++ ) {
+	        const matColor = node.childNodes[ i ];
 
-				const child = childNodes[ i ];
+	        if ( matColor.nodeName === 'r' ) {
 
-				if ( child.nodeName === 'metadata' ) {
+	          color.r = matColor.textContent;
 
-					if ( child.attributes.type !== undefined ) {
+						} else if ( matColor.nodeName === 'g' ) {
 
-						if ( child.attributes.type.value === 'name' ) {
+	          color.g = matColor.textContent;
 
-							amfName = child.textContent;
+						} else if ( matColor.nodeName === 'b' ) {
 
-						} else if ( child.attributes.type.value === 'author' ) {
+	          color.b = matColor.textContent;
 
-							amfAuthor = child.textContent;
+						} else if ( matColor.nodeName === 'a' ) {
+
+	          color.a = matColor.textContent;
 
 						}
 
 					}
 
-				} else if ( child.nodeName === 'material' ) {
-
-					const loadedMaterial = loadMaterials( child );
-					amfMaterials[ loadedMaterial.id ] = loadedMaterial.material;
-
-				} else if ( child.nodeName === 'object' ) {
-
-					const loadedObject = loadObject( child );
-					amfObjects[ loadedObject.id ] = loadedObject.obj;
+	      return color;
 
 				}
 
-			}
+	    function loadMeshVolume( node ) {
 
-			const sceneObject = new THREE.Group();
-			const defaultMaterial = new THREE.MeshPhongMaterial( {
-				color: 0xaaaaff,
-				flatShading: true
-			} );
-			sceneObject.name = amfName;
-			sceneObject.userData.author = amfAuthor;
-			sceneObject.userData.loader = 'AMF';
+	      const volume = {
+	        name: '',
+	        triangles: [],
+	        materialid: null
+	      };
+	      let currVolumeNode = node.firstElementChild;
 
-			for ( const id in amfObjects ) {
+	      if ( node.attributes.materialid !== undefined ) {
 
-				const part = amfObjects[ id ];
-				const meshes = part.meshes;
-				const newObject = new THREE.Group();
-				newObject.name = part.name || '';
-
-				for ( i = 0; i < meshes.length; i ++ ) {
-
-					let objDefaultMaterial = defaultMaterial;
-					const mesh = meshes[ i ];
-					const vertices = new THREE.Float32BufferAttribute( mesh.vertices, 3 );
-					let normals = null;
-
-					if ( mesh.normals.length ) {
-
-						normals = new THREE.Float32BufferAttribute( mesh.normals, 3 );
+	        volume.materialId = node.attributes.materialid.nodeValue;
 
 					}
 
-					if ( mesh.color ) {
+	      while ( currVolumeNode ) {
 
-						const color = mesh.color;
-						objDefaultMaterial = defaultMaterial.clone();
-						objDefaultMaterial.color = new THREE.Color( color.r, color.g, color.b );
+	        if ( currVolumeNode.nodeName === 'metadata' ) {
 
-						if ( color.a !== 1.0 ) {
+	          if ( currVolumeNode.attributes.type !== undefined ) {
 
-							objDefaultMaterial.transparent = true;
-							objDefaultMaterial.opacity = color.a;
+	            if ( currVolumeNode.attributes.type.value === 'name' ) {
+
+	              volume.name = currVolumeNode.textContent;
+
+								}
+
+							}
+
+						} else if ( currVolumeNode.nodeName === 'triangle' ) {
+
+	          const v1 = currVolumeNode.getElementsByTagName( 'v1' )[ 0 ].textContent;
+	          const v2 = currVolumeNode.getElementsByTagName( 'v2' )[ 0 ].textContent;
+	          const v3 = currVolumeNode.getElementsByTagName( 'v3' )[ 0 ].textContent;
+	          volume.triangles.push( v1, v2, v3 );
 
 						}
+
+	        currVolumeNode = currVolumeNode.nextElementSibling;
 
 					}
 
-					const volumes = mesh.volumes;
+	      return volume;
 
-					for ( j = 0; j < volumes.length; j ++ ) {
+				}
 
-						const volume = volumes[ j ];
-						const newGeometry = new THREE.BufferGeometry();
-						let material = objDefaultMaterial;
-						newGeometry.setIndex( volume.triangles );
-						newGeometry.setAttribute( 'position', vertices.clone() );
+	    function loadMeshVertices( node ) {
 
-						if ( normals ) {
+	      const vertArray = [];
+	      const normalArray = [];
+	      let currVerticesNode = node.firstElementChild;
 
-							newGeometry.setAttribute( 'normal', normals.clone() );
+	      while ( currVerticesNode ) {
+
+	        if ( currVerticesNode.nodeName === 'vertex' ) {
+
+	          let vNode = currVerticesNode.firstElementChild;
+
+	          while ( vNode ) {
+
+	            if ( vNode.nodeName === 'coordinates' ) {
+
+	              const x = vNode.getElementsByTagName( 'x' )[ 0 ].textContent;
+	              const y = vNode.getElementsByTagName( 'y' )[ 0 ].textContent;
+	              const z = vNode.getElementsByTagName( 'z' )[ 0 ].textContent;
+	              vertArray.push( x, y, z );
+
+								} else if ( vNode.nodeName === 'normal' ) {
+
+	              const nx = vNode.getElementsByTagName( 'nx' )[ 0 ].textContent;
+	              const ny = vNode.getElementsByTagName( 'ny' )[ 0 ].textContent;
+	              const nz = vNode.getElementsByTagName( 'nz' )[ 0 ].textContent;
+	              normalArray.push( nx, ny, nz );
+
+								}
+
+	            vNode = vNode.nextElementSibling;
+
+							}
 
 						}
 
-						if ( amfMaterials[ volume.materialId ] !== undefined ) {
+	        currVerticesNode = currVerticesNode.nextElementSibling;
 
-							material = amfMaterials[ volume.materialId ];
+					}
+
+	      return {
+	        'vertices': vertArray,
+	        'normals': normalArray
+	      };
+
+				}
+
+	    function loadObject( node ) {
+
+	      const objId = node.attributes.id.textContent;
+	      const loadedObject = {
+	        name: 'amfobject',
+	        meshes: []
+	      };
+	      let currColor = null;
+	      let currObjNode = node.firstElementChild;
+
+	      while ( currObjNode ) {
+
+	        if ( currObjNode.nodeName === 'metadata' ) {
+
+	          if ( currObjNode.attributes.type !== undefined ) {
+
+	            if ( currObjNode.attributes.type.value === 'name' ) {
+
+	              loadedObject.name = currObjNode.textContent;
+
+								}
+
+							}
+
+						} else if ( currObjNode.nodeName === 'color' ) {
+
+	          currColor = loadColor( currObjNode );
+
+						} else if ( currObjNode.nodeName === 'mesh' ) {
+
+	          let currMeshNode = currObjNode.firstElementChild;
+	          const mesh = {
+	            vertices: [],
+	            normals: [],
+	            volumes: [],
+	            color: currColor
+	          };
+
+	          while ( currMeshNode ) {
+
+	            if ( currMeshNode.nodeName === 'vertices' ) {
+
+	              const loadedVertices = loadMeshVertices( currMeshNode );
+	              mesh.normals = mesh.normals.concat( loadedVertices.normals );
+	              mesh.vertices = mesh.vertices.concat( loadedVertices.vertices );
+
+								} else if ( currMeshNode.nodeName === 'volume' ) {
+
+	              mesh.volumes.push( loadMeshVolume( currMeshNode ) );
+
+								}
+
+	            currMeshNode = currMeshNode.nextElementSibling;
+
+							}
+
+	          loadedObject.meshes.push( mesh );
 
 						}
 
-						newGeometry.scale( amfScale, amfScale, amfScale );
-						newObject.add( new THREE.Mesh( newGeometry, material.clone() ) );
+	        currObjNode = currObjNode.nextElementSibling;
+
+					}
+
+	      return {
+	        'id': objId,
+	        'obj': loadedObject
+	      };
+
+				}
+
+	    const xmlData = loadDocument( data );
+	    let amfName = '';
+	    let amfAuthor = '';
+	    const amfScale = loadDocumentScale( xmlData );
+	    const amfMaterials = {};
+	    const amfObjects = {};
+	    const childNodes = xmlData.documentElement.childNodes;
+	    let i, j;
+
+	    for ( i = 0; i < childNodes.length; i ++ ) {
+
+	      const child = childNodes[ i ];
+
+	      if ( child.nodeName === 'metadata' ) {
+
+	        if ( child.attributes.type !== undefined ) {
+
+	          if ( child.attributes.type.value === 'name' ) {
+
+	            amfName = child.textContent;
+
+							} else if ( child.attributes.type.value === 'author' ) {
+
+	            amfAuthor = child.textContent;
+
+							}
+
+						}
+
+					} else if ( child.nodeName === 'material' ) {
+
+	        const loadedMaterial = loadMaterials( child );
+	        amfMaterials[ loadedMaterial.id ] = loadedMaterial.material;
+
+					} else if ( child.nodeName === 'object' ) {
+
+	        const loadedObject = loadObject( child );
+	        amfObjects[ loadedObject.id ] = loadedObject.obj;
 
 					}
 
 				}
 
-				sceneObject.add( newObject );
+	    const sceneObject = new three.Group();
+	    const defaultMaterial = new three.MeshPhongMaterial( {
+	      color: 0xaaaaff,
+	      flatShading: true
+	    } );
+	    sceneObject.name = amfName;
+	    sceneObject.userData.author = amfAuthor;
+	    sceneObject.userData.loader = 'AMF';
+
+	    for ( const id in amfObjects ) {
+
+	      const part = amfObjects[ id ];
+	      const meshes = part.meshes;
+	      const newObject = new three.Group();
+	      newObject.name = part.name || '';
+
+	      for ( i = 0; i < meshes.length; i ++ ) {
+
+	        let objDefaultMaterial = defaultMaterial;
+	        const mesh = meshes[ i ];
+	        const vertices = new three.Float32BufferAttribute( mesh.vertices, 3 );
+	        let normals = null;
+
+	        if ( mesh.normals.length ) {
+
+	          normals = new three.Float32BufferAttribute( mesh.normals, 3 );
+
+						}
+
+	        if ( mesh.color ) {
+
+	          const color = mesh.color;
+	          objDefaultMaterial = defaultMaterial.clone();
+	          objDefaultMaterial.color = new three.Color( color.r, color.g, color.b );
+
+	          if ( color.a !== 1.0 ) {
+
+	            objDefaultMaterial.transparent = true;
+	            objDefaultMaterial.opacity = color.a;
+
+							}
+
+						}
+
+	        const volumes = mesh.volumes;
+
+	        for ( j = 0; j < volumes.length; j ++ ) {
+
+	          const volume = volumes[ j ];
+	          const newGeometry = new three.BufferGeometry();
+	          let material = objDefaultMaterial;
+	          newGeometry.setIndex( volume.triangles );
+	          newGeometry.setAttribute( 'position', vertices.clone() );
+
+	          if ( normals ) {
+
+	            newGeometry.setAttribute( 'normal', normals.clone() );
+
+							}
+
+	          if ( amfMaterials[ volume.materialId ] !== undefined ) {
+
+	            material = amfMaterials[ volume.materialId ];
+
+							}
+
+	          newGeometry.scale( amfScale, amfScale, amfScale );
+	          newObject.add( new three.Mesh( newGeometry, material.clone() ) );
+
+						}
+
+					}
+
+	      sceneObject.add( newObject );
+
+				}
+
+	    return sceneObject;
 
 			}
-
-			return sceneObject;
 
 		}
 
-	}
+		exports.AMFLoader = AMFLoader;
 
-	THREE.AMFLoader = AMFLoader;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/utils/TimerNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, FloatNode_js, NodeLib_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/NodeLib.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, FloatNode_js, NodeLib_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -29,7 +33,7 @@
 
 	TimerNode.prototype = Object.create( FloatNode_js.FloatNode.prototype );
 	TimerNode.prototype.constructor = TimerNode;
-	TimerNode.prototype.nodeType = "Timer";
+	TimerNode.prototype.nodeType = 'Timer';
 
 	TimerNode.prototype.getReadonly = function () {
 
@@ -113,4 +117,4 @@
 
 	exports.TimerNode = TimerNode;
 
-})));
+} ) ) );

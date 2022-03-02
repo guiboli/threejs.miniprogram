@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/math/MathNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE));
-}(this, (function (exports, TempNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -73,7 +77,7 @@
 
 	MathNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	MathNode.prototype.constructor = MathNode;
-	MathNode.prototype.nodeType = "Math";
+	MathNode.prototype.nodeType = 'Math';
 
 	MathNode.prototype.getNumInputs = function ( /*builder*/ ) {
 
@@ -277,4 +281,4 @@
 
 	exports.MathNode = MathNode;
 
-})));
+} ) ) );

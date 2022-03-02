@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/loaders/NodeMaterialLoader.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/Nodes.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/Nodes.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE));
-}(this, (function (exports, THREE, Nodes) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/Nodes.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', 'three', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/Nodes.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, THREE, Nodes ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -30,9 +34,9 @@
 
 			recursive = recursive !== undefined ? recursive : true;
 
-			if ( typeof uuid === "object" ) uuid = uuid.uuid;
+			if ( typeof uuid === 'object' ) uuid = uuid.uuid;
 
-			if ( typeof object === "object" ) {
+			if ( typeof object === 'object' ) {
 
 				var keys = Object.keys( object );
 
@@ -123,7 +127,7 @@
 
 			if ( ! object ) {
 
-				console.warn( "Node \"" + uuid + "\" not found." );
+				console.warn( 'Node "' + uuid + '" not found.' );
 
 			}
 
@@ -135,12 +139,12 @@
 
 			switch ( typeof json ) {
 
-				case "boolean":
-				case "number":
+				case 'boolean':
+				case 'number':
 
 					return json;
 
-				case "string":
+				case 'string':
 
 					if ( /^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/i.test( json ) || this.library[ json ] ) {
 
@@ -164,7 +168,7 @@
 
 						for ( var prop in json ) {
 
-							if ( prop === "uuid" ) continue;
+							if ( prop === 'uuid' ) continue;
 
 							json[ prop ] = this.resolve( json[ prop ] );
 
@@ -186,7 +190,7 @@
 
 				node = json.nodes[ uuid ];
 
-				object = new Nodes[ node.nodeType + "Node" ]();
+				object = new Nodes[ node.nodeType + 'Node' ]();
 
 				if ( node.name ) {
 
@@ -277,4 +281,4 @@
 	exports.NodeMaterialLoader = NodeMaterialLoader;
 	exports.NodeMaterialLoaderUtils = NodeMaterialLoaderUtils;
 
-})));
+} ) ) );

@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/misc/TextureCubeNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeUVNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeUVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, FloatNode_js, ExpressionNode_js, TextureCubeUVNode_js, ReflectNode_js, NormalNode_js, ColorSpaceNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeUVNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/inputs/FloatNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/ExpressionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/misc/TextureCubeUVNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/ReflectNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/NormalNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/utils/ColorSpaceNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, FloatNode_js, ExpressionNode_js, TextureCubeUVNode_js, ReflectNode_js, NormalNode_js, ColorSpaceNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -37,7 +41,7 @@
 
 	TextureCubeNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	TextureCubeNode.prototype.constructor = TextureCubeNode;
-	TextureCubeNode.prototype.nodeType = "TextureCube";
+	TextureCubeNode.prototype.nodeType = 'TextureCube';
 
 	TextureCubeNode.prototype.generateTextureCubeUV = function ( builder, cache ) {
 
@@ -97,7 +101,7 @@
 
 		} else {
 
-			console.warn( "THREE.TextureCubeNode is not compatible with " + builder.shader + " shader." );
+			console.warn( 'THREE.TextureCubeNode is not compatible with ' + builder.shader + ' shader.' );
 
 			return builder.format( 'vec4( 0.0 )', this.getType( builder ), output );
 
@@ -133,4 +137,4 @@
 
 	exports.TextureCubeNode = TextureCubeNode;
 
-})));
+} ) ) );

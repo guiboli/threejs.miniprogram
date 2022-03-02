@@ -1,35 +1,45 @@
 ( function () {
 
-	/**
- * Shaders to render 3D volumes using raycasting.
- * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
- * This is not the only approach, therefore it's marked 1.
- */
+	( function ( global, factory ) {
 
-	const VolumeRenderShader1 = {
-		uniforms: {
-			'u_size': {
-				value: new THREE.Vector3( 1, 1, 1 )
-			},
-			'u_renderstyle': {
-				value: 0
-			},
-			'u_renderthreshold': {
-				value: 0.5
-			},
-			'u_clim': {
-				value: new THREE.Vector2( 1, 1 )
-			},
-			'u_data': {
-				value: null
-			},
-			'u_cmdata': {
-				value: null
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		/**
+	 * Shaders to render 3D volumes using raycasting.
+	 * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
+	 * This is not the only approach, therefore it's marked 1.
+	 */
+
+		const VolumeRenderShader1 = {
+	  uniforms: {
+	    'u_size': {
+	      value: new three.Vector3( 1, 1, 1 )
+	    },
+	    'u_renderstyle': {
+	      value: 0
+	    },
+	    'u_renderthreshold': {
+	      value: 0.5
+	    },
+	    'u_clim': {
+	      value: new three.Vector2( 1, 1 )
+	    },
+	    'u_data': {
+	      value: null
+	    },
+	    'u_cmdata': {
+	      value: null
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec4 v_nearpos;
 		varying vec4 v_farpos;
@@ -60,9 +70,9 @@
 				v_position = position;
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 				precision highp float;
 				precision mediump sampler3D;
@@ -293,8 +303,12 @@
 						final_color.a = color.a;
 						return final_color;
 				}`
-	};
+		};
 
-	THREE.VolumeRenderShader1 = VolumeRenderShader1;
+		exports.VolumeRenderShader1 = VolumeRenderShader1;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

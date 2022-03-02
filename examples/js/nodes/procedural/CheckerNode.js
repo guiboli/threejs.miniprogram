@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/procedural/CheckerNode.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js'), require('/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js')) :
-	typeof define === 'function' && define.amd ? define(['exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE));
-}(this, (function (exports, TempNode_js, FunctionNode_js, UVNode_js) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js' ), require( '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ) ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/TempNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/core/FunctionNode.js', '/Users/dm/projects/workspace/threejs.miniprogram/examples/jsm/nodes/accessors/UVNode.js' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+
+}( this, ( function ( exports, TempNode_js, FunctionNode_js, UVNode_js ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -22,23 +26,23 @@
 
 	CheckerNode.prototype = Object.create( TempNode_js.TempNode.prototype );
 	CheckerNode.prototype.constructor = CheckerNode;
-	CheckerNode.prototype.nodeType = "Noise";
+	CheckerNode.prototype.nodeType = 'Noise';
 
 	CheckerNode.Nodes = ( function () {
 
 		// https://github.com/mattdesl/glsl-checker/blob/master/index.glsl
 
 		var checker = new FunctionNode_js.FunctionNode( [
-			"float checker( vec2 uv ) {",
+			'float checker( vec2 uv ) {',
 
-			"	float cx = floor( uv.x );",
-			"	float cy = floor( uv.y ); ",
-			"	float result = mod( cx + cy, 2.0 );",
+			'	float cx = floor( uv.x );',
+			'	float cy = floor( uv.y ); ',
+			'	float result = mod( cx + cy, 2.0 );',
 
-			"	return sign( result );",
+			'	return sign( result );',
 
-			"}"
-		].join( "\n" ) );
+			'}'
+		].join( '\n' ) );
 
 		return {
 			checker: checker
@@ -82,4 +86,4 @@
 
 	exports.CheckerNode = CheckerNode;
 
-})));
+} ) ) );

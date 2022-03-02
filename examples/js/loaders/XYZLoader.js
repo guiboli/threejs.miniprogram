@@ -1,91 +1,105 @@
 ( function () {
 
-	class XYZLoader extends THREE.Loader {
+	( function ( global, factory ) {
 
-		load( url, onLoad, onProgress, onError ) {
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
 
-			const scope = this;
-			const loader = new THREE.FileLoader( this.manager );
-			loader.setPath( this.path );
-			loader.setRequestHeader( this.requestHeader );
-			loader.setWithCredentials( this.withCredentials );
-			loader.load( url, function ( text ) {
+	} )( this, ( function ( exports, three ) {
 
-				try {
+		'use strict';
 
-					onLoad( scope.parse( text ) );
+		class XYZLoader extends three.Loader {
 
-				} catch ( e ) {
+	  load( url, onLoad, onProgress, onError ) {
 
-					if ( onError ) {
+	    const scope = this;
+	    const loader = new three.FileLoader( this.manager );
+	    loader.setPath( this.path );
+	    loader.setRequestHeader( this.requestHeader );
+	    loader.setWithCredentials( this.withCredentials );
+	    loader.load( url, function ( text ) {
 
-						onError( e );
+	      try {
 
-					} else {
+	        onLoad( scope.parse( text ) );
 
-						console.error( e );
+					} catch ( e ) {
+
+	        if ( onError ) {
+
+	          onError( e );
+
+						} else {
+
+	          console.error( e );
+
+						}
+
+	        scope.manager.itemError( url );
 
 					}
 
-					scope.manager.itemError( url );
-
-				}
-
-			}, onProgress, onError );
-
-		}
-
-		parse( text ) {
-
-			const lines = text.split( '\n' );
-			const vertices = [];
-			const colors = [];
-
-			for ( let line of lines ) {
-
-				line = line.trim();
-				if ( line.charAt( 0 ) === '#' ) continue; // skip comments
-
-				const lineValues = line.split( /\s+/ );
-
-				if ( lineValues.length === 3 ) {
-
-					// XYZ
-					vertices.push( parseFloat( lineValues[ 0 ] ) );
-					vertices.push( parseFloat( lineValues[ 1 ] ) );
-					vertices.push( parseFloat( lineValues[ 2 ] ) );
-
-				}
-
-				if ( lineValues.length === 6 ) {
-
-					// XYZRGB
-					vertices.push( parseFloat( lineValues[ 0 ] ) );
-					vertices.push( parseFloat( lineValues[ 1 ] ) );
-					vertices.push( parseFloat( lineValues[ 2 ] ) );
-					colors.push( parseFloat( lineValues[ 3 ] ) / 255 );
-					colors.push( parseFloat( lineValues[ 4 ] ) / 255 );
-					colors.push( parseFloat( lineValues[ 5 ] ) / 255 );
-
-				}
+				}, onProgress, onError );
 
 			}
 
-			const geometry = new THREE.BufferGeometry();
-			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+	  parse( text ) {
 
-			if ( colors.length > 0 ) {
+	    const lines = text.split( '\n' );
+	    const vertices = [];
+	    const colors = [];
 
-				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+	    for ( let line of lines ) {
+
+	      line = line.trim();
+	      if ( line.charAt( 0 ) === '#' ) continue; // skip comments
+
+	      const lineValues = line.split( /\s+/ );
+
+	      if ( lineValues.length === 3 ) {
+
+	        // XYZ
+	        vertices.push( parseFloat( lineValues[ 0 ] ) );
+	        vertices.push( parseFloat( lineValues[ 1 ] ) );
+	        vertices.push( parseFloat( lineValues[ 2 ] ) );
+
+					}
+
+	      if ( lineValues.length === 6 ) {
+
+	        // XYZRGB
+	        vertices.push( parseFloat( lineValues[ 0 ] ) );
+	        vertices.push( parseFloat( lineValues[ 1 ] ) );
+	        vertices.push( parseFloat( lineValues[ 2 ] ) );
+	        colors.push( parseFloat( lineValues[ 3 ] ) / 255 );
+	        colors.push( parseFloat( lineValues[ 4 ] ) / 255 );
+	        colors.push( parseFloat( lineValues[ 5 ] ) / 255 );
+
+					}
+
+				}
+
+	    const geometry = new three.BufferGeometry();
+	    geometry.setAttribute( 'position', new three.Float32BufferAttribute( vertices, 3 ) );
+
+	    if ( colors.length > 0 ) {
+
+	      geometry.setAttribute( 'color', new three.Float32BufferAttribute( colors, 3 ) );
+
+				}
+
+	    return geometry;
 
 			}
 
-			return geometry;
-
 		}
 
-	}
+		exports.XYZLoader = XYZLoader;
 
-	THREE.XYZLoader = XYZLoader;
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

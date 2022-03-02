@@ -1,63 +1,73 @@
 ( function () {
 
-	const SSRrShader = {
-		defines: {
-			MAX_STEP: 0,
-			PERSPECTIVE_CAMERA: true,
-			SPECULAR: true,
-			FILL_HOLE: true,
-			INFINITE_THICK: false
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tSpecular': {
-				value: null
-			},
-			'tNormalSelects': {
-				value: null
-			},
-			'tRefractive': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'tDepthSelects': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'ior': {
-				value: 1.03
-			},
-			'cameraRange': {
-				value: 0
-			},
-			'maxDistance': {
-				value: 180
-			},
-			'surfDist': {
-				value: .007
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+	( function ( global, factory ) {
+
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		const SSRrShader = {
+	  defines: {
+	    MAX_STEP: 0,
+	    PERSPECTIVE_CAMERA: true,
+	    SPECULAR: true,
+	    FILL_HOLE: true,
+	    INFINITE_THICK: false
+	  },
+	  uniforms: {
+	    'tDiffuse': {
+	      value: null
+	    },
+	    'tSpecular': {
+	      value: null
+	    },
+	    'tNormalSelects': {
+	      value: null
+	    },
+	    'tRefractive': {
+	      value: null
+	    },
+	    'tDepth': {
+	      value: null
+	    },
+	    'tDepthSelects': {
+	      value: null
+	    },
+	    'cameraNear': {
+	      value: null
+	    },
+	    'cameraFar': {
+	      value: null
+	    },
+	    'resolution': {
+	      value: new three.Vector2()
+	    },
+	    'cameraProjectionMatrix': {
+	      value: new three.Matrix4()
+	    },
+	    'cameraInverseProjectionMatrix': {
+	      value: new three.Matrix4()
+	    },
+	    'ior': {
+	      value: 1.03
+	    },
+	    'cameraRange': {
+	      value: 0
+	    },
+	    'maxDistance': {
+	      value: 180
+	    },
+	    'surfDist': {
+	      value: .007
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -70,9 +80,9 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -259,25 +269,25 @@
 			#endif
 		}
 	`
-	};
-	const SSRrDepthShader = {
-		defines: {
-			'PERSPECTIVE_CAMERA': 1
-		},
-		uniforms: {
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		};
+		const SSRrDepthShader = {
+	  defines: {
+	    'PERSPECTIVE_CAMERA': 1
+	  },
+	  uniforms: {
+	    'tDepth': {
+	      value: null
+	    },
+	    'cameraNear': {
+	      value: null
+	    },
+	    'cameraFar': {
+	      value: null
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -289,9 +299,9 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform sampler2D tDepth;
 
@@ -328,9 +338,13 @@
 		}
 
 	`
-	};
+		};
 
-	THREE.SSRrDepthShader = SSRrDepthShader;
-	THREE.SSRrShader = SSRrShader;
+		exports.SSRrDepthShader = SSRrDepthShader;
+		exports.SSRrShader = SSRrShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();

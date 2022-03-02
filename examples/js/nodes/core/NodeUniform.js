@@ -2,11 +2,15 @@
  * Generated from 'examples/jsm/nodes/core/NodeUniform.js'
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global.THREE = global.THREE || {}));
-}(this, (function (exports) { 'use strict';
+( function ( global, factory ) {
+
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
+		typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
+			( global = global || self, factory( global.THREE = global.THREE || {} ) );
+
+}( this, ( function ( exports ) {
+
+	'use strict';
 
 	/**
 	 * @author sunag / http://www.sunag.com.br/
@@ -45,4 +49,4 @@
 
 	exports.NodeUniform = NodeUniform;
 
-})));
+} ) ) );

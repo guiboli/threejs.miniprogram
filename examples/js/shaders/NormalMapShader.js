@@ -1,28 +1,38 @@
 ( function () {
 
-	/**
- * Normal map shader
- * - compute normals from heightmap
- */
+	( function ( global, factory ) {
 
-	const NormalMapShader = {
-		uniforms: {
-			'heightMap': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2( 512, 512 )
-			},
-			'scale': {
-				value: new THREE.Vector2( 1, 1 )
-			},
-			'height': {
-				value: 0.05
-			}
-		},
-		vertexShader:
-  /* glsl */
-  `
+		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
+			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
+				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+
+	} )( this, ( function ( exports, three ) {
+
+		'use strict';
+
+		/**
+	 * Normal map shader
+	 * - compute normals from heightmap
+	 */
+
+		const NormalMapShader = {
+	  uniforms: {
+	    'heightMap': {
+	      value: null
+	    },
+	    'resolution': {
+	      value: new three.Vector2( 512, 512 )
+	    },
+	    'scale': {
+	      value: new three.Vector2( 1, 1 )
+	    },
+	    'height': {
+	      value: 0.05
+	    }
+	  },
+	  vertexShader:
+	  /* glsl */
+	  `
 
 		varying vec2 vUv;
 
@@ -32,9 +42,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+	  fragmentShader:
+	  /* glsl */
+	  `
 
 		uniform float height;
 		uniform vec2 resolution;
@@ -52,8 +62,12 @@
 			gl_FragColor = vec4( ( 0.5 * normalize( vec3( val - valU, val - valV, height  ) ) + 0.5 ), 1.0 );
 
 		}`
-	};
+		};
 
-	THREE.NormalMapShader = NormalMapShader;
+		exports.NormalMapShader = NormalMapShader;
+
+		Object.defineProperty( exports, '__esModule', { value: true } );
+
+	} ) );
 
 } )();
