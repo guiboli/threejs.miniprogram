@@ -153,9 +153,6 @@ export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
-const global = window;
-
-export { global };
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 

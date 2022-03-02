@@ -4,7 +4,7 @@
   "description": "JavaScript 3D library",
   "type": "module",
   "miniprogram": "miniprogram_dist",
-  "main": "./build/three.min.js",
+  "main": "./build/three.js",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
@@ -21,7 +21,6 @@
   },
   "sideEffects": false,
   "files": [
-    "export/index.js",
     "build/three.js",
     "build/three.cjs",
     "build/three.min.js",
