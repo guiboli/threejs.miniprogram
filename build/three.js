@@ -9265,6 +9265,18 @@
 
 	WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
+	const parametersAdapter = parameters => {
+		const canvas = parameters.canvas;
+
+		canvas.addEventListener = () => {
+			console.log('[three adapter]', `add 'addEventListener'`);
+		};
+
+		canvas.removeEventListener = () => {
+			console.log('[three adapter]', `add 'removeEventListener]'`);
+		};
+	};
+
 	const _vector1 = /*@__PURE__*/new Vector3();
 
 	const _vector2 = /*@__PURE__*/new Vector3();
@@ -19186,6 +19198,8 @@
 	}
 
 	function WebGLRenderer(parameters = {}) {
+		parametersAdapter(parameters);
+
 		const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 					_context = parameters.context !== undefined ? parameters.context : null,
 					_depth = parameters.depth !== undefined ? parameters.depth : true,
@@ -36491,8 +36505,6 @@
 		return new Data3DTexture(data, width, height, depth);
 	}
 
-	const global = window;
-
 	if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 		__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register', {
 			detail: {
@@ -36949,7 +36961,6 @@
 	exports.ZeroSlopeEnding = ZeroSlopeEnding;
 	exports.ZeroStencilOp = ZeroStencilOp;
 	exports._SRGBAFormat = _SRGBAFormat;
-	exports.global = global;
 	exports.sRGBEncoding = sRGBEncoding;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
