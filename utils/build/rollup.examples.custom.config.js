@@ -177,9 +177,7 @@ const files = glob.sync("**/*.js", {
 });
 
 // Create a rollup config for each .js file
-export default files.filter((file) => {
-	return file === 'controls/OrbitControls.js'
-}).map((file) => {
+export default files.map((file) => {
 	const inputPath = path.join("examples/jsm", file);
 	const outputPath = path.resolve(jsFolder, file);
 
@@ -195,7 +193,7 @@ export default files.filter((file) => {
 			}),
 			babelCleanup(),
 			unmodularize(),
-			// terser(),
+			terser(),
 		],
 
 		output: {
