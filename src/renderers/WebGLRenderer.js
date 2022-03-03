@@ -1,3 +1,5 @@
+import {parametersAdapter} from '../_miniprogram/adapter/WebGLRenderer';
+
 import {
 	REVISION,
 	BackSide,
@@ -55,6 +57,7 @@ function createCanvasElement() {
 }
 
 function WebGLRenderer( parameters = {} ) {
+	parametersAdapter(parameters);
 
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
