@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
-})(this, (function (exports) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('miniapp-adapter')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'miniapp-adapter'], factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}, global.miniappAdapter));
+})(this, (function (exports, miniappAdapter) { 'use strict';
 
 	const REVISION = '138';
 	const MOUSE = {
@@ -9269,11 +9269,11 @@
 		const canvas = parameters.canvas;
 
 		canvas.addEventListener = () => {
-			console.log('[three adapter]', `add 'addEventListener'`);
+			console.log('[three adapter]', 'add \'addEventListener\'');
 		};
 
 		canvas.removeEventListener = () => {
-			console.log('[three adapter]', `add 'removeEventListener]'`);
+			console.log('[three adapter]', 'add \'removeEventListener]\'');
 		};
 	};
 
@@ -28579,24 +28579,26 @@
 
 	}
 
-	const loading = {};
+	var loading = {};
 
-	class FileLoader extends Loader {
-		constructor(manager) {
-			super(manager);
-		}
+	function FileLoader(manager) {
+		Loader.call(this, manager);
+	}
 
-		load(url, onLoad, onProgress, onError) {
+	FileLoader.prototype = Object.assign(Object.create(Loader.prototype), {
+		constructor: FileLoader,
+		load: function (url, onLoad, onProgress, onError) {
 			if (url === undefined) url = '';
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);
-			const cached = Cache.get(url);
+			var scope = this;
+			var cached = Cache.get(url);
 
 			if (cached !== undefined) {
-				this.manager.itemStart(url);
-				setTimeout(() => {
+				scope.manager.itemStart(url);
+				setTimeout(function () {
 					if (onLoad) onLoad(cached);
-					this.manager.itemEnd(url);
+					scope.manager.itemEnd(url);
 				}, 0);
 				return cached;
 			} // Check if request is duplicate
@@ -28609,157 +28611,172 @@
 					onError: onError
 				});
 				return;
-			} // Initialise array for duplicate requests
+			} // Check for data: URI
 
 
-			loading[url] = [];
-			loading[url].push({
-				onLoad: onLoad,
-				onProgress: onProgress,
-				onError: onError
-			}); // create request
+			var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
+			var dataUriRegexResult = url.match(dataUriRegex); // Safari can not handle Data URIs through XMLHttpRequest so process manually
 
-			const req = new Request(url, {
-				headers: new Headers(this.requestHeader),
-				credentials: this.withCredentials ? 'include' : 'same-origin' // An abort controller could be added within a future PR
+			if (dataUriRegexResult) {
+				var mimeType = dataUriRegexResult[1];
+				var isBase64 = !!dataUriRegexResult[2];
+				var data = dataUriRegexResult[3];
+				data = decodeURIComponent(data);
+				if (isBase64) data = atob(data);
 
-			}); // record states ( avoid data race )
+				try {
+					var response;
+					var responseType = (this.responseType || '').toLowerCase();
 
-			const mimeType = this.mimeType;
-			const responseType = this.responseType; // start the fetch
+					switch (responseType) {
+						case 'arraybuffer':
+						case 'blob':
+							var view = new Uint8Array(data.length);
 
-			fetch(req).then(response => {
-				if (response.status === 200 || response.status === 0) {
-					// Some browsers return HTTP Status 0 when using non-http protocol
-					// e.g. 'file://' or 'data://'. Handle as success.
-					if (response.status === 0) {
-						console.warn('THREE.FileLoader: HTTP Status 0 received.');
-					} // Workaround: Checking if response.body === undefined for Alipay browser #23548
+							for (var i = 0; i < data.length; i++) {
+								view[i] = data.charCodeAt(i);
+							}
+
+							if (responseType === 'blob') {
+								response = new Blob([view.buffer], {
+									type: mimeType
+								});
+							} else {
+								response = view.buffer;
+							}
+
+							break;
+
+						case 'document':
+							var parser = new DOMParser();
+							response = parser.parseFromString(data, mimeType);
+							break;
+
+						case 'json':
+							response = JSON.parse(data);
+							break;
+
+						default:
+							// 'text' or other
+							response = data;
+							break;
+					} // Wait for next browser tick like standard XMLHttpRequest event dispatching does
 
 
-					if (typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined) {
-						return response;
+					setTimeout(function () {
+						if (onLoad) onLoad(response);
+						scope.manager.itemEnd(url);
+					}, 0);
+				} catch (error) {
+					// Wait for next browser tick like standard XMLHttpRequest event dispatching does
+					setTimeout(function () {
+						if (onError) onError(error);
+						scope.manager.itemError(url);
+						scope.manager.itemEnd(url);
+					}, 0);
+				}
+			} else {
+				// Initialise array for duplicate requests
+				loading[url] = [];
+				loading[url].push({
+					onLoad: onLoad,
+					onProgress: onProgress,
+					onError: onError
+				});
+				var request = new miniappAdapter.XMLHttpRequest();
+				request.open('GET', url, true);
+				request.addEventListener('load', function (event) {
+					var response = this.response;
+					var callbacks = loading[url];
+					delete loading[url];
+
+					if (this.status === 200 || this.status === 0) {
+						// Some browsers return HTTP Status 0 when using non-http protocol
+						// e.g. 'file://' or 'data://'. Handle as success.
+						if (this.status === 0) console.warn('THREE.FileLoader: HTTP Status 0 received.'); // Add to cache only on HTTP success, so that we do not cache
+						// error response bodies as proper responses to requests.
+
+						Cache.add(url, response);
+
+						for (var i = 0, il = callbacks.length; i < il; i++) {
+							var callback = callbacks[i];
+							if (callback.onLoad) callback.onLoad(response);
+						}
+
+						scope.manager.itemEnd(url);
+					} else {
+						for (var i = 0, il = callbacks.length; i < il; i++) {
+							var callback = callbacks[i];
+							if (callback.onError) callback.onError(event);
+						}
+
+						scope.manager.itemError(url);
+						scope.manager.itemEnd(url);
+					}
+				}, false);
+				request.addEventListener('progress', function (event) {
+					var callbacks = loading[url];
+
+					for (var i = 0, il = callbacks.length; i < il; i++) {
+						var callback = callbacks[i];
+						if (callback.onProgress) callback.onProgress(event);
+					}
+				}, false);
+				request.addEventListener('error', function (event) {
+					var callbacks = loading[url];
+					delete loading[url];
+
+					for (var i = 0, il = callbacks.length; i < il; i++) {
+						var callback = callbacks[i];
+						if (callback.onError) callback.onError(event);
 					}
 
-					const callbacks = loading[url];
-					const reader = response.body.getReader();
-					const contentLength = response.headers.get('Content-Length');
-					const total = contentLength ? parseInt(contentLength) : 0;
-					const lengthComputable = total !== 0;
-					let loaded = 0; // periodically read data into the new stream tracking while download progress
+					scope.manager.itemError(url);
+					scope.manager.itemEnd(url);
+				}, false);
+				request.addEventListener('abort', function (event) {
+					var callbacks = loading[url];
+					delete loading[url];
 
-					const stream = new ReadableStream({
-						start(controller) {
-							readData();
+					for (var i = 0, il = callbacks.length; i < il; i++) {
+						var callback = callbacks[i];
+						if (callback.onError) callback.onError(event);
+					}
 
-							function readData() {
-								reader.read().then(({
-									done,
-									value
-								}) => {
-									if (done) {
-										controller.close();
-									} else {
-										loaded += value.byteLength;
-										const event = new ProgressEvent('progress', {
-											lengthComputable,
-											loaded,
-											total
-										});
+					scope.manager.itemError(url);
+					scope.manager.itemEnd(url);
+				}, false);
+				if (this.responseType !== undefined) request.responseType = this.responseType;
+				if (this.withCredentials !== undefined) request.withCredentials = this.withCredentials;
+				if (request.overrideMimeType) request.overrideMimeType(this.mimeType !== undefined ? this.mimeType : 'text/plain');
 
-										for (let i = 0, il = callbacks.length; i < il; i++) {
-											const callback = callbacks[i];
-											if (callback.onProgress) callback.onProgress(event);
-										}
-
-										controller.enqueue(value);
-										readData();
-									}
-								});
-							}
-						}
-
-					});
-					return new Response(stream);
-				} else {
-					throw Error(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`);
-				}
-			}).then(response => {
-				switch (responseType) {
-					case 'arraybuffer':
-						return response.arrayBuffer();
-
-					case 'blob':
-						return response.blob();
-
-					case 'document':
-						return response.text().then(text => {
-							const parser = new DOMParser();
-							return parser.parseFromString(text, mimeType);
-						});
-
-					case 'json':
-						return response.json();
-
-					default:
-						if (mimeType === undefined) {
-							return response.text();
-						} else {
-							// sniff encoding
-							const re = /charset="?([^;"\s]*)"?/i;
-							const exec = re.exec(mimeType);
-							const label = exec && exec[1] ? exec[1].toLowerCase() : undefined;
-							const decoder = new TextDecoder(label);
-							return response.arrayBuffer().then(ab => decoder.decode(ab));
-						}
-
-				}
-			}).then(data => {
-				// Add to cache only on HTTP success, so that we do not cache
-				// error response bodies as proper responses to requests.
-				Cache.add(url, data);
-				const callbacks = loading[url];
-				delete loading[url];
-
-				for (let i = 0, il = callbacks.length; i < il; i++) {
-					const callback = callbacks[i];
-					if (callback.onLoad) callback.onLoad(data);
-				}
-			}).catch(err => {
-				// Abort errors and other errors are handled the same
-				const callbacks = loading[url];
-
-				if (callbacks === undefined) {
-					// When onLoad was called and url was deleted in `loading`
-					this.manager.itemError(url);
-					throw err;
+				for (var header in this.requestHeader) {
+					request.setRequestHeader(header, this.requestHeader[header]);
 				}
 
-				delete loading[url];
+				request.send(null);
+			}
 
-				for (let i = 0, il = callbacks.length; i < il; i++) {
-					const callback = callbacks[i];
-					if (callback.onError) callback.onError(err);
-				}
-
-				this.manager.itemError(url);
-			}).finally(() => {
-				this.manager.itemEnd(url);
-			});
-			this.manager.itemStart(url);
-		}
-
-		setResponseType(value) {
+			scope.manager.itemStart(url);
+			return request;
+		},
+		setResponseType: function (value) {
 			this.responseType = value;
 			return this;
-		}
-
-		setMimeType(value) {
+		},
+		setWithCredentials: function (value) {
+			this.withCredentials = value;
+			return this;
+		},
+		setMimeType: function (value) {
 			this.mimeType = value;
 			return this;
+		},
+		setRequestHeader: function (value) {
+			this.requestHeader = value;
+			return this;
 		}
-
-	}
+	});
 
 	class AnimationLoader extends Loader {
 		constructor(manager) {

@@ -1,5 +1,7 @@
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import inject from 'rollup-plugin-inject';
+
 import babelrc from './.babelrc.json';
 
 export function glconstants() {
@@ -290,6 +292,9 @@ let builds = [
 			addons(),
 			glconstants(),
 			glsl(),
+			inject({
+				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			}),
 			header()
 		],
 		output: [
@@ -311,6 +316,9 @@ let builds = [
 				...babelrc
 			} ),
 			babelCleanup(),
+			inject({
+				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			}),
 			header()
 		],
 		output: [
@@ -340,6 +348,9 @@ let builds = [
 				...babelrc
 			} ),
 			babelCleanup(),
+			inject({
+				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			}),
 			terser(),
 			header()
 		],

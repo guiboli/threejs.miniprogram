@@ -2,6 +2,7 @@ import babel from '@rollup/plugin-babel';
 import path from 'path';
 import os from 'os';
 import glob from 'glob';
+import inject from 'rollup-plugin-inject';
 import babelrc from './.babelrc.json';
 
 const EOL = os.EOL;
@@ -211,6 +212,9 @@ export default files.map( file => {
 				...babelrc
 			} ),
 			babelCleanup(),
+			inject({
+				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			}),
 			unmodularize(),
 		],
 
