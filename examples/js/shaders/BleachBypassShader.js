@@ -1,32 +1,22 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
-	 * - based on Nvidia example
-	 * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
-	 */
-		const BleachBypassShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'opacity': {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
+ * - based on Nvidia example
+ * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
+ */
+	const BleachBypassShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'opacity': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -36,9 +26,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform float opacity;
 
@@ -68,12 +58,8 @@
 			gl_FragColor = vec4( mixRGB, base.a );
 
 		}`
-		};
+	};
 
-		exports.BleachBypassShader = BleachBypassShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.BleachBypassShader = BleachBypassShader;
 
 } )();

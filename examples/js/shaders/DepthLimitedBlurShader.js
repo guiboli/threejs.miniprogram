@@ -1,54 +1,44 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * TODO
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * TODO
-	 */
-
-		const DepthLimitedBlurShader = {
-	  defines: {
-	    'KERNEL_RADIUS': 4,
-	    'DEPTH_PACKING': 1,
-	    'PERSPECTIVE_CAMERA': 1
-	  },
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'size': {
-	      value: new three.Vector2( 512, 512 )
-	    },
-	    'sampleUvOffsets': {
-	      value: [ new three.Vector2( 0, 0 ) ]
-	    },
-	    'sampleWeights': {
-	      value: [ 1.0 ]
-	    },
-	    'tDepth': {
-	      value: null
-	    },
-	    'cameraNear': {
-	      value: 10
-	    },
-	    'cameraFar': {
-	      value: 1000
-	    },
-	    'depthCutoff': {
-	      value: 10
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const DepthLimitedBlurShader = {
+		defines: {
+			'KERNEL_RADIUS': 4,
+			'DEPTH_PACKING': 1,
+			'PERSPECTIVE_CAMERA': 1
+		},
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'size': {
+				value: new THREE.Vector2( 512, 512 )
+			},
+			'sampleUvOffsets': {
+				value: [ new THREE.Vector2( 0, 0 ) ]
+			},
+			'sampleWeights': {
+				value: [ 1.0 ]
+			},
+			'tDepth': {
+				value: null
+			},
+			'cameraNear': {
+				value: 10
+			},
+			'cameraFar': {
+				value: 1000
+			},
+			'depthCutoff': {
+				value: 10
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		#include <common>
 
@@ -63,9 +53,9 @@
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		#include <common>
 		#include <packing>
@@ -140,55 +130,51 @@
 
 			gl_FragColor = diffuseSum / weightSum;
 		}`
-		};
-		const BlurShaderUtils = {
-	  createSampleWeights: function ( kernelRadius, stdDev ) {
+	};
+	const BlurShaderUtils = {
+		createSampleWeights: function ( kernelRadius, stdDev ) {
 
-	    const weights = [];
+			const weights = [];
 
-	    for ( let i = 0; i <= kernelRadius; i ++ ) {
+			for ( let i = 0; i <= kernelRadius; i ++ ) {
 
-	      weights.push( gaussian( i, stdDev ) );
-
-				}
-
-	    return weights;
-
-			},
-	  createSampleOffsets: function ( kernelRadius, uvIncrement ) {
-
-	    const offsets = [];
-
-	    for ( let i = 0; i <= kernelRadius; i ++ ) {
-
-	      offsets.push( uvIncrement.clone().multiplyScalar( i ) );
-
-				}
-
-	    return offsets;
-
-			},
-	  configure: function ( material, kernelRadius, stdDev, uvIncrement ) {
-
-	    material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
-	    material.uniforms[ 'sampleUvOffsets' ].value = BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
-	    material.uniforms[ 'sampleWeights' ].value = BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
-	    material.needsUpdate = true;
+				weights.push( gaussian( i, stdDev ) );
 
 			}
-		};
 
-		function gaussian( x, stdDev ) {
+			return weights;
 
-	  return Math.exp( - ( x * x ) / ( 2.0 * ( stdDev * stdDev ) ) ) / ( Math.sqrt( 2.0 * Math.PI ) * stdDev );
+		},
+		createSampleOffsets: function ( kernelRadius, uvIncrement ) {
+
+			const offsets = [];
+
+			for ( let i = 0; i <= kernelRadius; i ++ ) {
+
+				offsets.push( uvIncrement.clone().multiplyScalar( i ) );
+
+			}
+
+			return offsets;
+
+		},
+		configure: function ( material, kernelRadius, stdDev, uvIncrement ) {
+
+			material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
+			material.uniforms[ 'sampleUvOffsets' ].value = BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
+			material.uniforms[ 'sampleWeights' ].value = BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
+			material.needsUpdate = true;
 
 		}
+	};
 
-		exports.BlurShaderUtils = BlurShaderUtils;
-		exports.DepthLimitedBlurShader = DepthLimitedBlurShader;
+	function gaussian( x, stdDev ) {
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
+		return Math.exp( - ( x * x ) / ( 2.0 * ( stdDev * stdDev ) ) ) / ( Math.sqrt( 2.0 * Math.PI ) * stdDev );
 
-	} ) );
+	}
+
+	THREE.BlurShaderUtils = BlurShaderUtils;
+	THREE.DepthLimitedBlurShader = DepthLimitedBlurShader;
 
 } )();

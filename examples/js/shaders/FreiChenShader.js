@@ -1,34 +1,24 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Edge Detection Shader using Frei-Chen filter
+ * Based on http://rastergrid.com/blog/2011/01/frei-chen-edge-detector
+ *
+ * aspect: vec2 of (1/width, 1/height)
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * Edge Detection Shader using Frei-Chen filter
-	 * Based on http://rastergrid.com/blog/2011/01/frei-chen-edge-detector
-	 *
-	 * aspect: vec2 of (1/width, 1/height)
-	 */
-
-		const FreiChenShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'aspect': {
-	      value: new three.Vector2( 512, 512 )
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const FreiChenShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'aspect': {
+				value: new THREE.Vector2( 512, 512 )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -38,9 +28,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		varying vec2 vUv;
@@ -100,12 +90,8 @@
 
 			gl_FragColor = vec4(vec3(sqrt(M/S)), 1.0);
 		}`
-		};
+	};
 
-		exports.FreiChenShader = FreiChenShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.FreiChenShader = FreiChenShader;
 
 } )();

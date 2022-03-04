@@ -1,30 +1,20 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * Technicolor Shader
-	 * Simulates the look of the two-strip technicolor process popular in early 20th century films.
-	 * More historical info here: http://www.widescreenmuseum.com/oldcolor/technicolor1.htm
-	 * Demo here: http://charliehoey.com/technicolor_shader/shader_test.html
-	 */
-		const TechnicolorShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * Technicolor Shader
+ * Simulates the look of the two-strip technicolor process popular in early 20th century films.
+ * More historical info here: http://www.widescreenmuseum.com/oldcolor/technicolor1.htm
+ * Demo here: http://charliehoey.com/technicolor_shader/shader_test.html
+ */
+	const TechnicolorShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -34,9 +24,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		varying vec2 vUv;
@@ -49,12 +39,8 @@
 			gl_FragColor = newTex;
 
 		}`
-		};
+	};
 
-		exports.TechnicolorShader = TechnicolorShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.TechnicolorShader = TechnicolorShader;
 
 } )();

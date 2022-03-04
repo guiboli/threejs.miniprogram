@@ -1,37 +1,27 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Color correction
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * Color correction
-	 */
-
-		const ColorCorrectionShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'powRGB': {
-	      value: new three.Vector3( 2, 2, 2 )
-	    },
-	    'mulRGB': {
-	      value: new three.Vector3( 1, 1, 1 )
-	    },
-	    'addRGB': {
-	      value: new three.Vector3( 0, 0, 0 )
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const ColorCorrectionShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'powRGB': {
+				value: new THREE.Vector3( 2, 2, 2 )
+			},
+			'mulRGB': {
+				value: new THREE.Vector3( 1, 1, 1 )
+			},
+			'addRGB': {
+				value: new THREE.Vector3( 0, 0, 0 )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -42,9 +32,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform vec3 powRGB;
@@ -59,12 +49,8 @@
 			gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );
 
 		}`
-		};
+	};
 
-		exports.ColorCorrectionShader = ColorCorrectionShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.ColorCorrectionShader = ColorCorrectionShader;
 
 } )();

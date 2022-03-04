@@ -1,35 +1,25 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * Vignette shader
-	 * based on PaintEffect postprocess from ro.me
-	 * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
-	 */
-		const VignetteShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'offset': {
-	      value: 1.0
-	    },
-	    'darkness': {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * Vignette shader
+ * based on PaintEffect postprocess from ro.me
+ * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
+ */
+	const VignetteShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'offset': {
+				value: 1.0
+			},
+			'darkness': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -39,9 +29,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform float offset;
 		uniform float darkness;
@@ -59,12 +49,8 @@
 			gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );
 
 		}`
-		};
+	};
 
-		exports.VignetteShader = VignetteShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.VignetteShader = VignetteShader;
 
 } )();

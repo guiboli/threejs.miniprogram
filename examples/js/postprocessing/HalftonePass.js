@@ -1,89 +1,75 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * RGB Halftone pass for three.js effects composer. Requires THREE.HalftoneShader.
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( './Pass.js' ), require( '../shaders/HalftoneShader.js' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', './Pass', '../shaders/HalftoneShader' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+	class HalftonePass extends THREE.Pass {
 
-	} )( this, ( function ( exports, three, Pass_js, HalftoneShader_js ) {
+		constructor( width, height, params ) {
 
-		'use strict';
+			super();
 
-		/**
-	 * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
-	 */
+			if ( THREE.HalftoneShader === undefined ) {
 
-		class HalftonePass extends Pass_js.Pass {
-
-	  constructor( width, height, params ) {
-
-	    super();
-
-	    if ( HalftoneShader_js.HalftoneShader === undefined ) {
-
-	      console.error( 'THREE.HalftonePass requires HalftoneShader' );
-
-				}
-
-	    this.uniforms = three.UniformsUtils.clone( HalftoneShader_js.HalftoneShader.uniforms );
-	    this.material = new three.ShaderMaterial( {
-	      uniforms: this.uniforms,
-	      fragmentShader: HalftoneShader_js.HalftoneShader.fragmentShader,
-	      vertexShader: HalftoneShader_js.HalftoneShader.vertexShader
-	    } ); // set params
-
-	    this.uniforms.width.value = width;
-	    this.uniforms.height.value = height;
-
-	    for ( const key in params ) {
-
-	      if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
-
-	        this.uniforms[ key ].value = params[ key ];
-
-					}
-
-				}
-
-	    this.fsQuad = new Pass_js.FullScreenQuad( this.material );
+				console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
 
 			}
 
-	  render( renderer, writeBuffer, readBuffer
-	  /*, deltaTime, maskActive*/
-	  ) {
+			this.uniforms = THREE.UniformsUtils.clone( THREE.HalftoneShader.uniforms );
+			this.material = new THREE.ShaderMaterial( {
+				uniforms: this.uniforms,
+				fragmentShader: THREE.HalftoneShader.fragmentShader,
+				vertexShader: THREE.HalftoneShader.vertexShader
+			} ); // set params
 
-	    this.material.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+			this.uniforms.width.value = width;
+			this.uniforms.height.value = height;
 
-	    if ( this.renderToScreen ) {
+			for ( const key in params ) {
 
-	      renderer.setRenderTarget( null );
-	      this.fsQuad.render( renderer );
+				if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
 
-				} else {
-
-	      renderer.setRenderTarget( writeBuffer );
-	      if ( this.clear ) renderer.clear();
-	      this.fsQuad.render( renderer );
+					this.uniforms[ key ].value = params[ key ];
 
 				}
 
 			}
 
-	  setSize( width, height ) {
+			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
-	    this.uniforms.width.value = width;
-	    this.uniforms.height.value = height;
+		}
+
+		render( renderer, writeBuffer, readBuffer
+			/*, deltaTime, maskActive*/
+		) {
+
+			this.material.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
+
+			if ( this.renderToScreen ) {
+
+				renderer.setRenderTarget( null );
+				this.fsQuad.render( renderer );
+
+			} else {
+
+				renderer.setRenderTarget( writeBuffer );
+				if ( this.clear ) renderer.clear();
+				this.fsQuad.render( renderer );
 
 			}
 
 		}
 
-		exports.HalftonePass = HalftonePass;
+		setSize( width, height ) {
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
+			this.uniforms.width.value = width;
+			this.uniforms.height.value = height;
 
-	} ) );
+		}
+
+	}
+
+	THREE.HalftonePass = HalftonePass;
 
 } )();

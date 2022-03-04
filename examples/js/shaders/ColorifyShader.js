@@ -1,31 +1,21 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Colorify shader
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * Colorify shader
-	 */
-
-		const ColorifyShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'color': {
-	      value: new three.Color( 0xffffff )
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const ColorifyShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'color': {
+				value: new THREE.Color( 0xffffff )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -35,9 +25,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
@@ -54,12 +44,8 @@
 			gl_FragColor = vec4( v * color, texel.w );
 
 		}`
-		};
+	};
 
-		exports.ColorifyShader = ColorifyShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.ColorifyShader = ColorifyShader;
 
 } )();

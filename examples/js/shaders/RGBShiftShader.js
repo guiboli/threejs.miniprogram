@@ -1,39 +1,29 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * RGB Shift Shader
-	 * Shifts red and blue channels from center in opposite directions
-	 * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
-	 * by Tom Butterworth / http://kriss.cx/tom/
-	 *
-	 * amount: shift distance (1 is width of input)
-	 * angle: shift angle in radians
-	 */
-		const RGBShiftShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'amount': {
-	      value: 0.005
-	    },
-	    'angle': {
-	      value: 0.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * RGB Shift Shader
+ * Shifts red and blue channels from center in opposite directions
+ * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
+ * by Tom Butterworth / http://kriss.cx/tom/
+ *
+ * amount: shift distance (1 is width of input)
+ * angle: shift angle in radians
+ */
+	const RGBShiftShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'amount': {
+				value: 0.005
+			},
+			'angle': {
+				value: 0.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -43,9 +33,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform sampler2D tDiffuse;
 		uniform float amount;
@@ -62,12 +52,8 @@
 			gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
 
 		}`
-		};
+	};
 
-		exports.RGBShiftShader = RGBShiftShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.RGBShiftShader = RGBShiftShader;
 
 } )();

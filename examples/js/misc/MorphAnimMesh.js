@@ -1,83 +1,69 @@
 ( function () {
 
-	( function ( global, factory ) {
+	class MorphAnimMesh extends THREE.Mesh {
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+		constructor( geometry, material ) {
 
-	} )( this, ( function ( exports, three ) {
+			super( geometry, material );
+			this.type = 'MorphAnimMesh';
+			this.mixer = new THREE.AnimationMixer( this );
+			this.activeAction = null;
 
-		'use strict';
+		}
 
-		class MorphAnimMesh extends three.Mesh {
+		setDirectionForward() {
 
-	  constructor( geometry, material ) {
+			this.mixer.timeScale = 1.0;
 
-	    super( geometry, material );
-	    this.type = 'MorphAnimMesh';
-	    this.mixer = new three.AnimationMixer( this );
-	    this.activeAction = null;
+		}
 
-			}
+		setDirectionBackward() {
 
-	  setDirectionForward() {
+			this.mixer.timeScale = - 1.0;
 
-	    this.mixer.timeScale = 1.0;
+		}
 
-			}
+		playAnimation( label, fps ) {
 
-	  setDirectionBackward() {
+			if ( this.activeAction ) {
 
-	    this.mixer.timeScale = - 1.0;
-
-			}
-
-	  playAnimation( label, fps ) {
-
-	    if ( this.activeAction ) {
-
-	      this.activeAction.stop();
-	      this.activeAction = null;
-
-				}
-
-	    const clip = three.AnimationClip.findByName( this, label );
-
-	    if ( clip ) {
-
-	      const action = this.mixer.clipAction( clip );
-	      action.timeScale = clip.tracks.length * fps / clip.duration;
-	      this.activeAction = action.play();
-
-				} else {
-
-	      throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
-
-				}
+				this.activeAction.stop();
+				this.activeAction = null;
 
 			}
 
-	  updateAnimation( delta ) {
+			const clip = THREE.AnimationClip.findByName( this, label );
 
-	    this.mixer.update( delta );
+			if ( clip ) {
 
-			}
+				const action = this.mixer.clipAction( clip );
+				action.timeScale = clip.tracks.length * fps / clip.duration;
+				this.activeAction = action.play();
 
-	  copy( source ) {
+			} else {
 
-	    super.copy( source );
-	    this.mixer = new three.AnimationMixer( this );
-	    return this;
+				throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
 
 			}
 
 		}
 
-		exports.MorphAnimMesh = MorphAnimMesh;
+		updateAnimation( delta ) {
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
+			this.mixer.update( delta );
 
-	} ) );
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+			this.mixer = new THREE.AnimationMixer( this );
+			return this;
+
+		}
+
+	}
+
+	THREE.MorphAnimMesh = MorphAnimMesh;
 
 } )();

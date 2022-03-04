@@ -1,19 +1,9 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		const CSMShader = {
-	  lights_fragment_begin:
-	  /* glsl */
-	  `
+	const CSMShader = {
+		lights_fragment_begin:
+  /* glsl */
+  `
 GeometricContext geometry;
 
 geometry.position = - vViewPosition;
@@ -235,21 +225,17 @@ IncidentLight directLight;
 
 #endif
 `,
-	  lights_pars_begin:
-	  /* glsl */
-	  `
+		lights_pars_begin:
+  /* glsl */
+  `
 #if defined( USE_CSM ) && defined( CSM_CASCADES )
 uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;
 uniform float shadowFar;
 #endif
-	` + three.ShaderChunk.lights_pars_begin
-		};
+	` + THREE.ShaderChunk.lights_pars_begin
+	};
 
-		exports.CSMShader = CSMShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.CSMShader = CSMShader;
 
 } )();

@@ -1,39 +1,29 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( './ShaderPass.js' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', './ShaderPass' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, ShaderPass_js ) {
-
-		'use strict';
-
-		const LUTShader = {
-	  defines: {
-	    USE_3DTEXTURE: 1
-	  },
-	  uniforms: {
-	    lut3d: {
-	      value: null
-	    },
-	    lut: {
-	      value: null
-	    },
-	    lutSize: {
-	      value: 0
-	    },
-	    tDiffuse: {
-	      value: null
-	    },
-	    intensity: {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const LUTShader = {
+		defines: {
+			USE_3DTEXTURE: 1
+		},
+		uniforms: {
+			lut3d: {
+				value: null
+			},
+			lut: {
+				value: null
+			},
+			lutSize: {
+				value: 0
+			},
+			tDiffuse: {
+				value: null
+			},
+			intensity: {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -45,9 +35,9 @@
 		}
 
 	`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform float lutSize;
 		#if USE_3DTEXTURE
@@ -119,41 +109,39 @@
 		}
 
 	`
-		};
+	};
 
-		class LUTPass extends ShaderPass_js.ShaderPass {
+	class LUTPass extends THREE.ShaderPass {
 
-	  set lut( v ) {
+		set lut( v ) {
 
-	    const material = this.material;
+			const material = this.material;
 
-	    if ( v !== this.lut ) {
+			if ( v !== this.lut ) {
 
-	      material.uniforms.lut3d.value = null;
-	      material.uniforms.lut.value = null;
+				material.uniforms.lut3d.value = null;
+				material.uniforms.lut.value = null;
 
-	      if ( v ) {
+				if ( v ) {
 
-	        const is3dTextureDefine = v.isData3DTexture ? 1 : 0;
+					const is3dTextureDefine = v.isData3DTexture ? 1 : 0;
 
-	        if ( is3dTextureDefine !== material.defines.USE_3DTEXTURE ) {
+					if ( is3dTextureDefine !== material.defines.USE_3DTEXTURE ) {
 
-	          material.defines.USE_3DTEXTURE = is3dTextureDefine;
-	          material.needsUpdate = true;
+						material.defines.USE_3DTEXTURE = is3dTextureDefine;
+						material.needsUpdate = true;
 
-						}
+					}
 
-	        material.uniforms.lutSize.value = v.image.width;
+					material.uniforms.lutSize.value = v.image.width;
 
-	        if ( v.isData3DTexture ) {
+					if ( v.isData3DTexture ) {
 
-	          material.uniforms.lut3d.value = v;
+						material.uniforms.lut3d.value = v;
 
-						} else {
+					} else {
 
-	          material.uniforms.lut.value = v;
-
-						}
+						material.uniforms.lut.value = v;
 
 					}
 
@@ -161,38 +149,36 @@
 
 			}
 
-	  get lut() {
+		}
 
-	    return this.material.uniforms.lut.value || this.material.uniforms.lut3d.value;
+		get lut() {
 
-			}
-
-	  set intensity( v ) {
-
-	    this.material.uniforms.intensity.value = v;
-
-			}
-
-	  get intensity() {
-
-	    return this.material.uniforms.intensity.value;
-
-			}
-
-	  constructor( options = {} ) {
-
-	    super( LUTShader );
-	    this.lut = options.lut || null;
-	    this.intensity = 'intensity' in options ? options.intensity : 1;
-
-			}
+			return this.material.uniforms.lut.value || this.material.uniforms.lut3d.value;
 
 		}
 
-		exports.LUTPass = LUTPass;
+		set intensity( v ) {
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
+			this.material.uniforms.intensity.value = v;
 
-	} ) );
+		}
+
+		get intensity() {
+
+			return this.material.uniforms.intensity.value;
+
+		}
+
+		constructor( options = {} ) {
+
+			super( LUTShader );
+			this.lut = options.lut || null;
+			this.intensity = 'intensity' in options ? options.intensity : 1;
+
+		}
+
+	}
+
+	THREE.LUTPass = LUTPass;
 
 } )();

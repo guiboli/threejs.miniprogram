@@ -221,7 +221,7 @@ export const color = ( ...params ) => {
 
 	if ( params[ 0 ]?.isNode === true ) {
 
-		return nodeObject( new ConvertNode( params[0], 'color' ) );
+		return nodeObject( new ConvertNode( params[ 0 ], 'color' ) );
 
 	}
 

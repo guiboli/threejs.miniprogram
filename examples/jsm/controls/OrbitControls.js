@@ -8,25 +8,39 @@ import {
 	Vector3
 } from 'three';
 
-const pageOffsetAdapter = (event) => {
-  if(event.pageX === undefined) {
-    console.warn('[three adapter]', `no 'pageX', will use 'x'`, event);
-    if (event.x !== undefined) {
-      event.pageX = event.x;
-    } else {
-      console.error('[three adapter]', `no 'pageX' and no 'x'`, event);
-    }
-  }
+const pageOffsetAdapter = ( event ) => {
 
-  if(event.pageY === undefined) {
-    console.warn('[three adapter]', `no 'pageY', will use 'y'`, event);
-    if (event.y !== undefined) {
-      event.pageY = event.y;
-    } else {
-      console.error('[three adapter]', `no 'pageY' and no 'y'`, event);
-    }
-  }
-}
+	if ( event.pageX === undefined ) {
+
+		console.warn( '[three adapter]', 'no \'pageX\', will use \'x\'', event );
+		if ( event.x !== undefined ) {
+
+			event.pageX = event.x;
+
+		} else {
+
+			console.error( '[three adapter]', 'no \'pageX\' and no \'x\'', event );
+
+		}
+
+	}
+
+	if ( event.pageY === undefined ) {
+
+		console.warn( '[three adapter]', 'no \'pageY\', will use \'y\'', event );
+		if ( event.y !== undefined ) {
+
+			event.pageY = event.y;
+
+		} else {
+
+			console.error( '[three adapter]', 'no \'pageY\' and no \'y\'', event );
+
+		}
+
+	}
+
+};
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -42,6 +56,7 @@ const _endEvent = { type: 'end' };
 class OrbitControls extends EventDispatcher {
 
 	constructor( object, domElement ) {
+
 		super();
 
 		if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
@@ -683,6 +698,7 @@ class OrbitControls extends EventDispatcher {
 			if ( pointers.length === 1 ) {
 
 				panStart.set( pointers[ 0 ].pageX, pointers[ 0 ].pageY );
+
 			} else {
 
 				const x = 0.5 * ( pointers[ 0 ].pageX + pointers[ 1 ].pageX );
@@ -721,10 +737,12 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		const handleTouchMoveRotateAdapter = (event) => {
-			if (event.touches) {
-				const target = event.changedTouches[0];
-				pageOffsetAdapter(target);
+		const handleTouchMoveRotateAdapter = ( event ) => {
+
+			if ( event.touches ) {
+
+				const target = event.changedTouches[ 0 ];
+				pageOffsetAdapter( target );
 				if ( pointers.length == 1 ) {
 
 					rotateEnd.set( target.pageX, target.pageY );
@@ -750,10 +768,14 @@ class OrbitControls extends EventDispatcher {
 				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
 
 				rotateStart.copy( rotateEnd );
+
 			} else {
-				return handleTouchMoveRotate(event);
+
+				return handleTouchMoveRotate( event );
+
 			}
-		}
+
+		};
 
 		function handleTouchMoveRotate( event ) {
 
@@ -785,16 +807,19 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		const handleTouchMovePanAdapter = (event) => {
-			if(event.touches) {
-				const target = event.changedTouches[0];
-				pageOffsetAdapter(target);
+		const handleTouchMovePanAdapter = ( event ) => {
+
+			if ( event.touches ) {
+
+				const target = event.changedTouches[ 0 ];
+				pageOffsetAdapter( target );
 
 				if ( pointers.length === 1 ) {
 
 					panEnd.set( target.pageX, event.pageY );
 
 				} else {
+
 					const position = getSecondPointerPositionAdapter( event );
 					// const position = getSecondPointerPosition( event );
 
@@ -810,10 +835,14 @@ class OrbitControls extends EventDispatcher {
 				pan( panDelta.x, panDelta.y );
 
 				panStart.copy( panEnd );
+
 			} else {
-				return handleTouchMovePan(event)
+
+				return handleTouchMovePan( event );
+
 			}
-		}
+
+		};
 
 		function handleTouchMovePan( event ) {
 
@@ -822,6 +851,7 @@ class OrbitControls extends EventDispatcher {
 				panEnd.set( event.pageX, event.pageY );
 
 			} else {
+
 				const position = getSecondPointerPositionAdapter( event );
 				// const position = getSecondPointerPosition( event );
 
@@ -840,10 +870,12 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		const handleTouchMoveDollyAdapter = (event) => {
-			if (event.touches) {
-				const target = event.changedTouches[0];
-				pageOffsetAdapter(target);
+		const handleTouchMoveDollyAdapter = ( event ) => {
+
+			if ( event.touches ) {
+
+				const target = event.changedTouches[ 0 ];
+				pageOffsetAdapter( target );
 				const position = getSecondPointerPositionAdapter( event );
 				// const position = getSecondPointerPosition( event );
 
@@ -859,12 +891,17 @@ class OrbitControls extends EventDispatcher {
 				dollyOut( dollyDelta.y );
 
 				dollyStart.copy( dollyEnd );
+
 			} else {
-				return handleTouchMoveDolly(event);
+
+				return handleTouchMoveDolly( event );
+
 			}
-		}
+
+		};
 
 		function handleTouchMoveDolly( event ) {
+
 			const position = getSecondPointerPositionAdapter( event );
 			// const position = getSecondPointerPosition( event );
 
@@ -884,6 +921,7 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function handleTouchMoveDollyPan( event ) {
+
 			if ( scope.enableZoom ) handleTouchMoveDollyAdapter( event );
 			// if ( scope.enableZoom ) handleTouchMoveDolly( event );
 			if ( scope.enablePan ) handleTouchMovePanAdapter( event );
@@ -892,6 +930,7 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function handleTouchMoveDollyRotate( event ) {
+
 			if ( scope.enableZoom ) handleTouchMoveDollyAdapter( event );
 			// if ( scope.enableZoom ) handleTouchMoveDolly( event );
 			if ( scope.enableRotate ) handleTouchMoveRotateAdapter( event );
@@ -904,6 +943,7 @@ class OrbitControls extends EventDispatcher {
 		//
 
 		function onPointerDown( event ) {
+
 			if ( scope.enabled === false ) return;
 
 			if ( pointers.length === 0 ) {
@@ -919,7 +959,7 @@ class OrbitControls extends EventDispatcher {
 
 			addPointer( event );
 
-			if ( event.pointerType === 'touch' || event.type === 'touchstart') {
+			if ( event.pointerType === 'touch' || event.type === 'touchstart' ) {
 
 				onTouchStart( event );
 
@@ -1126,12 +1166,15 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function onTouchStart( event ) {
+
 			trackPointerAdapter( event );
 			// trackPointer( event );
 
 			// miniprogram adapter
-			if (event.touches) {
+			if ( event.touches ) {
+
 				pointers = event.touches;
+
 			}
 
 			switch ( pointers.length ) {
@@ -1224,7 +1267,7 @@ class OrbitControls extends EventDispatcher {
 				case STATE.TOUCH_ROTATE:
 
 					if ( scope.enableRotate === false ) return;
-					handleTouchMoveRotateAdapter(event)
+					handleTouchMoveRotateAdapter( event );
 					// handleTouchMoveRotate( event );
 
 					scope.update();
@@ -1234,7 +1277,7 @@ class OrbitControls extends EventDispatcher {
 				case STATE.TOUCH_PAN:
 
 					if ( scope.enablePan === false ) return;
-					handleTouchMovePanAdapter(event);
+					handleTouchMovePanAdapter( event );
 					// handleTouchMovePan( event );
 
 					scope.update();
@@ -1271,18 +1314,23 @@ class OrbitControls extends EventDispatcher {
 
 		// miniprogram adapter
 		function handleTouchEnd( /*event*/ ) {}
-		function onTouchEnd(event) {
+
+		function onTouchEnd( event ) {
+
 			trackPointerAdapter( event );
 			// miniprogram adapter
-			if (event.touches) {
+			if ( event.touches ) {
+
 				pointers = [];
 				pointerPositions = {};
+
 			}
-			if (scope.enabled === false) return;
 
-			handleTouchEnd(event);
+			if ( scope.enabled === false ) return;
 
-			scope.dispatchEvent(_endEvent);
+			handleTouchEnd( event );
+
+			scope.dispatchEvent( _endEvent );
 
 			state = STATE.NONE;
 
@@ -1320,19 +1368,27 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		const trackPointerAdapter = (event) => {
-			if (event.touches) {
-				event.touches.forEach((touch) => {
-					pageOffsetAdapter(touch);
+		const trackPointerAdapter = ( event ) => {
+
+			if ( event.touches ) {
+
+				event.touches.forEach( ( touch ) => {
+
+					pageOffsetAdapter( touch );
 					const position = new Vector2();
 					position.x = touch.pageX;
 					position.y = touch.pageY;
-					pointerPositions[touch.identifier] = position;
-				});
+					pointerPositions[ touch.identifier ] = position;
+
+				} );
+
 			} else {
-				trackPointer(event);
+
+				trackPointer( event );
+
 			}
-		}
+
+		};
 
 		function trackPointer( event ) {
 
@@ -1348,15 +1404,21 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		const getSecondPointerPositionAdapter = (event) => {
-			if (event.touches) {
-				const target = event.changedTouches[0];
+		const getSecondPointerPositionAdapter = ( event ) => {
+
+			if ( event.touches ) {
+
+				const target = event.changedTouches[ 0 ];
 				const pointer = ( target.identifier === pointers[ 0 ].identifier ) ? pointers[ 1 ] : pointers[ 0 ];
 				return pointerPositions[ pointer.identifier ];
+
 			} else {
-				return getSecondPointerPosition(event);
+
+				return getSecondPointerPosition( event );
+
 			}
-		}
+
+		};
 
 		function getSecondPointerPosition( event ) {
 

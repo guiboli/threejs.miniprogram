@@ -1,73 +1,63 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Based on "A Practical Analytic Model for Daylight"
+ * aka The Preetham Model, the de facto standard analytic skydome model
+ * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
+ *
+ * First implemented by Simon Wallner
+ * http://simonwallner.at/project/atmospheric-scattering/
+ *
+ * Improved by Martin Upitis
+ * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ *
+ * Three.js integration by zz85 http://twitter.com/blurspline
+*/
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+	class Sky extends THREE.Mesh {
 
-	} )( this, ( function ( exports, three ) {
+		constructor() {
 
-		'use strict';
-
-		/**
-	 * Based on "A Practical Analytic Model for Daylight"
-	 * aka The Preetham Model, the de facto standard analytic skydome model
-	 * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
-	 *
-	 * First implemented by Simon Wallner
-	 * http://simonwallner.at/project/atmospheric-scattering/
-	 *
-	 * Improved by Martin Upitis
-	 * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
-	 *
-	 * Three.js integration by zz85 http://twitter.com/blurspline
-	*/
-
-		class Sky extends three.Mesh {
-
-	  constructor() {
-
-	    const shader = Sky.SkyShader;
-	    const material = new three.ShaderMaterial( {
-	      name: 'SkyShader',
-	      fragmentShader: shader.fragmentShader,
-	      vertexShader: shader.vertexShader,
-	      uniforms: three.UniformsUtils.clone( shader.uniforms ),
-	      side: three.BackSide,
-	      depthWrite: false
-	    } );
-	    super( new three.BoxGeometry( 1, 1, 1 ), material );
-
-			}
+			const shader = Sky.SkyShader;
+			const material = new THREE.ShaderMaterial( {
+				name: 'SkyShader',
+				fragmentShader: shader.fragmentShader,
+				vertexShader: shader.vertexShader,
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				side: THREE.BackSide,
+				depthWrite: false
+			} );
+			super( new THREE.BoxGeometry( 1, 1, 1 ), material );
 
 		}
 
-		Sky.prototype.isSky = true;
-		Sky.SkyShader = {
-	  uniforms: {
-	    'turbidity': {
-	      value: 2
-	    },
-	    'rayleigh': {
-	      value: 1
-	    },
-	    'mieCoefficient': {
-	      value: 0.005
-	    },
-	    'mieDirectionalG': {
-	      value: 0.8
-	    },
-	    'sunPosition': {
-	      value: new three.Vector3()
-	    },
-	    'up': {
-	      value: new three.Vector3( 0, 1, 0 )
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	}
+
+	Sky.prototype.isSky = true;
+	Sky.SkyShader = {
+		uniforms: {
+			'turbidity': {
+				value: 2
+			},
+			'rayleigh': {
+				value: 1
+			},
+			'mieCoefficient': {
+				value: 0.005
+			},
+			'mieDirectionalG': {
+				value: 0.8
+			},
+			'sunPosition': {
+				value: new THREE.Vector3()
+			},
+			'up': {
+				value: new THREE.Vector3( 0, 1, 0 )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 		uniform vec3 sunPosition;
 		uniform float rayleigh;
 		uniform float turbidity;
@@ -138,9 +128,9 @@
 			vBetaM = totalMie( turbidity ) * mieCoefficient;
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
 		varying float vSunfade;
@@ -226,12 +216,8 @@
 			#include <encodings_fragment>
 
 		}`
-		};
+	};
 
-		exports.Sky = Sky;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.Sky = Sky;
 
 } )();

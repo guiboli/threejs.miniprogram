@@ -1,34 +1,24 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * ACES Filmic Tone Mapping Shader by Stephen Hill
-	 * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-	 *
-	 * this implementation of ACES is modified to accommodate a brighter viewing environment.
-	 * the scale factor of 1/0.6 is subjective. see discussion in #19621.
-	 */
-		const ACESFilmicToneMappingShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'exposure': {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * ACES Filmic Tone Mapping Shader by Stephen Hill
+ * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
+ *
+ * this implementation of ACES is modified to accommodate a brighter viewing environment.
+ * the scale factor of 1/0.6 is subjective. see discussion in #19621.
+ */
+	const ACESFilmicToneMappingShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'exposure': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -38,9 +28,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		#define saturate(a) clamp( a, 0.0, 1.0 )
 
@@ -95,12 +85,8 @@
 			gl_FragColor = vec4( ACESFilmicToneMapping( tex.rgb ), tex.a );
 
 		}`
-		};
+	};
 
-		exports.ACESFilmicToneMappingShader = ACESFilmicToneMappingShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.ACESFilmicToneMappingShader = ACESFilmicToneMappingShader;
 
 } )();

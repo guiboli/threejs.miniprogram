@@ -1,42 +1,32 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Dot screen shader
+ * based on glfx.js sepia shader
+ * https://github.com/evanw/glfx.js
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * Dot screen shader
-	 * based on glfx.js sepia shader
-	 * https://github.com/evanw/glfx.js
-	 */
-
-		const DotScreenShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'tSize': {
-	      value: new three.Vector2( 256, 256 )
-	    },
-	    'center': {
-	      value: new three.Vector2( 0.5, 0.5 )
-	    },
-	    'angle': {
-	      value: 1.57
-	    },
-	    'scale': {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const DotScreenShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'tSize': {
+				value: new THREE.Vector2( 256, 256 )
+			},
+			'center': {
+				value: new THREE.Vector2( 0.5, 0.5 )
+			},
+			'angle': {
+				value: 1.57
+			},
+			'scale': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -46,9 +36,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform vec2 center;
 		uniform float angle;
@@ -79,12 +69,8 @@
 			gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );
 
 		}`
-		};
+	};
 
-		exports.DotScreenShader = DotScreenShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.DotScreenShader = DotScreenShader;
 
 } )();

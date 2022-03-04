@@ -1,289 +1,277 @@
 ( function () {
 
-	( function ( global, factory ) {
+	const _start = new THREE.Vector3();
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ), require( './LineSegmentsGeometry.js' ), require( './LineMaterial.js' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three', './LineSegmentsGeometry', './LineMaterial' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE, global.THREE, global.THREE ) );
+	const _end = new THREE.Vector3();
 
-	} )( this, ( function ( exports, three, LineSegmentsGeometry_js, LineMaterial_js ) {
+	const _start4 = new THREE.Vector4();
 
-		'use strict';
+	const _end4 = new THREE.Vector4();
 
-		const _start = new three.Vector3();
+	const _ssOrigin = new THREE.Vector4();
 
-		const _end = new three.Vector3();
+	const _ssOrigin3 = new THREE.Vector3();
 
-		const _start4 = new three.Vector4();
+	const _mvMatrix = new THREE.Matrix4();
 
-		const _end4 = new three.Vector4();
+	const _line = new THREE.Line3();
 
-		const _ssOrigin = new three.Vector4();
+	const _closestPoint = new THREE.Vector3();
 
-		const _ssOrigin3 = new three.Vector3();
+	const _box = new THREE.Box3();
 
-		const _mvMatrix = new three.Matrix4();
+	const _sphere = new THREE.Sphere();
 
-		const _line = new three.Line3();
-
-		const _closestPoint = new three.Vector3();
-
-		const _box = new three.Box3();
-
-		const _sphere = new three.Sphere();
-
-		const _clipToWorldVector = new three.Vector4(); // Returns the margin required to expand by in world space given the distance from the camera,
-		// line width, resolution, and camera projection
+	const _clipToWorldVector = new THREE.Vector4(); // Returns the margin required to expand by in world space given the distance from the camera,
+	// line width, resolution, and camera projection
 
 
-		function getWorldSpaceHalfWidth( camera, distance, lineWidth, resolution ) {
+	function getWorldSpaceHalfWidth( camera, distance, lineWidth, resolution ) {
 
-	  // transform into clip space, adjust the x and y values by the pixel width offset, then
-	  // transform back into world space to get world offset. Note clip space is [-1, 1] so full
-	  // width does not need to be halved.
-	  _clipToWorldVector.set( 0, 0, - distance, 1.0 ).applyMatrix4( camera.projectionMatrix );
+		// transform into clip space, adjust the x and y values by the pixel width offset, then
+		// transform back into world space to get world offset. Note clip space is [-1, 1] so full
+		// width does not need to be halved.
+		_clipToWorldVector.set( 0, 0, - distance, 1.0 ).applyMatrix4( camera.projectionMatrix );
 
-	  _clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
 
-	  _clipToWorldVector.x = lineWidth / resolution.width;
-	  _clipToWorldVector.y = lineWidth / resolution.height;
+		_clipToWorldVector.x = lineWidth / resolution.width;
+		_clipToWorldVector.y = lineWidth / resolution.height;
 
-	  _clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
+		_clipToWorldVector.applyMatrix4( camera.projectionMatrixInverse );
 
-	  _clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
+		_clipToWorldVector.multiplyScalar( 1.0 / _clipToWorldVector.w );
 
-	  return Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) );
+		return Math.abs( Math.max( _clipToWorldVector.x, _clipToWorldVector.y ) );
 
-		}
+	}
 
-		class LineSegments2 extends three.Mesh {
+	class LineSegments2 extends THREE.Mesh {
 
-	  constructor( geometry = new LineSegmentsGeometry_js.LineSegmentsGeometry(), material = new LineMaterial_js.LineMaterial( {
-	    color: Math.random() * 0xffffff
-	  } ) ) {
+		constructor( geometry = new THREE.LineSegmentsGeometry(), material = new THREE.LineMaterial( {
+			color: Math.random() * 0xffffff
+		} ) ) {
 
-	    super( geometry, material );
-	    this.type = 'LineSegments2';
+			super( geometry, material );
+			this.type = 'LineSegments2';
 
-			} // for backwards-compatability, but could be a method of LineSegmentsGeometry...
+		} // for backwards-compatability, but could be a method of THREE.LineSegmentsGeometry...
 
 
-	  computeLineDistances() {
+		computeLineDistances() {
 
-	    const geometry = this.geometry;
-	    const instanceStart = geometry.attributes.instanceStart;
-	    const instanceEnd = geometry.attributes.instanceEnd;
-	    const lineDistances = new Float32Array( 2 * instanceStart.count );
+			const geometry = this.geometry;
+			const instanceStart = geometry.attributes.instanceStart;
+			const instanceEnd = geometry.attributes.instanceEnd;
+			const lineDistances = new Float32Array( 2 * instanceStart.count );
 
-	    for ( let i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
+			for ( let i = 0, j = 0, l = instanceStart.count; i < l; i ++, j += 2 ) {
 
-	      _start.fromBufferAttribute( instanceStart, i );
+				_start.fromBufferAttribute( instanceStart, i );
 
-	      _end.fromBufferAttribute( instanceEnd, i );
+				_end.fromBufferAttribute( instanceEnd, i );
 
-	      lineDistances[ j ] = j === 0 ? 0 : lineDistances[ j - 1 ];
-	      lineDistances[ j + 1 ] = lineDistances[ j ] + _start.distanceTo( _end );
-
-				}
-
-	    const instanceDistanceBuffer = new three.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
-
-	    geometry.setAttribute( 'instanceDistanceStart', new three.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-
-	    geometry.setAttribute( 'instanceDistanceEnd', new three.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
-
-	    return this;
+				lineDistances[ j ] = j === 0 ? 0 : lineDistances[ j - 1 ];
+				lineDistances[ j + 1 ] = lineDistances[ j ] + _start.distanceTo( _end );
 
 			}
 
-	  raycast( raycaster, intersects ) {
+			const instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-	    if ( raycaster.camera === null ) {
+			geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
 
-	      console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2.' );
+			geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
-				}
+			return this;
 
-	    const threshold = raycaster.params.Line2 !== undefined ? raycaster.params.Line2.threshold || 0 : 0;
-	    const ray = raycaster.ray;
-	    const camera = raycaster.camera;
-	    const projectionMatrix = camera.projectionMatrix;
-	    const matrixWorld = this.matrixWorld;
-	    const geometry = this.geometry;
-	    const material = this.material;
-	    const resolution = material.resolution;
-	    const lineWidth = material.linewidth + threshold;
-	    const instanceStart = geometry.attributes.instanceStart;
-	    const instanceEnd = geometry.attributes.instanceEnd; // camera forward is negative
+		}
 
-	    const near = - camera.near; //
-	    // check if we intersect the sphere bounds
+		raycast( raycaster, intersects ) {
 
-	    if ( geometry.boundingSphere === null ) {
+			if ( raycaster.camera === null ) {
 
-	      geometry.computeBoundingSphere();
+				console.error( 'LineSegments2: "Raycaster.camera" needs to be set in order to raycast against LineSegments2.' );
 
-				}
+			}
 
-	    _sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
+			const threshold = raycaster.params.Line2 !== undefined ? raycaster.params.Line2.threshold || 0 : 0;
+			const ray = raycaster.ray;
+			const camera = raycaster.camera;
+			const projectionMatrix = camera.projectionMatrix;
+			const matrixWorld = this.matrixWorld;
+			const geometry = this.geometry;
+			const material = this.material;
+			const resolution = material.resolution;
+			const lineWidth = material.linewidth + threshold;
+			const instanceStart = geometry.attributes.instanceStart;
+			const instanceEnd = geometry.attributes.instanceEnd; // camera forward is negative
 
-	    const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) ); // increase the sphere bounds by the worst case line screen space width
+			const near = - camera.near; //
+			// check if we intersect the sphere bounds
 
-	    const sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
-	    _sphere.radius += sphereMargin;
+			if ( geometry.boundingSphere === null ) {
 
-	    if ( raycaster.ray.intersectsSphere( _sphere ) === false ) {
+				geometry.computeBoundingSphere();
 
-	      return;
+			}
 
-				} //
-	    // check if we intersect the box bounds
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
 
+			const distanceToSphere = Math.max( camera.near, _sphere.distanceToPoint( ray.origin ) ); // increase the sphere bounds by the worst case line screen space width
 
-	    if ( geometry.boundingBox === null ) {
+			const sphereMargin = getWorldSpaceHalfWidth( camera, distanceToSphere, lineWidth, resolution );
+			_sphere.radius += sphereMargin;
 
-	      geometry.computeBoundingBox();
+			if ( raycaster.ray.intersectsSphere( _sphere ) === false ) {
 
-				}
+				return;
 
-	    _box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
+			} //
+			// check if we intersect the box bounds
 
-	    const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) ); // increase the box bounds by the worst case line screen space width
 
-	    const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
-	    _box.max.x += boxMargin;
-	    _box.max.y += boxMargin;
-	    _box.max.z += boxMargin;
-	    _box.min.x -= boxMargin;
-	    _box.min.y -= boxMargin;
-	    _box.min.z -= boxMargin;
+			if ( geometry.boundingBox === null ) {
 
-	    if ( raycaster.ray.intersectsBox( _box ) === false ) {
+				geometry.computeBoundingBox();
 
-	      return;
+			}
 
-				} //
-	    // pick a point 1 unit out along the ray to avoid the ray origin
-	    // sitting at the camera origin which will cause "w" to be 0 when
-	    // applying the projection matrix.
+			_box.copy( geometry.boundingBox ).applyMatrix4( matrixWorld );
 
+			const distanceToBox = Math.max( camera.near, _box.distanceToPoint( ray.origin ) ); // increase the box bounds by the worst case line screen space width
 
-	    ray.at( 1, _ssOrigin ); // ndc space [ - 1.0, 1.0 ]
+			const boxMargin = getWorldSpaceHalfWidth( camera, distanceToBox, lineWidth, resolution );
+			_box.max.x += boxMargin;
+			_box.max.y += boxMargin;
+			_box.max.z += boxMargin;
+			_box.min.x -= boxMargin;
+			_box.min.y -= boxMargin;
+			_box.min.z -= boxMargin;
 
-	    _ssOrigin.w = 1;
+			if ( raycaster.ray.intersectsBox( _box ) === false ) {
 
-	    _ssOrigin.applyMatrix4( camera.matrixWorldInverse );
+				return;
 
-	    _ssOrigin.applyMatrix4( projectionMatrix );
+			} //
+			// pick a point 1 unit out along the ray to avoid the ray origin
+			// sitting at the camera origin which will cause "w" to be 0 when
+			// applying the projection matrix.
 
-	    _ssOrigin.multiplyScalar( 1 / _ssOrigin.w ); // screen space
 
+			ray.at( 1, _ssOrigin ); // ndc space [ - 1.0, 1.0 ]
 
-	    _ssOrigin.x *= resolution.x / 2;
-	    _ssOrigin.y *= resolution.y / 2;
-	    _ssOrigin.z = 0;
+			_ssOrigin.w = 1;
 
-	    _ssOrigin3.copy( _ssOrigin );
+			_ssOrigin.applyMatrix4( camera.matrixWorldInverse );
 
-	    _mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
+			_ssOrigin.applyMatrix4( projectionMatrix );
 
-	    for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
+			_ssOrigin.multiplyScalar( 1 / _ssOrigin.w ); // screen space
 
-	      _start4.fromBufferAttribute( instanceStart, i );
 
-	      _end4.fromBufferAttribute( instanceEnd, i );
+			_ssOrigin.x *= resolution.x / 2;
+			_ssOrigin.y *= resolution.y / 2;
+			_ssOrigin.z = 0;
 
-	      _start4.w = 1;
-	      _end4.w = 1; // camera space
+			_ssOrigin3.copy( _ssOrigin );
 
-	      _start4.applyMatrix4( _mvMatrix );
+			_mvMatrix.multiplyMatrices( camera.matrixWorldInverse, matrixWorld );
 
-	      _end4.applyMatrix4( _mvMatrix ); // skip the segment if it's entirely behind the camera
+			for ( let i = 0, l = instanceStart.count; i < l; i ++ ) {
 
+				_start4.fromBufferAttribute( instanceStart, i );
 
-	      const isBehindCameraNear = _start4.z > near && _end4.z > near;
+				_end4.fromBufferAttribute( instanceEnd, i );
 
-	      if ( isBehindCameraNear ) {
+				_start4.w = 1;
+				_end4.w = 1; // camera space
 
-	        continue;
+				_start4.applyMatrix4( _mvMatrix );
 
-					} // trim the segment if it extends behind camera near
+				_end4.applyMatrix4( _mvMatrix ); // skip the segment if it's entirely behind the camera
 
 
-	      if ( _start4.z > near ) {
+				const isBehindCameraNear = _start4.z > near && _end4.z > near;
 
-	        const deltaDist = _start4.z - _end4.z;
-	        const t = ( _start4.z - near ) / deltaDist;
+				if ( isBehindCameraNear ) {
 
-	        _start4.lerp( _end4, t );
+					continue;
 
-					} else if ( _end4.z > near ) {
+				} // trim the segment if it extends behind camera near
 
-	        const deltaDist = _end4.z - _start4.z;
-	        const t = ( _end4.z - near ) / deltaDist;
 
-	        _end4.lerp( _start4, t );
+				if ( _start4.z > near ) {
 
-					} // clip space
+					const deltaDist = _start4.z - _end4.z;
+					const t = ( _start4.z - near ) / deltaDist;
 
+					_start4.lerp( _end4, t );
 
-	      _start4.applyMatrix4( projectionMatrix );
+				} else if ( _end4.z > near ) {
 
-	      _end4.applyMatrix4( projectionMatrix ); // ndc space [ - 1.0, 1.0 ]
+					const deltaDist = _end4.z - _start4.z;
+					const t = ( _end4.z - near ) / deltaDist;
 
+					_end4.lerp( _start4, t );
 
-	      _start4.multiplyScalar( 1 / _start4.w );
+				} // clip space
 
-	      _end4.multiplyScalar( 1 / _end4.w ); // screen space
 
+				_start4.applyMatrix4( projectionMatrix );
 
-	      _start4.x *= resolution.x / 2;
-	      _start4.y *= resolution.y / 2;
-	      _end4.x *= resolution.x / 2;
-	      _end4.y *= resolution.y / 2; // create 2d segment
+				_end4.applyMatrix4( projectionMatrix ); // ndc space [ - 1.0, 1.0 ]
 
-	      _line.start.copy( _start4 );
 
-	      _line.start.z = 0;
+				_start4.multiplyScalar( 1 / _start4.w );
 
-	      _line.end.copy( _end4 );
+				_end4.multiplyScalar( 1 / _end4.w ); // screen space
 
-	      _line.end.z = 0; // get closest point on ray to segment
 
-	      const param = _line.closestPointToPointParameter( _ssOrigin3, true );
+				_start4.x *= resolution.x / 2;
+				_start4.y *= resolution.y / 2;
+				_end4.x *= resolution.x / 2;
+				_end4.y *= resolution.y / 2; // create 2d segment
 
-	      _line.at( param, _closestPoint ); // check if the intersection point is within clip space
+				_line.start.copy( _start4 );
 
+				_line.start.z = 0;
 
-	      const zPos = three.MathUtils.lerp( _start4.z, _end4.z, param );
-	      const isInClipSpace = zPos >= - 1 && zPos <= 1;
-	      const isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
+				_line.end.copy( _end4 );
 
-	      if ( isInClipSpace && isInside ) {
+				_line.end.z = 0; // get closest point on ray to segment
 
-	        _line.start.fromBufferAttribute( instanceStart, i );
+				const param = _line.closestPointToPointParameter( _ssOrigin3, true );
 
-	        _line.end.fromBufferAttribute( instanceEnd, i );
+				_line.at( param, _closestPoint ); // check if the intersection point is within clip space
 
-	        _line.start.applyMatrix4( matrixWorld );
 
-	        _line.end.applyMatrix4( matrixWorld );
+				const zPos = THREE.MathUtils.lerp( _start4.z, _end4.z, param );
+				const isInClipSpace = zPos >= - 1 && zPos <= 1;
+				const isInside = _ssOrigin3.distanceTo( _closestPoint ) < lineWidth * 0.5;
 
-	        const pointOnLine = new three.Vector3();
-	        const point = new three.Vector3();
-	        ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
-	        intersects.push( {
-	          point: point,
-	          pointOnLine: pointOnLine,
-	          distance: ray.origin.distanceTo( point ),
-	          object: this,
-	          face: null,
-	          faceIndex: i,
-	          uv: null,
-	          uv2: null
-	        } );
+				if ( isInClipSpace && isInside ) {
 
-					}
+					_line.start.fromBufferAttribute( instanceStart, i );
+
+					_line.end.fromBufferAttribute( instanceEnd, i );
+
+					_line.start.applyMatrix4( matrixWorld );
+
+					_line.end.applyMatrix4( matrixWorld );
+
+					const pointOnLine = new THREE.Vector3();
+					const point = new THREE.Vector3();
+					ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
+					intersects.push( {
+						point: point,
+						pointOnLine: pointOnLine,
+						distance: ray.origin.distanceTo( point ),
+						object: this,
+						face: null,
+						faceIndex: i,
+						uv: null,
+						uv2: null
+					} );
 
 				}
 
@@ -291,12 +279,10 @@
 
 		}
 
-		LineSegments2.prototype.isLineSegments2 = true;
+	}
 
-		exports.LineSegments2 = LineSegments2;
+	LineSegments2.prototype.isLineSegments2 = true;
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.LineSegments2 = LineSegments2;
 
 } )();

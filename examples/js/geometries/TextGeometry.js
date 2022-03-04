@@ -1,65 +1,51 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Text = 3D Text
+ *
+ * parameters = {
+ *  font: <THREE.Font>, // font
+ *
+ *  size: <float>, // size of the text
+ *  height: <float>, // thickness to extrude text
+ *  curveSegments: <int>, // number of points on the curves
+ *
+ *  bevelEnabled: <bool>, // turn on bevel
+ *  bevelThickness: <float>, // how deep into text bevel goes
+ *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
+ *  bevelOffset: <float> // how far from text outline does bevel start
+ * }
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+	class TextGeometry extends THREE.ExtrudeGeometry {
 
-	} )( this, ( function ( exports, three ) {
+		constructor( text, parameters = {} ) {
 
-		'use strict';
+			const font = parameters.font;
 
-		/**
-	 * Text = 3D Text
-	 *
-	 * parameters = {
-	 *  font: <THREE.Font>, // font
-	 *
-	 *  size: <float>, // size of the text
-	 *  height: <float>, // thickness to extrude text
-	 *  curveSegments: <int>, // number of points on the curves
-	 *
-	 *  bevelEnabled: <bool>, // turn on bevel
-	 *  bevelThickness: <float>, // how deep into text bevel goes
-	 *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
-	 *  bevelOffset: <float> // how far from text outline does bevel start
-	 * }
-	 */
+			if ( font === undefined ) {
 
-		class TextGeometry extends three.ExtrudeGeometry {
+				super(); // generate default extrude geometry
 
-	  constructor( text, parameters = {} ) {
+			} else {
 
-	    const font = parameters.font;
+				const shapes = font.generateShapes( text, parameters.size ); // translate parameters to THREE.ExtrudeGeometry API
 
-	    if ( font === undefined ) {
+				parameters.depth = parameters.height !== undefined ? parameters.height : 50; // defaults
 
-	      super(); // generate default extrude geometry
-
-				} else {
-
-	      const shapes = font.generateShapes( text, parameters.size ); // translate parameters to ExtrudeGeometry API
-
-	      parameters.depth = parameters.height !== undefined ? parameters.height : 50; // defaults
-
-	      if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-	      if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-	      if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-	      super( shapes, parameters );
-
-				}
-
-	    this.type = 'TextGeometry';
+				if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+				if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+				if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+				super( shapes, parameters );
 
 			}
 
+			this.type = 'TextGeometry';
+
 		}
 
-		exports.TextGeometry = TextGeometry;
+	}
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.TextGeometry = TextGeometry;
 
 } )();

@@ -1,244 +1,230 @@
 ( function () {
 
-	( function ( global, factory ) {
+	const _box = new THREE.Box3();
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+	const _vector = new THREE.Vector3();
 
-	} )( this, ( function ( exports, three ) {
+	class LineSegmentsGeometry extends THREE.InstancedBufferGeometry {
 
-		'use strict';
+		constructor() {
 
-		const _box = new three.Box3();
+			super();
+			this.type = 'LineSegmentsGeometry';
+			const positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
+			const uvs = [ - 1, 2, 1, 2, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 2, 1, - 2 ];
+			const index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
+			this.setIndex( index );
+			this.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			this.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
-		const _vector = new three.Vector3();
+		}
 
-		class LineSegmentsGeometry extends three.InstancedBufferGeometry {
+		applyMatrix4( matrix ) {
 
-	  constructor() {
+			const start = this.attributes.instanceStart;
+			const end = this.attributes.instanceEnd;
 
-	    super();
-	    this.type = 'LineSegmentsGeometry';
-	    const positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
-	    const uvs = [ - 1, 2, 1, 2, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 2, 1, - 2 ];
-	    const index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
-	    this.setIndex( index );
-	    this.setAttribute( 'position', new three.Float32BufferAttribute( positions, 3 ) );
-	    this.setAttribute( 'uv', new three.Float32BufferAttribute( uvs, 2 ) );
+			if ( start !== undefined ) {
 
-			}
-
-	  applyMatrix4( matrix ) {
-
-	    const start = this.attributes.instanceStart;
-	    const end = this.attributes.instanceEnd;
-
-	    if ( start !== undefined ) {
-
-	      start.applyMatrix4( matrix );
-	      end.applyMatrix4( matrix );
-	      start.needsUpdate = true;
-
-				}
-
-	    if ( this.boundingBox !== null ) {
-
-	      this.computeBoundingBox();
-
-				}
-
-	    if ( this.boundingSphere !== null ) {
-
-	      this.computeBoundingSphere();
-
-				}
-
-	    return this;
+				start.applyMatrix4( matrix );
+				end.applyMatrix4( matrix );
+				start.needsUpdate = true;
 
 			}
 
-	  setPositions( array ) {
+			if ( this.boundingBox !== null ) {
 
-	    let lineSegments;
-
-	    if ( array instanceof Float32Array ) {
-
-	      lineSegments = array;
-
-				} else if ( Array.isArray( array ) ) {
-
-	      lineSegments = new Float32Array( array );
-
-				}
-
-	    const instanceBuffer = new three.InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
-
-	    this.setAttribute( 'instanceStart', new three.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-
-	    this.setAttribute( 'instanceEnd', new three.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
-	    //
-
-	    this.computeBoundingBox();
-	    this.computeBoundingSphere();
-	    return this;
+				this.computeBoundingBox();
 
 			}
 
-	  setColors( array ) {
+			if ( this.boundingSphere !== null ) {
 
-	    let colors;
-
-	    if ( array instanceof Float32Array ) {
-
-	      colors = array;
-
-				} else if ( Array.isArray( array ) ) {
-
-	      colors = new Float32Array( array );
-
-				}
-
-	    const instanceColorBuffer = new three.InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
-
-	    this.setAttribute( 'instanceColorStart', new three.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-
-	    this.setAttribute( 'instanceColorEnd', new three.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
-
-	    return this;
+				this.computeBoundingSphere();
 
 			}
 
-	  fromWireframeGeometry( geometry ) {
+			return this;
 
-	    this.setPositions( geometry.attributes.position.array );
-	    return this;
+		}
 
-			}
+		setPositions( array ) {
 
-	  fromEdgesGeometry( geometry ) {
+			let lineSegments;
 
-	    this.setPositions( geometry.attributes.position.array );
-	    return this;
+			if ( array instanceof Float32Array ) {
 
-			}
+				lineSegments = array;
 
-	  fromMesh( mesh ) {
+			} else if ( Array.isArray( array ) ) {
 
-	    this.fromWireframeGeometry( new three.WireframeGeometry( mesh.geometry ) ); // set colors, maybe
-
-	    return this;
+				lineSegments = new Float32Array( array );
 
 			}
 
-	  fromLineSegments( lineSegments ) {
+			const instanceBuffer = new THREE.InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
 
-	    const geometry = lineSegments.geometry;
+			this.setAttribute( 'instanceStart', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
 
-	    if ( geometry.isGeometry ) {
+			this.setAttribute( 'instanceEnd', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+			//
 
-	      console.error( 'THREE.LineSegmentsGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-	      return;
+			this.computeBoundingBox();
+			this.computeBoundingSphere();
+			return this;
 
-				} else if ( geometry.isBufferGeometry ) {
+		}
 
-	      this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+		setColors( array ) {
 
-				} // set colors, maybe
+			let colors;
 
+			if ( array instanceof Float32Array ) {
 
-	    return this;
+				colors = array;
 
-			}
+			} else if ( Array.isArray( array ) ) {
 
-	  computeBoundingBox() {
-
-	    if ( this.boundingBox === null ) {
-
-	      this.boundingBox = new three.Box3();
-
-				}
-
-	    const start = this.attributes.instanceStart;
-	    const end = this.attributes.instanceEnd;
-
-	    if ( start !== undefined && end !== undefined ) {
-
-	      this.boundingBox.setFromBufferAttribute( start );
-
-	      _box.setFromBufferAttribute( end );
-
-	      this.boundingBox.union( _box );
-
-				}
+				colors = new Float32Array( array );
 
 			}
 
-	  computeBoundingSphere() {
+			const instanceColorBuffer = new THREE.InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
 
-	    if ( this.boundingSphere === null ) {
+			this.setAttribute( 'instanceColorStart', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
 
-	      this.boundingSphere = new three.Sphere();
+			this.setAttribute( 'instanceColorEnd', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
 
-				}
+			return this;
 
-	    if ( this.boundingBox === null ) {
+		}
 
-	      this.computeBoundingBox();
+		fromWireframeGeometry( geometry ) {
 
-				}
+			this.setPositions( geometry.attributes.position.array );
+			return this;
 
-	    const start = this.attributes.instanceStart;
-	    const end = this.attributes.instanceEnd;
+		}
 
-	    if ( start !== undefined && end !== undefined ) {
+		fromEdgesGeometry( geometry ) {
 
-	      const center = this.boundingSphere.center;
-	      this.boundingBox.getCenter( center );
-	      let maxRadiusSq = 0;
+			this.setPositions( geometry.attributes.position.array );
+			return this;
 
-	      for ( let i = 0, il = start.count; i < il; i ++ ) {
+		}
 
-	        _vector.fromBufferAttribute( start, i );
+		fromMesh( mesh ) {
 
-	        maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+			this.fromWireframeGeometry( new THREE.WireframeGeometry( mesh.geometry ) ); // set colors, maybe
 
-	        _vector.fromBufferAttribute( end, i );
+			return this;
 
-	        maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+		}
 
-					}
+		fromLineSegments( lineSegments ) {
 
-	      this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			const geometry = lineSegments.geometry;
 
-	      if ( isNaN( this.boundingSphere.radius ) ) {
+			if ( geometry.isGeometry ) {
 
-	        console.error( 'THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
+				console.error( 'THREE.LineSegmentsGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
+				return;
 
-					}
+			} else if ( geometry.isBufferGeometry ) {
 
-				}
+				this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+
+			} // set colors, maybe
+
+
+			return this;
+
+		}
+
+		computeBoundingBox() {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new THREE.Box3();
 
 			}
 
-	  toJSON() { // todo
-	  }
+			const start = this.attributes.instanceStart;
+			const end = this.attributes.instanceEnd;
 
-	  applyMatrix( matrix ) {
+			if ( start !== undefined && end !== undefined ) {
 
-	    console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
-	    return this.applyMatrix4( matrix );
+				this.boundingBox.setFromBufferAttribute( start );
+
+				_box.setFromBufferAttribute( end );
+
+				this.boundingBox.union( _box );
 
 			}
 
 		}
 
-		LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
+		computeBoundingSphere() {
 
-		exports.LineSegmentsGeometry = LineSegmentsGeometry;
+			if ( this.boundingSphere === null ) {
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
+				this.boundingSphere = new THREE.Sphere();
 
-	} ) );
+			}
+
+			if ( this.boundingBox === null ) {
+
+				this.computeBoundingBox();
+
+			}
+
+			const start = this.attributes.instanceStart;
+			const end = this.attributes.instanceEnd;
+
+			if ( start !== undefined && end !== undefined ) {
+
+				const center = this.boundingSphere.center;
+				this.boundingBox.getCenter( center );
+				let maxRadiusSq = 0;
+
+				for ( let i = 0, il = start.count; i < il; i ++ ) {
+
+					_vector.fromBufferAttribute( start, i );
+
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+					_vector.fromBufferAttribute( end, i );
+
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+
+				}
+
+				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+				if ( isNaN( this.boundingSphere.radius ) ) {
+
+					console.error( 'THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
+
+				}
+
+			}
+
+		}
+
+		toJSON() { // todo
+		}
+
+		applyMatrix( matrix ) {
+
+			console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
+			return this.applyMatrix4( matrix );
+
+		}
+
+	}
+
+	LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
+
+	THREE.LineSegmentsGeometry = LineSegmentsGeometry;
 
 } )();

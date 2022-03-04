@@ -63,7 +63,7 @@ class NormalMapNode extends TempNode {
 
 		if ( scaleNode !== null ) {
 
-			const normalMapScale = new OperatorNode( '*', new SplitNode( normalMap, 'xy'), scaleNode );
+			const normalMapScale = new OperatorNode( '*', new SplitNode( normalMap, 'xy' ), scaleNode );
 			normalMap = new JoinNode( [ normalMapScale, new SplitNode( normalMap, 'z' ) ] );
 
 		}

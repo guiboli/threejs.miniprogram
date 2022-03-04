@@ -1,32 +1,22 @@
 ( function () {
 
-	( function ( global, factory ) {
-
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {} ) );
-
-	} )( this, ( function ( exports ) {
-
-		'use strict';
-
-		/**
-	 * Sepia tone shader
-	 * based on glfx.js sepia shader
-	 * https://github.com/evanw/glfx.js
-	 */
-		const SepiaShader = {
-	  uniforms: {
-	    'tDiffuse': {
-	      value: null
-	    },
-	    'amount': {
-	      value: 1.0
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	/**
+ * Sepia tone shader
+ * based on glfx.js sepia shader
+ * https://github.com/evanw/glfx.js
+ */
+	const SepiaShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'amount': {
+				value: 1.0
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -36,9 +26,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		uniform float amount;
 
@@ -58,12 +48,8 @@
 			gl_FragColor = vec4( min( vec3( 1.0 ), color.rgb ), color.a );
 
 		}`
-		};
+	};
 
-		exports.SepiaShader = SepiaShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.SepiaShader = SepiaShader;
 
 } )();

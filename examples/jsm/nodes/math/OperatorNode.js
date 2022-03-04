@@ -46,9 +46,9 @@ class OperatorNode extends TempNode {
 			return typeA;
 
 		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
-			
+
 			return 'int';
-			
+
 		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';

@@ -1,37 +1,27 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * Triangle blur shader
+ * based on glfx.js triangle blur shader
+ * https://github.com/evanw/glfx.js
+ *
+ * A basic blur filter, which convolves the image with a
+ * pyramid filter. The pyramid filter is separable and is applied as two
+ * perpendicular triangle filters.
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
-
-	} )( this, ( function ( exports, three ) {
-
-		'use strict';
-
-		/**
-	 * Triangle blur shader
-	 * based on glfx.js triangle blur shader
-	 * https://github.com/evanw/glfx.js
-	 *
-	 * A basic blur filter, which convolves the image with a
-	 * pyramid filter. The pyramid filter is separable and is applied as two
-	 * perpendicular triangle filters.
-	 */
-
-		const TriangleBlurShader = {
-	  uniforms: {
-	    'texture': {
-	      value: null
-	    },
-	    'delta': {
-	      value: new three.Vector2( 1, 1 )
-	    }
-	  },
-	  vertexShader:
-	  /* glsl */
-	  `
+	const TriangleBlurShader = {
+		uniforms: {
+			'texture': {
+				value: null
+			},
+			'delta': {
+				value: new THREE.Vector2( 1, 1 )
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
 		varying vec2 vUv;
 
@@ -41,9 +31,9 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-	  fragmentShader:
-	  /* glsl */
-	  `
+		fragmentShader:
+  /* glsl */
+  `
 
 		#include <common>
 
@@ -77,12 +67,8 @@
 			gl_FragColor = color / total;
 
 		}`
-		};
+	};
 
-		exports.TriangleBlurShader = TriangleBlurShader;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.TriangleBlurShader = TriangleBlurShader;
 
 } )();

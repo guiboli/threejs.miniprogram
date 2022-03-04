@@ -1,265 +1,253 @@
 ( function () {
 
-	( function ( global, factory ) {
+	/**
+ * This is a class to check whether objects are in a selection area in 3D space
+ */
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+	const _frustum = new THREE.Frustum();
 
-	} )( this, ( function ( exports, three ) {
+	const _center = new THREE.Vector3();
 
-		'use strict';
+	const _tmpPoint = new THREE.Vector3();
 
-		/**
-	 * This is a class to check whether objects are in a selection area in 3D space
-	 */
+	const _vecNear = new THREE.Vector3();
 
-		const _frustum = new three.Frustum();
+	const _vecTopLeft = new THREE.Vector3();
 
-		const _center = new three.Vector3();
+	const _vecTopRight = new THREE.Vector3();
 
-		const _tmpPoint = new three.Vector3();
+	const _vecDownRight = new THREE.Vector3();
 
-		const _vecNear = new three.Vector3();
+	const _vecDownLeft = new THREE.Vector3();
 
-		const _vecTopLeft = new three.Vector3();
+	const _vecFarTopLeft = new THREE.Vector3();
 
-		const _vecTopRight = new three.Vector3();
+	const _vecFarTopRight = new THREE.Vector3();
 
-		const _vecDownRight = new three.Vector3();
+	const _vecFarDownRight = new THREE.Vector3();
 
-		const _vecDownLeft = new three.Vector3();
+	const _vecFarDownLeft = new THREE.Vector3();
 
-		const _vecFarTopLeft = new three.Vector3();
+	const _vectemp1 = new THREE.Vector3();
 
-		const _vecFarTopRight = new three.Vector3();
+	const _vectemp2 = new THREE.Vector3();
 
-		const _vecFarDownRight = new three.Vector3();
+	const _vectemp3 = new THREE.Vector3();
 
-		const _vecFarDownLeft = new three.Vector3();
+	const _matrix = new THREE.Matrix4();
 
-		const _vectemp1 = new three.Vector3();
+	const _quaternion = new THREE.Quaternion();
 
-		const _vectemp2 = new three.Vector3();
+	const _scale = new THREE.Vector3();
 
-		const _vectemp3 = new three.Vector3();
+	class SelectionBox {
 
-		const _matrix = new three.Matrix4();
+		constructor( camera, scene, deep = Number.MAX_VALUE ) {
 
-		const _quaternion = new three.Quaternion();
+			this.camera = camera;
+			this.scene = scene;
+			this.startPoint = new THREE.Vector3();
+			this.endPoint = new THREE.Vector3();
+			this.collection = [];
+			this.instances = {};
+			this.deep = deep;
 
-		const _scale = new three.Vector3();
+		}
 
-		class SelectionBox {
+		select( startPoint, endPoint ) {
 
-	  constructor( camera, scene, deep = Number.MAX_VALUE ) {
+			this.startPoint = startPoint || this.startPoint;
+			this.endPoint = endPoint || this.endPoint;
+			this.collection = [];
+			this.updateFrustum( this.startPoint, this.endPoint );
+			this.searchChildInFrustum( _frustum, this.scene );
+			return this.collection;
 
-	    this.camera = camera;
-	    this.scene = scene;
-	    this.startPoint = new three.Vector3();
-	    this.endPoint = new three.Vector3();
-	    this.collection = [];
-	    this.instances = {};
-	    this.deep = deep;
+		}
+
+		updateFrustum( startPoint, endPoint ) {
+
+			startPoint = startPoint || this.startPoint;
+			endPoint = endPoint || this.endPoint; // Avoid invalid frustum
+
+			if ( startPoint.x === endPoint.x ) {
+
+				endPoint.x += Number.EPSILON;
 
 			}
 
-	  select( startPoint, endPoint ) {
+			if ( startPoint.y === endPoint.y ) {
 
-	    this.startPoint = startPoint || this.startPoint;
-	    this.endPoint = endPoint || this.endPoint;
-	    this.collection = [];
-	    this.updateFrustum( this.startPoint, this.endPoint );
-	    this.searchChildInFrustum( _frustum, this.scene );
-	    return this.collection;
+				endPoint.y += Number.EPSILON;
 
 			}
 
-	  updateFrustum( startPoint, endPoint ) {
+			this.camera.updateProjectionMatrix();
+			this.camera.updateMatrixWorld();
 
-	    startPoint = startPoint || this.startPoint;
-	    endPoint = endPoint || this.endPoint; // Avoid invalid frustum
+			if ( this.camera.isPerspectiveCamera ) {
 
-	    if ( startPoint.x === endPoint.x ) {
+				_tmpPoint.copy( startPoint );
 
-	      endPoint.x += Number.EPSILON;
+				_tmpPoint.x = Math.min( startPoint.x, endPoint.x );
+				_tmpPoint.y = Math.max( startPoint.y, endPoint.y );
+				endPoint.x = Math.max( startPoint.x, endPoint.x );
+				endPoint.y = Math.min( startPoint.y, endPoint.y );
 
-				}
+				_vecNear.setFromMatrixPosition( this.camera.matrixWorld );
 
-	    if ( startPoint.y === endPoint.y ) {
+				_vecTopLeft.copy( _tmpPoint );
 
-	      endPoint.y += Number.EPSILON;
+				_vecTopRight.set( endPoint.x, _tmpPoint.y, 0 );
 
-				}
+				_vecDownRight.copy( endPoint );
 
-	    this.camera.updateProjectionMatrix();
-	    this.camera.updateMatrixWorld();
+				_vecDownLeft.set( _tmpPoint.x, endPoint.y, 0 );
 
-	    if ( this.camera.isPerspectiveCamera ) {
+				_vecTopLeft.unproject( this.camera );
 
-	      _tmpPoint.copy( startPoint );
+				_vecTopRight.unproject( this.camera );
 
-	      _tmpPoint.x = Math.min( startPoint.x, endPoint.x );
-	      _tmpPoint.y = Math.max( startPoint.y, endPoint.y );
-	      endPoint.x = Math.max( startPoint.x, endPoint.x );
-	      endPoint.y = Math.min( startPoint.y, endPoint.y );
+				_vecDownRight.unproject( this.camera );
 
-	      _vecNear.setFromMatrixPosition( this.camera.matrixWorld );
+				_vecDownLeft.unproject( this.camera );
 
-	      _vecTopLeft.copy( _tmpPoint );
+				_vectemp1.copy( _vecTopLeft ).sub( _vecNear );
 
-	      _vecTopRight.set( endPoint.x, _tmpPoint.y, 0 );
+				_vectemp2.copy( _vecTopRight ).sub( _vecNear );
 
-	      _vecDownRight.copy( endPoint );
+				_vectemp3.copy( _vecDownRight ).sub( _vecNear );
 
-	      _vecDownLeft.set( _tmpPoint.x, endPoint.y, 0 );
+				_vectemp1.normalize();
 
-	      _vecTopLeft.unproject( this.camera );
+				_vectemp2.normalize();
 
-	      _vecTopRight.unproject( this.camera );
+				_vectemp3.normalize();
 
-	      _vecDownRight.unproject( this.camera );
+				_vectemp1.multiplyScalar( this.deep );
 
-	      _vecDownLeft.unproject( this.camera );
+				_vectemp2.multiplyScalar( this.deep );
 
-	      _vectemp1.copy( _vecTopLeft ).sub( _vecNear );
+				_vectemp3.multiplyScalar( this.deep );
 
-	      _vectemp2.copy( _vecTopRight ).sub( _vecNear );
+				_vectemp1.add( _vecNear );
 
-	      _vectemp3.copy( _vecDownRight ).sub( _vecNear );
+				_vectemp2.add( _vecNear );
 
-	      _vectemp1.normalize();
+				_vectemp3.add( _vecNear );
 
-	      _vectemp2.normalize();
+				const planes = _frustum.planes;
+				planes[ 0 ].setFromCoplanarPoints( _vecNear, _vecTopLeft, _vecTopRight );
+				planes[ 1 ].setFromCoplanarPoints( _vecNear, _vecTopRight, _vecDownRight );
+				planes[ 2 ].setFromCoplanarPoints( _vecDownRight, _vecDownLeft, _vecNear );
+				planes[ 3 ].setFromCoplanarPoints( _vecDownLeft, _vecTopLeft, _vecNear );
+				planes[ 4 ].setFromCoplanarPoints( _vecTopRight, _vecDownRight, _vecDownLeft );
+				planes[ 5 ].setFromCoplanarPoints( _vectemp3, _vectemp2, _vectemp1 );
+				planes[ 5 ].normal.multiplyScalar( - 1 );
 
-	      _vectemp3.normalize();
+			} else if ( this.camera.isOrthographicCamera ) {
 
-	      _vectemp1.multiplyScalar( this.deep );
+				const left = Math.min( startPoint.x, endPoint.x );
+				const top = Math.max( startPoint.y, endPoint.y );
+				const right = Math.max( startPoint.x, endPoint.x );
+				const down = Math.min( startPoint.y, endPoint.y );
 
-	      _vectemp2.multiplyScalar( this.deep );
+				_vecTopLeft.set( left, top, - 1 );
 
-	      _vectemp3.multiplyScalar( this.deep );
+				_vecTopRight.set( right, top, - 1 );
 
-	      _vectemp1.add( _vecNear );
+				_vecDownRight.set( right, down, - 1 );
 
-	      _vectemp2.add( _vecNear );
+				_vecDownLeft.set( left, down, - 1 );
 
-	      _vectemp3.add( _vecNear );
+				_vecFarTopLeft.set( left, top, 1 );
 
-	      const planes = _frustum.planes;
-	      planes[ 0 ].setFromCoplanarPoints( _vecNear, _vecTopLeft, _vecTopRight );
-	      planes[ 1 ].setFromCoplanarPoints( _vecNear, _vecTopRight, _vecDownRight );
-	      planes[ 2 ].setFromCoplanarPoints( _vecDownRight, _vecDownLeft, _vecNear );
-	      planes[ 3 ].setFromCoplanarPoints( _vecDownLeft, _vecTopLeft, _vecNear );
-	      planes[ 4 ].setFromCoplanarPoints( _vecTopRight, _vecDownRight, _vecDownLeft );
-	      planes[ 5 ].setFromCoplanarPoints( _vectemp3, _vectemp2, _vectemp1 );
-	      planes[ 5 ].normal.multiplyScalar( - 1 );
+				_vecFarTopRight.set( right, top, 1 );
 
-				} else if ( this.camera.isOrthographicCamera ) {
+				_vecFarDownRight.set( right, down, 1 );
 
-	      const left = Math.min( startPoint.x, endPoint.x );
-	      const top = Math.max( startPoint.y, endPoint.y );
-	      const right = Math.max( startPoint.x, endPoint.x );
-	      const down = Math.min( startPoint.y, endPoint.y );
+				_vecFarDownLeft.set( left, down, 1 );
 
-	      _vecTopLeft.set( left, top, - 1 );
+				_vecTopLeft.unproject( this.camera );
 
-	      _vecTopRight.set( right, top, - 1 );
+				_vecTopRight.unproject( this.camera );
 
-	      _vecDownRight.set( right, down, - 1 );
+				_vecDownRight.unproject( this.camera );
 
-	      _vecDownLeft.set( left, down, - 1 );
+				_vecDownLeft.unproject( this.camera );
 
-	      _vecFarTopLeft.set( left, top, 1 );
+				_vecFarTopLeft.unproject( this.camera );
 
-	      _vecFarTopRight.set( right, top, 1 );
+				_vecFarTopRight.unproject( this.camera );
 
-	      _vecFarDownRight.set( right, down, 1 );
+				_vecFarDownRight.unproject( this.camera );
 
-	      _vecFarDownLeft.set( left, down, 1 );
+				_vecFarDownLeft.unproject( this.camera );
 
-	      _vecTopLeft.unproject( this.camera );
+				const planes = _frustum.planes;
+				planes[ 0 ].setFromCoplanarPoints( _vecTopLeft, _vecFarTopLeft, _vecFarTopRight );
+				planes[ 1 ].setFromCoplanarPoints( _vecTopRight, _vecFarTopRight, _vecFarDownRight );
+				planes[ 2 ].setFromCoplanarPoints( _vecFarDownRight, _vecFarDownLeft, _vecDownLeft );
+				planes[ 3 ].setFromCoplanarPoints( _vecFarDownLeft, _vecFarTopLeft, _vecTopLeft );
+				planes[ 4 ].setFromCoplanarPoints( _vecTopRight, _vecDownRight, _vecDownLeft );
+				planes[ 5 ].setFromCoplanarPoints( _vecFarDownRight, _vecFarTopRight, _vecFarTopLeft );
+				planes[ 5 ].normal.multiplyScalar( - 1 );
 
-	      _vecTopRight.unproject( this.camera );
+			} else {
 
-	      _vecDownRight.unproject( this.camera );
+				console.error( 'THREE.SelectionBox: Unsupported camera type.' );
 
-	      _vecDownLeft.unproject( this.camera );
+			}
 
-	      _vecFarTopLeft.unproject( this.camera );
+		}
 
-	      _vecFarTopRight.unproject( this.camera );
+		searchChildInFrustum( frustum, object ) {
 
-	      _vecFarDownRight.unproject( this.camera );
+			if ( object.isMesh || object.isLine || object.isPoints ) {
 
-	      _vecFarDownLeft.unproject( this.camera );
+				if ( object.isInstancedMesh ) {
 
-	      const planes = _frustum.planes;
-	      planes[ 0 ].setFromCoplanarPoints( _vecTopLeft, _vecFarTopLeft, _vecFarTopRight );
-	      planes[ 1 ].setFromCoplanarPoints( _vecTopRight, _vecFarTopRight, _vecFarDownRight );
-	      planes[ 2 ].setFromCoplanarPoints( _vecFarDownRight, _vecFarDownLeft, _vecDownLeft );
-	      planes[ 3 ].setFromCoplanarPoints( _vecFarDownLeft, _vecFarTopLeft, _vecTopLeft );
-	      planes[ 4 ].setFromCoplanarPoints( _vecTopRight, _vecDownRight, _vecDownLeft );
-	      planes[ 5 ].setFromCoplanarPoints( _vecFarDownRight, _vecFarTopRight, _vecFarTopLeft );
-	      planes[ 5 ].normal.multiplyScalar( - 1 );
+					this.instances[ object.uuid ] = [];
+
+					for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
+
+						object.getMatrixAt( instanceId, _matrix );
+
+						_matrix.decompose( _center, _quaternion, _scale );
+
+						_center.applyMatrix4( object.matrixWorld );
+
+						if ( frustum.containsPoint( _center ) ) {
+
+							this.instances[ object.uuid ].push( instanceId );
+
+						}
+
+					}
 
 				} else {
 
-	      console.error( 'THREE.SelectionBox: Unsupported camera type.' );
+					if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
+
+					_center.copy( object.geometry.boundingSphere.center );
+
+					_center.applyMatrix4( object.matrixWorld );
+
+					if ( frustum.containsPoint( _center ) ) {
+
+						this.collection.push( object );
+
+					}
 
 				}
 
 			}
 
-	  searchChildInFrustum( frustum, object ) {
+			if ( object.children.length > 0 ) {
 
-	    if ( object.isMesh || object.isLine || object.isPoints ) {
+				for ( let x = 0; x < object.children.length; x ++ ) {
 
-	      if ( object.isInstancedMesh ) {
-
-	        this.instances[ object.uuid ] = [];
-
-	        for ( let instanceId = 0; instanceId < object.count; instanceId ++ ) {
-
-	          object.getMatrixAt( instanceId, _matrix );
-
-	          _matrix.decompose( _center, _quaternion, _scale );
-
-	          _center.applyMatrix4( object.matrixWorld );
-
-	          if ( frustum.containsPoint( _center ) ) {
-
-	            this.instances[ object.uuid ].push( instanceId );
-
-							}
-
-						}
-
-					} else {
-
-	        if ( object.geometry.boundingSphere === null ) object.geometry.computeBoundingSphere();
-
-	        _center.copy( object.geometry.boundingSphere.center );
-
-	        _center.applyMatrix4( object.matrixWorld );
-
-	        if ( frustum.containsPoint( _center ) ) {
-
-	          this.collection.push( object );
-
-						}
-
-					}
-
-				}
-
-	    if ( object.children.length > 0 ) {
-
-	      for ( let x = 0; x < object.children.length; x ++ ) {
-
-	        this.searchChildInFrustum( frustum, object.children[ x ] );
-
-					}
+					this.searchChildInFrustum( frustum, object.children[ x ] );
 
 				}
 
@@ -267,10 +255,8 @@
 
 		}
 
-		exports.SelectionBox = SelectionBox;
+	}
 
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.SelectionBox = SelectionBox;
 
 } )();

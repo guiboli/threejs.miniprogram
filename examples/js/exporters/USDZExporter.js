@@ -1,187 +1,144 @@
 ( function () {
 
-	( function ( global, factory ) {
+	class USDZExporter {
 
-		typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( '../libs/fflate.module.js' ) ) :
-			typeof define === 'function' && define.amd ? define( [ 'exports', '../libs/fflate.module' ], factory ) :
-				( global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+		async parse( scene ) {
 
-	} )( this, ( function ( exports, fflate ) {
+			const files = {};
+			const modelFileName = 'model.usda'; // model file should be first in USDZ archive so we init it here
 
-		'use strict';
+			files[ modelFileName ] = null;
+			let output = buildHeader();
+			const materials = {};
+			const textures = {};
+			scene.traverseVisible( object => {
 
-		function _interopNamespace( e ) {
+				if ( object.isMesh ) {
 
-			if ( e && e.__esModule ) return e;
-			var n = Object.create( null );
-			if ( e ) {
+					if ( object.material.isMeshStandardMaterial ) {
 
-				Object.keys( e ).forEach( function ( k ) {
+						const geometry = object.geometry;
+						const material = object.material;
+						const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
-					if ( k !== 'default' ) {
+						if ( ! ( geometryFileName in files ) ) {
 
-						var d = Object.getOwnPropertyDescriptor( e, k );
-						Object.defineProperty( n, k, d.get ? d : {
-							enumerable: true,
-							get: function () {
-
-								return e[ k ];
-
-							}
-						} );
-
-					}
-
-				} );
-
-			}
-
-			n[ 'default' ] = e;
-			return Object.freeze( n );
-
-		}
-
-		var fflate__namespace = /*#__PURE__*/_interopNamespace( fflate );
-
-		class USDZExporter {
-
-	  async parse( scene ) {
-
-	    const files = {};
-	    const modelFileName = 'model.usda'; // model file should be first in USDZ archive so we init it here
-
-	    files[ modelFileName ] = null;
-	    let output = buildHeader();
-	    const materials = {};
-	    const textures = {};
-	    scene.traverseVisible( object => {
-
-	      if ( object.isMesh ) {
-
-	        if ( object.material.isMeshStandardMaterial ) {
-
-	          const geometry = object.geometry;
-	          const material = object.material;
-	          const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
-
-	          if ( ! ( geometryFileName in files ) ) {
-
-	            const meshObject = buildMeshObject( geometry );
-	            files[ geometryFileName ] = buildUSDFileAsString( meshObject );
-
-							}
-
-	          if ( ! ( material.uuid in materials ) ) {
-
-	            materials[ material.uuid ] = material;
-
-							}
-
-	          output += buildXform( object, geometry, material );
-
-						} else {
-
-	          console.warn( 'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)', object );
+							const meshObject = buildMeshObject( geometry );
+							files[ geometryFileName ] = buildUSDFileAsString( meshObject );
 
 						}
 
-					}
+						if ( ! ( material.uuid in materials ) ) {
 
-				} );
-	    output += buildMaterials( materials, textures );
-	    files[ modelFileName ] = fflate__namespace.strToU8( output );
-	    output = null;
+							materials[ material.uuid ] = material;
 
-	    for ( const id in textures ) {
+						}
 
-	      const texture = textures[ id ];
-	      const color = id.split( '_' )[ 1 ];
-	      const isRGBA = texture.format === 1023;
-	      const canvas = imageToCanvas( texture.image, color );
-	      const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
-	      files[ `textures/Texture_${id}.${isRGBA ? 'png' : 'jpg'}` ] = new Uint8Array( await blob.arrayBuffer() );
+						output += buildXform( object, geometry, material );
 
-				} // 64 byte alignment
-	    // https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+					} else {
 
-
-	    let offset = 0;
-
-	    for ( const filename in files ) {
-
-	      const file = files[ filename ];
-	      const headerSize = 34 + filename.length;
-	      offset += headerSize;
-	      const offsetMod64 = offset & 63;
-
-	      if ( offsetMod64 !== 4 ) {
-
-	        const padLength = 64 - offsetMod64;
-	        const padding = new Uint8Array( padLength );
-	        files[ filename ] = [ file, {
-	          extra: {
-	            12345: padding
-	          }
-	        } ];
+						console.warn( 'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)', object );
 
 					}
-
-	      offset = file.length;
 
 				}
 
-	    return fflate__namespace.zipSync( files, {
-	      level: 0
-	    } );
+			} );
+			output += buildMaterials( materials, textures );
+			files[ modelFileName ] = fflate.strToU8( output );
+			output = null;
+
+			for ( const id in textures ) {
+
+				const texture = textures[ id ];
+				const color = id.split( '_' )[ 1 ];
+				const isRGBA = texture.format === 1023;
+				const canvas = imageToCanvas( texture.image, color );
+				const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+				files[ `textures/Texture_${id}.${isRGBA ? 'png' : 'jpg'}` ] = new Uint8Array( await blob.arrayBuffer() );
+
+			} // 64 byte alignment
+			// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
+
+
+			let offset = 0;
+
+			for ( const filename in files ) {
+
+				const file = files[ filename ];
+				const headerSize = 34 + filename.length;
+				offset += headerSize;
+				const offsetMod64 = offset & 63;
+
+				if ( offsetMod64 !== 4 ) {
+
+					const padLength = 64 - offsetMod64;
+					const padding = new Uint8Array( padLength );
+					files[ filename ] = [ file, {
+						extra: {
+							12345: padding
+						}
+					} ];
+
+				}
+
+				offset = file.length;
 
 			}
+
+			return fflate.zipSync( files, {
+				level: 0
+			} );
 
 		}
 
-		function imageToCanvas( image, color ) {
+	}
 
-	  if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement || typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas || typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
+	function imageToCanvas( image, color ) {
 
-	    const scale = 1024 / Math.max( image.width, image.height );
-	    const canvas = document.createElement( 'canvas' );
-	    canvas.width = image.width * Math.min( 1, scale );
-	    canvas.height = image.height * Math.min( 1, scale );
-	    const context = canvas.getContext( '2d' );
-	    context.drawImage( image, 0, 0, canvas.width, canvas.height );
+		if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement || typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas || typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
 
-	    if ( color !== undefined ) {
+			const scale = 1024 / Math.max( image.width, image.height );
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = image.width * Math.min( 1, scale );
+			canvas.height = image.height * Math.min( 1, scale );
+			const context = canvas.getContext( '2d' );
+			context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-	      const hex = parseInt( color, 16 );
-	      const r = ( hex >> 16 & 255 ) / 255;
-	      const g = ( hex >> 8 & 255 ) / 255;
-	      const b = ( hex & 255 ) / 255;
-	      const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
-	      const data = imagedata.data;
+			if ( color !== undefined ) {
 
-	      for ( let i = 0; i < data.length; i += 4 ) {
+				const hex = parseInt( color, 16 );
+				const r = ( hex >> 16 & 255 ) / 255;
+				const g = ( hex >> 8 & 255 ) / 255;
+				const b = ( hex & 255 ) / 255;
+				const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
+				const data = imagedata.data;
 
-	        data[ i + 0 ] = data[ i + 0 ] * r;
-	        data[ i + 1 ] = data[ i + 1 ] * g;
-	        data[ i + 2 ] = data[ i + 2 ] * b;
+				for ( let i = 0; i < data.length; i += 4 ) {
 
-					}
-
-	      context.putImageData( imagedata, 0, 0 );
+					data[ i + 0 ] = data[ i + 0 ] * r;
+					data[ i + 1 ] = data[ i + 1 ] * g;
+					data[ i + 2 ] = data[ i + 2 ] * b;
 
 				}
 
-	    return canvas;
+				context.putImageData( imagedata, 0, 0 );
 
 			}
 
-		} //
+			return canvas;
+
+		}
+
+	} //
 
 
-		const PRECISION = 7;
+	const PRECISION = 7;
 
-		function buildHeader() {
+	function buildHeader() {
 
-	  return `#usda 1.0
+		return `#usda 1.0
 (
     customLayerData = {
         string creator = "Three.js USDZExporter"
@@ -192,29 +149,29 @@
 
 `;
 
+	}
+
+	function buildUSDFileAsString( dataToInsert ) {
+
+		let output = buildHeader();
+		output += dataToInsert;
+		return fflate.strToU8( output );
+
+	} // Xform
+
+
+	function buildXform( object, geometry, material ) {
+
+		const name = 'Object_' + object.id;
+		const transform = buildMatrix( object.matrixWorld );
+
+		if ( object.matrixWorld.determinant() < 0 ) {
+
+			console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', object );
+
 		}
 
-		function buildUSDFileAsString( dataToInsert ) {
-
-	  let output = buildHeader();
-	  output += dataToInsert;
-	  return fflate__namespace.strToU8( output );
-
-		} // Xform
-
-
-		function buildXform( object, geometry, material ) {
-
-	  const name = 'Object_' + object.id;
-	  const transform = buildMatrix( object.matrixWorld );
-
-	  if ( object.matrixWorld.determinant() < 0 ) {
-
-	    console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', object );
-
-			}
-
-	  return `def Xform "${name}" (
+		return `def Xform "${name}" (
     prepend references = @./geometries/Geometry_${geometry.id}.usd@</Geometry>
 )
 {
@@ -226,40 +183,40 @@
 
 `;
 
-		}
+	}
 
-		function buildMatrix( matrix ) {
+	function buildMatrix( matrix ) {
 
-	  const array = matrix.elements;
-	  return `( ${buildMatrixRow( array, 0 )}, ${buildMatrixRow( array, 4 )}, ${buildMatrixRow( array, 8 )}, ${buildMatrixRow( array, 12 )} )`;
+		const array = matrix.elements;
+		return `( ${buildMatrixRow( array, 0 )}, ${buildMatrixRow( array, 4 )}, ${buildMatrixRow( array, 8 )}, ${buildMatrixRow( array, 12 )} )`;
 
-		}
+	}
 
-		function buildMatrixRow( array, offset ) {
+	function buildMatrixRow( array, offset ) {
 
-	  return `(${array[ offset + 0 ]}, ${array[ offset + 1 ]}, ${array[ offset + 2 ]}, ${array[ offset + 3 ]})`;
+		return `(${array[ offset + 0 ]}, ${array[ offset + 1 ]}, ${array[ offset + 2 ]}, ${array[ offset + 3 ]})`;
 
-		} // Mesh
+	} // Mesh
 
 
-		function buildMeshObject( geometry ) {
+	function buildMeshObject( geometry ) {
 
-	  const mesh = buildMesh( geometry );
-	  return `
+		const mesh = buildMesh( geometry );
+		return `
 def "Geometry"
 {
   ${mesh}
 }
 `;
 
-		}
+	}
 
-		function buildMesh( geometry ) {
+	function buildMesh( geometry ) {
 
-	  const name = 'Geometry';
-	  const attributes = geometry.attributes;
-	  const count = attributes.position.count;
-	  return `
+		const name = 'Geometry';
+		const attributes = geometry.attributes;
+		const count = attributes.position.count;
+		return `
     def Mesh "${name}"
     {
         int[] faceVertexCounts = [${buildMeshVertexCount( geometry )}]
@@ -275,125 +232,125 @@ def "Geometry"
     }
 `;
 
-		}
+	}
 
-		function buildMeshVertexCount( geometry ) {
+	function buildMeshVertexCount( geometry ) {
 
-	  const count = geometry.index !== null ? geometry.index.count : geometry.attributes.position.count;
-	  return Array( count / 3 ).fill( 3 ).join( ', ' );
+		const count = geometry.index !== null ? geometry.index.count : geometry.attributes.position.count;
+		return Array( count / 3 ).fill( 3 ).join( ', ' );
 
-		}
+	}
 
-		function buildMeshVertexIndices( geometry ) {
+	function buildMeshVertexIndices( geometry ) {
 
-	  const index = geometry.index;
-	  const array = [];
+		const index = geometry.index;
+		const array = [];
 
-	  if ( index !== null ) {
+		if ( index !== null ) {
 
-	    for ( let i = 0; i < index.count; i ++ ) {
+			for ( let i = 0; i < index.count; i ++ ) {
 
-	      array.push( index.getX( i ) );
-
-				}
-
-			} else {
-
-	    const length = geometry.attributes.position.count;
-
-	    for ( let i = 0; i < length; i ++ ) {
-
-	      array.push( i );
-
-				}
+				array.push( index.getX( i ) );
 
 			}
 
-	  return array.join( ', ' );
+		} else {
+
+			const length = geometry.attributes.position.count;
+
+			for ( let i = 0; i < length; i ++ ) {
+
+				array.push( i );
+
+			}
 
 		}
 
-		function buildVector3Array( attribute, count ) {
+		return array.join( ', ' );
 
-	  if ( attribute === undefined ) {
+	}
 
-	    console.warn( 'USDZExporter: Normals missing.' );
-	    return Array( count ).fill( '(0, 0, 0)' ).join( ', ' );
+	function buildVector3Array( attribute, count ) {
 
-			}
+		if ( attribute === undefined ) {
 
-	  const array = [];
-
-	  for ( let i = 0; i < attribute.count; i ++ ) {
-
-	    const x = attribute.getX( i );
-	    const y = attribute.getY( i );
-	    const z = attribute.getZ( i );
-	    array.push( `(${x.toPrecision( PRECISION )}, ${y.toPrecision( PRECISION )}, ${z.toPrecision( PRECISION )})` );
-
-			}
-
-	  return array.join( ', ' );
+			console.warn( 'USDZExporter: Normals missing.' );
+			return Array( count ).fill( '(0, 0, 0)' ).join( ', ' );
 
 		}
 
-		function buildVector2Array( attribute, count ) {
+		const array = [];
 
-	  if ( attribute === undefined ) {
+		for ( let i = 0; i < attribute.count; i ++ ) {
 
-	    console.warn( 'USDZExporter: UVs missing.' );
-	    return Array( count ).fill( '(0, 0)' ).join( ', ' );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			const z = attribute.getZ( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${y.toPrecision( PRECISION )}, ${z.toPrecision( PRECISION )})` );
 
-			}
+		}
 
-	  const array = [];
+		return array.join( ', ' );
 
-	  for ( let i = 0; i < attribute.count; i ++ ) {
+	}
 
-	    const x = attribute.getX( i );
-	    const y = attribute.getY( i );
-	    array.push( `(${x.toPrecision( PRECISION )}, ${1 - y.toPrecision( PRECISION )})` );
+	function buildVector2Array( attribute, count ) {
 
-			}
+		if ( attribute === undefined ) {
 
-	  return array.join( ', ' );
+			console.warn( 'USDZExporter: UVs missing.' );
+			return Array( count ).fill( '(0, 0)' ).join( ', ' );
 
-		} // Materials
+		}
+
+		const array = [];
+
+		for ( let i = 0; i < attribute.count; i ++ ) {
+
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			array.push( `(${x.toPrecision( PRECISION )}, ${1 - y.toPrecision( PRECISION )})` );
+
+		}
+
+		return array.join( ', ' );
+
+	} // Materials
 
 
-		function buildMaterials( materials, textures ) {
+	function buildMaterials( materials, textures ) {
 
-	  const array = [];
+		const array = [];
 
-	  for ( const uuid in materials ) {
+		for ( const uuid in materials ) {
 
-	    const material = materials[ uuid ];
-	    array.push( buildMaterial( material, textures ) );
+			const material = materials[ uuid ];
+			array.push( buildMaterial( material, textures ) );
 
-			}
+		}
 
-	  return `def "Materials"
+		return `def "Materials"
 {
 ${array.join( '' )}
 }
 
 `;
 
-		}
+	}
 
-		function buildMaterial( material, textures ) {
+	function buildMaterial( material, textures ) {
 
-	  // https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
-	  const pad = '            ';
-	  const inputs = [];
-	  const samplers = [];
+		// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
+		const pad = '            ';
+		const inputs = [];
+		const samplers = [];
 
-	  function buildTexture( texture, mapType, color ) {
+		function buildTexture( texture, mapType, color ) {
 
-	    const id = texture.id + ( color ? '_' + color.getHexString() : '' );
-	    const isRGBA = texture.format === 1023;
-	    textures[ id ] = texture;
-	    return `
+			const id = texture.id + ( color ? '_' + color.getHexString() : '' );
+			const isRGBA = texture.format === 1023;
+			textures[ id ] = texture;
+			return `
         def Shader "Transform2d_${mapType}" (
             sdrMetadata = {
                 string role = "math"
@@ -420,87 +377,87 @@ ${array.join( '' )}
             float3 outputs:rgb
         }`;
 
-			}
+		}
 
-	  if ( material.map !== null ) {
+		if ( material.map !== null ) {
 
-	    inputs.push( `${pad}color3f inputs:diffuseColor.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:rgb>` );
-	    samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
+			inputs.push( `${pad}color3f inputs:diffuseColor.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:rgb>` );
+			samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 
-			} else {
+		} else {
 
-	    inputs.push( `${pad}color3f inputs:diffuseColor = ${buildColor( material.color )}` );
+			inputs.push( `${pad}color3f inputs:diffuseColor = ${buildColor( material.color )}` );
 
-			}
+		}
 
-	  if ( material.emissiveMap !== null ) {
+		if ( material.emissiveMap !== null ) {
 
-	    inputs.push( `${pad}color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>` );
-	    samplers.push( buildTexture( material.emissiveMap, 'emissive' ) );
+			inputs.push( `${pad}color3f inputs:emissiveColor.connect = </Materials/Material_${material.id}/Texture_${material.emissiveMap.id}_emissive.outputs:rgb>` );
+			samplers.push( buildTexture( material.emissiveMap, 'emissive' ) );
 
-			} else if ( material.emissive.getHex() > 0 ) {
+		} else if ( material.emissive.getHex() > 0 ) {
 
-	    inputs.push( `${pad}color3f inputs:emissiveColor = ${buildColor( material.emissive )}` );
+			inputs.push( `${pad}color3f inputs:emissiveColor = ${buildColor( material.emissive )}` );
 
-			}
+		}
 
-	  if ( material.normalMap !== null ) {
+		if ( material.normalMap !== null ) {
 
-	    inputs.push( `${pad}normal3f inputs:normal.connect = </Materials/Material_${material.id}/Texture_${material.normalMap.id}_normal.outputs:rgb>` );
-	    samplers.push( buildTexture( material.normalMap, 'normal' ) );
+			inputs.push( `${pad}normal3f inputs:normal.connect = </Materials/Material_${material.id}/Texture_${material.normalMap.id}_normal.outputs:rgb>` );
+			samplers.push( buildTexture( material.normalMap, 'normal' ) );
 
-			}
+		}
 
-	  if ( material.aoMap !== null ) {
+		if ( material.aoMap !== null ) {
 
-	    inputs.push( `${pad}float inputs:occlusion.connect = </Materials/Material_${material.id}/Texture_${material.aoMap.id}_occlusion.outputs:r>` );
-	    samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
+			inputs.push( `${pad}float inputs:occlusion.connect = </Materials/Material_${material.id}/Texture_${material.aoMap.id}_occlusion.outputs:r>` );
+			samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
 
-			}
+		}
 
-	  if ( material.roughnessMap !== null && material.roughness === 1 ) {
+		if ( material.roughnessMap !== null && material.roughness === 1 ) {
 
-	    inputs.push( `${pad}float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>` );
-	    samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
+			inputs.push( `${pad}float inputs:roughness.connect = </Materials/Material_${material.id}/Texture_${material.roughnessMap.id}_roughness.outputs:g>` );
+			samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
 
-			} else {
+		} else {
 
-	    inputs.push( `${pad}float inputs:roughness = ${material.roughness}` );
+			inputs.push( `${pad}float inputs:roughness = ${material.roughness}` );
 
-			}
+		}
 
-	  if ( material.metalnessMap !== null && material.metalness === 1 ) {
+		if ( material.metalnessMap !== null && material.metalness === 1 ) {
 
-	    inputs.push( `${pad}float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>` );
-	    samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
+			inputs.push( `${pad}float inputs:metallic.connect = </Materials/Material_${material.id}/Texture_${material.metalnessMap.id}_metallic.outputs:b>` );
+			samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
 
-			} else {
+		} else {
 
-	    inputs.push( `${pad}float inputs:metallic = ${material.metalness}` );
+			inputs.push( `${pad}float inputs:metallic = ${material.metalness}` );
 
-			}
+		}
 
-	  if ( material.alphaMap !== null ) {
+		if ( material.alphaMap !== null ) {
 
-	    inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>` );
-	    inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
-	    samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
+			inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.alphaMap.id}_opacity.outputs:r>` );
+			inputs.push( `${pad}float inputs:opacityThreshold = 0.0001` );
+			samplers.push( buildTexture( material.alphaMap, 'opacity' ) );
 
-			} else {
+		} else {
 
-	    inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
+			inputs.push( `${pad}float inputs:opacity = ${material.opacity}` );
 
-			}
+		}
 
-	  if ( material.isMeshPhysicalMaterial ) {
+		if ( material.isMeshPhysicalMaterial ) {
 
-	    inputs.push( `${pad}float inputs:clearcoat = ${material.clearcoat}` );
-	    inputs.push( `${pad}float inputs:clearcoatRoughness = ${material.clearcoatRoughness}` );
-	    inputs.push( `${pad}float inputs:ior = ${material.ior}` );
+			inputs.push( `${pad}float inputs:clearcoat = ${material.clearcoat}` );
+			inputs.push( `${pad}float inputs:clearcoatRoughness = ${material.clearcoatRoughness}` );
+			inputs.push( `${pad}float inputs:ior = ${material.ior}` );
 
-			}
+		}
 
-	  return `
+		return `
     def Material "Material_${material.id}"
     {
         def Shader "PreviewSurface"
@@ -527,24 +484,20 @@ ${samplers.join( '\n' )}
     }
 `;
 
-		}
+	}
 
-		function buildColor( color ) {
+	function buildColor( color ) {
 
-	  return `(${color.r}, ${color.g}, ${color.b})`;
+		return `(${color.r}, ${color.g}, ${color.b})`;
 
-		}
+	}
 
-		function buildVector2( vector ) {
+	function buildVector2( vector ) {
 
-	  return `(${vector.x}, ${vector.y})`;
+		return `(${vector.x}, ${vector.y})`;
 
-		}
+	}
 
-		exports.USDZExporter = USDZExporter;
-
-		Object.defineProperty( exports, '__esModule', { value: true } );
-
-	} ) );
+	THREE.USDZExporter = USDZExporter;
 
 } )();
