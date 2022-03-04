@@ -28581,13 +28581,13 @@ class Loader {
 
 var loading = {};
 
-function FileLoader(manager) {
-	Loader.call(this, manager);
-}
+class FileLoader extends Loader {
+	constructor(manager) {
+		super(manager);
+	}
 
-FileLoader.prototype = Object.assign(Object.create(Loader.prototype), {
-	constructor: FileLoader,
-	load: function (url, onLoad, onProgress, onError) {
+	load(url, onLoad, onProgress, onError) {
+		console.log('[app debug] ~ file: FileLoader.js ~ line 17 ~ FileLoader.prototype=Object.assign ~ url', url);
 		if (url === undefined) url = '';
 		if (this.path !== undefined) url = this.path + url;
 		url = this.manager.resolveURL(url);
@@ -28759,24 +28759,29 @@ FileLoader.prototype = Object.assign(Object.create(Loader.prototype), {
 
 		scope.manager.itemStart(url);
 		return request;
-	},
-	setResponseType: function (value) {
+	}
+
+	setResponseType(value) {
 		this.responseType = value;
 		return this;
-	},
-	setWithCredentials: function (value) {
+	}
+
+	setWithCredentials(value) {
 		this.withCredentials = value;
 		return this;
-	},
-	setMimeType: function (value) {
+	}
+
+	setMimeType(value) {
 		this.mimeType = value;
 		return this;
-	},
-	setRequestHeader: function (value) {
+	}
+
+	setRequestHeader(value) {
 		this.requestHeader = value;
 		return this;
 	}
-});
+
+}
 
 class AnimationLoader extends Loader {
 	constructor(manager) {
