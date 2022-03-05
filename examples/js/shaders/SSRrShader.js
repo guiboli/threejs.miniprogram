@@ -1,61 +1,60 @@
 ( function () {
-
-	const SSRrShader = {
-		defines: {
-			MAX_STEP: 0,
-			PERSPECTIVE_CAMERA: true,
-			SPECULAR: true,
-			FILL_HOLE: true,
-			INFINITE_THICK: false
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tSpecular': {
-				value: null
-			},
-			'tNormalSelects': {
-				value: null
-			},
-			'tRefractive': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'tDepthSelects': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'ior': {
-				value: 1.03
-			},
-			'cameraRange': {
-				value: 0
-			},
-			'maxDistance': {
-				value: 180
-			},
-			'surfDist': {
-				value: .007
-			}
-		},
-		vertexShader:
+const SSRrShader = {
+  defines: {
+    MAX_STEP: 0,
+    PERSPECTIVE_CAMERA: true,
+    SPECULAR: true,
+    FILL_HOLE: true,
+    INFINITE_THICK: false
+  },
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'tSpecular': {
+      value: null
+    },
+    'tNormalSelects': {
+      value: null
+    },
+    'tRefractive': {
+      value: null
+    },
+    'tDepth': {
+      value: null
+    },
+    'tDepthSelects': {
+      value: null
+    },
+    'cameraNear': {
+      value: null
+    },
+    'cameraFar': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2()
+    },
+    'cameraProjectionMatrix': {
+      value: new THREE.Matrix4()
+    },
+    'cameraInverseProjectionMatrix': {
+      value: new THREE.Matrix4()
+    },
+    'ior': {
+      value: 1.03
+    },
+    'cameraRange': {
+      value: 0
+    },
+    'maxDistance': {
+      value: 180
+    },
+    'surfDist': {
+      value: .007
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -70,7 +69,7 @@
 		}
 
 	`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 		// precision highp float;
@@ -259,23 +258,23 @@
 			#endif
 		}
 	`
-	};
-	const SSRrDepthShader = {
-		defines: {
-			'PERSPECTIVE_CAMERA': 1
-		},
-		uniforms: {
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			}
-		},
-		vertexShader:
+};
+const SSRrDepthShader = {
+  defines: {
+    'PERSPECTIVE_CAMERA': 1
+  },
+  uniforms: {
+    'tDepth': {
+      value: null
+    },
+    'cameraNear': {
+      value: null
+    },
+    'cameraFar': {
+      value: null
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -289,7 +288,7 @@
 		}
 
 	`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -328,9 +327,8 @@
 		}
 
 	`
-	};
+};
 
-	THREE.SSRrDepthShader = SSRrDepthShader;
-	THREE.SSRrShader = SSRrShader;
-
+THREE.SSRrDepthShader = SSRrDepthShader;
+THREE.SSRrShader = SSRrShader;
 } )();

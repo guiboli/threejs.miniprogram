@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
  * Kaleidoscope Shader
  * Radial reflection around center point
  * Ported from: http://pixelshaders.com/editor/
@@ -9,19 +8,19 @@
  * sides: number of reflections
  * angle: initial angle in radians
  */
-	const KaleidoShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'sides': {
-				value: 6.0
-			},
-			'angle': {
-				value: 0.0
-			}
-		},
-		vertexShader:
+const KaleidoShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'sides': {
+      value: 6.0
+    },
+    'angle': {
+      value: 0.0
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -33,7 +32,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -56,8 +55,7 @@
 			gl_FragColor = color;
 
 		}`
-	};
+};
 
-	THREE.KaleidoShader = KaleidoShader;
-
+THREE.KaleidoShader = KaleidoShader;
 } )();

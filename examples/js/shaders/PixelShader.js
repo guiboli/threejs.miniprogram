@@ -1,21 +1,20 @@
 ( function () {
-
-	/**
+/**
  * Pixelation shader
  */
-	const PixelShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'resolution': {
-				value: null
-			},
-			'pixelSize': {
-				value: 1
-			}
-		},
-		vertexShader:
+const PixelShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'resolution': {
+      value: null
+    },
+    'pixelSize': {
+      value: 1
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -27,7 +26,7 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -44,8 +43,7 @@
 			gl_FragColor = texture2D(tDiffuse, coord);
 
 		}`
-	};
+};
 
-	THREE.PixelShader = PixelShader;
-
+THREE.PixelShader = PixelShader;
 } )();

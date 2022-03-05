@@ -1,166 +1,137 @@
 ( function () {
-
-	/**
+/**
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
  */
 
-	class PeppersGhostEffect {
+class PeppersGhostEffect {
+  constructor(renderer) {
+    const scope = this;
+    scope.cameraDistance = 15;
+    scope.reflectFromAbove = false; // Internals
 
-		constructor( renderer ) {
+    let _halfWidth, _width, _height;
 
-			const scope = this;
-			scope.cameraDistance = 15;
-			scope.reflectFromAbove = false; // Internals
+    const _cameraF = new THREE.PerspectiveCamera(); //front
 
-			let _halfWidth, _width, _height;
 
-			const _cameraF = new THREE.PerspectiveCamera(); //front
+    const _cameraB = new THREE.PerspectiveCamera(); //back
 
 
-			const _cameraB = new THREE.PerspectiveCamera(); //back
+    const _cameraL = new THREE.PerspectiveCamera(); //left
 
 
-			const _cameraL = new THREE.PerspectiveCamera(); //left
+    const _cameraR = new THREE.PerspectiveCamera(); //right
 
 
-			const _cameraR = new THREE.PerspectiveCamera(); //right
+    const _position = new THREE.Vector3();
 
+    const _quaternion = new THREE.Quaternion();
 
-			const _position = new THREE.Vector3();
+    const _scale = new THREE.Vector3(); // Initialization
 
-			const _quaternion = new THREE.Quaternion();
 
-			const _scale = new THREE.Vector3(); // Initialization
+    renderer.autoClear = false;
 
+    this.setSize = function (width, height) {
+      _halfWidth = width / 2;
 
-			renderer.autoClear = false;
+      if (width < height) {
+        _width = width / 3;
+        _height = width / 3;
+      } else {
+        _width = height / 3;
+        _height = height / 3;
+      }
 
-			this.setSize = function ( width, height ) {
+      renderer.setSize(width, height);
+    };
 
-				_halfWidth = width / 2;
+    this.render = function (scene, camera) {
+      scene.updateMatrixWorld();
+      if (camera.parent === null) camera.updateMatrixWorld();
+      camera.matrixWorld.decompose(_position, _quaternion, _scale); // front
 
-				if ( width < height ) {
+      _cameraF.position.copy(_position);
 
-					_width = width / 3;
-					_height = width / 3;
+      _cameraF.quaternion.copy(_quaternion);
 
-				} else {
+      _cameraF.translateZ(scope.cameraDistance);
 
-					_width = height / 3;
-					_height = height / 3;
+      _cameraF.lookAt(scene.position); // back
 
-				}
 
-				renderer.setSize( width, height );
+      _cameraB.position.copy(_position);
 
-			};
+      _cameraB.quaternion.copy(_quaternion);
 
-			this.render = function ( scene, camera ) {
+      _cameraB.translateZ(-scope.cameraDistance);
 
-				scene.updateMatrixWorld();
-				if ( camera.parent === null ) camera.updateMatrixWorld();
-				camera.matrixWorld.decompose( _position, _quaternion, _scale ); // front
+      _cameraB.lookAt(scene.position);
 
-				_cameraF.position.copy( _position );
+      _cameraB.rotation.z += 180 * (Math.PI / 180); // left
 
-				_cameraF.quaternion.copy( _quaternion );
+      _cameraL.position.copy(_position);
 
-				_cameraF.translateZ( scope.cameraDistance );
+      _cameraL.quaternion.copy(_quaternion);
 
-				_cameraF.lookAt( scene.position ); // back
+      _cameraL.translateX(-scope.cameraDistance);
 
+      _cameraL.lookAt(scene.position);
 
-				_cameraB.position.copy( _position );
+      _cameraL.rotation.x += 90 * (Math.PI / 180); // right
 
-				_cameraB.quaternion.copy( _quaternion );
+      _cameraR.position.copy(_position);
 
-				_cameraB.translateZ( - scope.cameraDistance );
+      _cameraR.quaternion.copy(_quaternion);
 
-				_cameraB.lookAt( scene.position );
+      _cameraR.translateX(scope.cameraDistance);
 
-				_cameraB.rotation.z += 180 * ( Math.PI / 180 ); // left
+      _cameraR.lookAt(scene.position);
 
-				_cameraL.position.copy( _position );
+      _cameraR.rotation.x += 90 * (Math.PI / 180);
+      renderer.clear();
+      renderer.setScissorTest(true);
+      renderer.setScissor(_halfWidth - _width / 2, _height * 2, _width, _height);
+      renderer.setViewport(_halfWidth - _width / 2, _height * 2, _width, _height);
 
-				_cameraL.quaternion.copy( _quaternion );
+      if (scope.reflectFromAbove) {
+        renderer.render(scene, _cameraB);
+      } else {
+        renderer.render(scene, _cameraF);
+      }
 
-				_cameraL.translateX( - scope.cameraDistance );
+      renderer.setScissor(_halfWidth - _width / 2, 0, _width, _height);
+      renderer.setViewport(_halfWidth - _width / 2, 0, _width, _height);
 
-				_cameraL.lookAt( scene.position );
-
-				_cameraL.rotation.x += 90 * ( Math.PI / 180 ); // right
-
-				_cameraR.position.copy( _position );
-
-				_cameraR.quaternion.copy( _quaternion );
-
-				_cameraR.translateX( scope.cameraDistance );
-
-				_cameraR.lookAt( scene.position );
-
-				_cameraR.rotation.x += 90 * ( Math.PI / 180 );
-				renderer.clear();
-				renderer.setScissorTest( true );
-				renderer.setScissor( _halfWidth - _width / 2, _height * 2, _width, _height );
-				renderer.setViewport( _halfWidth - _width / 2, _height * 2, _width, _height );
-
-				if ( scope.reflectFromAbove ) {
-
-					renderer.render( scene, _cameraB );
-
-				} else {
-
-					renderer.render( scene, _cameraF );
-
-				}
-
-				renderer.setScissor( _halfWidth - _width / 2, 0, _width, _height );
-				renderer.setViewport( _halfWidth - _width / 2, 0, _width, _height );
-
-				if ( scope.reflectFromAbove ) {
-
-					renderer.render( scene, _cameraF );
-
-				} else {
-
-					renderer.render( scene, _cameraB );
-
-				}
-
-				renderer.setScissor( _halfWidth - _width / 2 - _width, _height, _width, _height );
-				renderer.setViewport( _halfWidth - _width / 2 - _width, _height, _width, _height );
-
-				if ( scope.reflectFromAbove ) {
-
-					renderer.render( scene, _cameraR );
-
-				} else {
-
-					renderer.render( scene, _cameraL );
-
-				}
-
-				renderer.setScissor( _halfWidth + _width / 2, _height, _width, _height );
-				renderer.setViewport( _halfWidth + _width / 2, _height, _width, _height );
-
-				if ( scope.reflectFromAbove ) {
-
-					renderer.render( scene, _cameraL );
-
-				} else {
-
-					renderer.render( scene, _cameraR );
-
-				}
-
-				renderer.setScissorTest( false );
-
-			};
-
-		}
-
-	}
-
-	THREE.PeppersGhostEffect = PeppersGhostEffect;
-
+      if (scope.reflectFromAbove) {
+        renderer.render(scene, _cameraF);
+      } else {
+        renderer.render(scene, _cameraB);
+      }
+
+      renderer.setScissor(_halfWidth - _width / 2 - _width, _height, _width, _height);
+      renderer.setViewport(_halfWidth - _width / 2 - _width, _height, _width, _height);
+
+      if (scope.reflectFromAbove) {
+        renderer.render(scene, _cameraR);
+      } else {
+        renderer.render(scene, _cameraL);
+      }
+
+      renderer.setScissor(_halfWidth + _width / 2, _height, _width, _height);
+      renderer.setViewport(_halfWidth + _width / 2, _height, _width, _height);
+
+      if (scope.reflectFromAbove) {
+        renderer.render(scene, _cameraL);
+      } else {
+        renderer.render(scene, _cameraR);
+      }
+
+      renderer.setScissorTest(false);
+    };
+  }
+
+}
+
+THREE.PeppersGhostEffect = PeppersGhostEffect;
 } )();

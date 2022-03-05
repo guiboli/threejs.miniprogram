@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
  * Text = 3D Text
  *
  * parameters = {
@@ -17,35 +16,27 @@
  * }
  */
 
-	class TextGeometry extends THREE.ExtrudeGeometry {
+class TextGeometry extends THREE.ExtrudeGeometry {
+  constructor(text, parameters = {}) {
+    const font = parameters.font;
 
-		constructor( text, parameters = {} ) {
+    if (font === undefined) {
+      super(); // generate default extrude geometry
+    } else {
+      const shapes = font.generateShapes(text, parameters.size); // translate parameters to THREE.ExtrudeGeometry API
 
-			const font = parameters.font;
+      parameters.depth = parameters.height !== undefined ? parameters.height : 50; // defaults
 
-			if ( font === undefined ) {
+      if (parameters.bevelThickness === undefined) parameters.bevelThickness = 10;
+      if (parameters.bevelSize === undefined) parameters.bevelSize = 8;
+      if (parameters.bevelEnabled === undefined) parameters.bevelEnabled = false;
+      super(shapes, parameters);
+    }
 
-				super(); // generate default extrude geometry
+    this.type = 'TextGeometry';
+  }
 
-			} else {
+}
 
-				const shapes = font.generateShapes( text, parameters.size ); // translate parameters to THREE.ExtrudeGeometry API
-
-				parameters.depth = parameters.height !== undefined ? parameters.height : 50; // defaults
-
-				if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-				if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-				if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-				super( shapes, parameters );
-
-			}
-
-			this.type = 'TextGeometry';
-
-		}
-
-	}
-
-	THREE.TextGeometry = TextGeometry;
-
+THREE.TextGeometry = TextGeometry;
 } )();

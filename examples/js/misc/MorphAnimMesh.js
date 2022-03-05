@@ -1,69 +1,48 @@
 ( function () {
+class MorphAnimMesh extends THREE.Mesh {
+  constructor(geometry, material) {
+    super(geometry, material);
+    this.type = 'MorphAnimMesh';
+    this.mixer = new THREE.AnimationMixer(this);
+    this.activeAction = null;
+  }
 
-	class MorphAnimMesh extends THREE.Mesh {
+  setDirectionForward() {
+    this.mixer.timeScale = 1.0;
+  }
 
-		constructor( geometry, material ) {
+  setDirectionBackward() {
+    this.mixer.timeScale = -1.0;
+  }
 
-			super( geometry, material );
-			this.type = 'MorphAnimMesh';
-			this.mixer = new THREE.AnimationMixer( this );
-			this.activeAction = null;
+  playAnimation(label, fps) {
+    if (this.activeAction) {
+      this.activeAction.stop();
+      this.activeAction = null;
+    }
 
-		}
+    const clip = THREE.AnimationClip.findByName(this, label);
 
-		setDirectionForward() {
+    if (clip) {
+      const action = this.mixer.clipAction(clip);
+      action.timeScale = clip.tracks.length * fps / clip.duration;
+      this.activeAction = action.play();
+    } else {
+      throw new Error('THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()');
+    }
+  }
 
-			this.mixer.timeScale = 1.0;
+  updateAnimation(delta) {
+    this.mixer.update(delta);
+  }
 
-		}
+  copy(source) {
+    super.copy(source);
+    this.mixer = new THREE.AnimationMixer(this);
+    return this;
+  }
 
-		setDirectionBackward() {
+}
 
-			this.mixer.timeScale = - 1.0;
-
-		}
-
-		playAnimation( label, fps ) {
-
-			if ( this.activeAction ) {
-
-				this.activeAction.stop();
-				this.activeAction = null;
-
-			}
-
-			const clip = THREE.AnimationClip.findByName( this, label );
-
-			if ( clip ) {
-
-				const action = this.mixer.clipAction( clip );
-				action.timeScale = clip.tracks.length * fps / clip.duration;
-				this.activeAction = action.play();
-
-			} else {
-
-				throw new Error( 'THREE.MorphAnimMesh: animations[' + label + '] undefined in .playAnimation()' );
-
-			}
-
-		}
-
-		updateAnimation( delta ) {
-
-			this.mixer.update( delta );
-
-		}
-
-		copy( source ) {
-
-			super.copy( source );
-			this.mixer = new THREE.AnimationMixer( this );
-			return this;
-
-		}
-
-	}
-
-	THREE.MorphAnimMesh = MorphAnimMesh;
-
+THREE.MorphAnimMesh = MorphAnimMesh;
 } )();

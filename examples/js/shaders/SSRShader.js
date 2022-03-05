@@ -1,61 +1,60 @@
 ( function () {
-
-	/**
+/**
  * References:
  * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
 
-	const SSRShader = {
-		defines: {
-			MAX_STEP: 0,
-			PERSPECTIVE_CAMERA: true,
-			DISTANCE_ATTENUATION: true,
-			FRESNEL: true,
-			INFINITE_THICK: false,
-			SELECTIVE: false
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tNormal': {
-				value: null
-			},
-			'tMetalness': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
-			},
-			'opacity': {
-				value: .5
-			},
-			'maxDistance': {
-				value: 180
-			},
-			'cameraRange': {
-				value: 0
-			},
-			'thickness': {
-				value: .018
-			}
-		},
-		vertexShader:
+const SSRShader = {
+  defines: {
+    MAX_STEP: 0,
+    PERSPECTIVE_CAMERA: true,
+    DISTANCE_ATTENUATION: true,
+    FRESNEL: true,
+    INFINITE_THICK: false,
+    SELECTIVE: false
+  },
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'tNormal': {
+      value: null
+    },
+    'tMetalness': {
+      value: null
+    },
+    'tDepth': {
+      value: null
+    },
+    'cameraNear': {
+      value: null
+    },
+    'cameraFar': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2()
+    },
+    'cameraProjectionMatrix': {
+      value: new THREE.Matrix4()
+    },
+    'cameraInverseProjectionMatrix': {
+      value: new THREE.Matrix4()
+    },
+    'opacity': {
+      value: .5
+    },
+    'maxDistance': {
+      value: 180
+    },
+    'cameraRange': {
+      value: 0
+    },
+    'thickness': {
+      value: .018
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -70,7 +69,7 @@
 		}
 
 	`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 		// precision highp float;
@@ -250,23 +249,23 @@
 			}
 		}
 	`
-	};
-	const SSRDepthShader = {
-		defines: {
-			'PERSPECTIVE_CAMERA': 1
-		},
-		uniforms: {
-			'tDepth': {
-				value: null
-			},
-			'cameraNear': {
-				value: null
-			},
-			'cameraFar': {
-				value: null
-			}
-		},
-		vertexShader:
+};
+const SSRDepthShader = {
+  defines: {
+    'PERSPECTIVE_CAMERA': 1
+  },
+  uniforms: {
+    'tDepth': {
+      value: null
+    },
+    'cameraNear': {
+      value: null
+    },
+    'cameraFar': {
+      value: null
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -280,7 +279,7 @@
 		}
 
 	`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -319,20 +318,20 @@
 		}
 
 	`
-	};
-	const SSRBlurShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2()
-			},
-			'opacity': {
-				value: .5
-			}
-		},
-		vertexShader:
+};
+const SSRBlurShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2()
+    },
+    'opacity': {
+      value: .5
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -346,7 +345,7 @@
 		}
 
 	`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -384,10 +383,9 @@
 
 		}
 	`
-	};
+};
 
-	THREE.SSRBlurShader = SSRBlurShader;
-	THREE.SSRDepthShader = SSRDepthShader;
-	THREE.SSRShader = SSRShader;
-
+THREE.SSRBlurShader = SSRBlurShader;
+THREE.SSRDepthShader = SSRDepthShader;
+THREE.SSRShader = SSRShader;
 } )();

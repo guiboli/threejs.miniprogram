@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
  * Triangle blur shader
  * based on glfx.js triangle blur shader
  * https://github.com/evanw/glfx.js
@@ -10,16 +9,16 @@
  * perpendicular triangle filters.
  */
 
-	const TriangleBlurShader = {
-		uniforms: {
-			'texture': {
-				value: null
-			},
-			'delta': {
-				value: new THREE.Vector2( 1, 1 )
-			}
-		},
-		vertexShader:
+const TriangleBlurShader = {
+  uniforms: {
+    'texture': {
+      value: null
+    },
+    'delta': {
+      value: new THREE.Vector2(1, 1)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -31,7 +30,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -67,8 +66,7 @@
 			gl_FragColor = color / total;
 
 		}`
-	};
+};
 
-	THREE.TriangleBlurShader = TriangleBlurShader;
-
+THREE.TriangleBlurShader = TriangleBlurShader;
 } )();

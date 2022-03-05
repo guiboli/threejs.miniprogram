@@ -1,21 +1,20 @@
 ( function () {
-
-	/**
+/**
  * Mirror Shader
  * Copies half the input to the other half
  *
  * side: side of input to mirror (0 = left, 1 = right, 2 = top, 3 = bottom)
  */
-	const MirrorShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'side': {
-				value: 1
-			}
-		},
-		vertexShader:
+const MirrorShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'side': {
+      value: 1
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -27,7 +26,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -52,8 +51,7 @@
 			gl_FragColor = color;
 
 		}`
-	};
+};
 
-	THREE.MirrorShader = MirrorShader;
-
+THREE.MirrorShader = MirrorShader;
 } )();

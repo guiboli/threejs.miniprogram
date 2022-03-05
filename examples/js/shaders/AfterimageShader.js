@@ -1,23 +1,22 @@
 ( function () {
-
-	/**
+/**
  * Afterimage shader
  * I created this effect inspired by a demo on codepen:
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
-	const AfterimageShader = {
-		uniforms: {
-			'damp': {
-				value: 0.96
-			},
-			'tOld': {
-				value: null
-			},
-			'tNew': {
-				value: null
-			}
-		},
-		vertexShader:
+const AfterimageShader = {
+  uniforms: {
+    'damp': {
+      value: 0.96
+    },
+    'tOld': {
+      value: null
+    },
+    'tNew': {
+      value: null
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -29,7 +28,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -56,8 +55,7 @@
 			gl_FragColor = max(texelNew, texelOld);
 
 		}`
-	};
+};
 
-	THREE.AfterimageShader = AfterimageShader;
-
+THREE.AfterimageShader = AfterimageShader;
 } )();

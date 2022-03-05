@@ -1,19 +1,18 @@
 ( function () {
-
-	/**
+/**
  * Colorify shader
  */
 
-	const ColorifyShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'color': {
-				value: new THREE.Color( 0xffffff )
-			}
-		},
-		vertexShader:
+const ColorifyShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'color': {
+      value: new THREE.Color(0xffffff)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -25,7 +24,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -44,8 +43,7 @@
 			gl_FragColor = vec4( v * color, texel.w );
 
 		}`
-	};
+};
 
-	THREE.ColorifyShader = ColorifyShader;
-
+THREE.ColorifyShader = ColorifyShader;
 } )();

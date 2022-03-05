@@ -28587,7 +28587,6 @@
 		}
 
 		load(url, onLoad, onProgress, onError) {
-			console.log('[app debug] ~ file: FileLoader.js ~ line 17 ~ FileLoader.prototype=Object.assign ~ url', url);
 			if (url === undefined) url = '';
 			if (this.path !== undefined) url = this.path + url;
 			url = this.manager.resolveURL(url);

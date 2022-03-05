@@ -1,22 +1,21 @@
 ( function () {
-
-	/**
+/**
  * ACES Filmic Tone Mapping Shader by Stephen Hill
  * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
  *
  * this implementation of ACES is modified to accommodate a brighter viewing environment.
  * the scale factor of 1/0.6 is subjective. see discussion in #19621.
  */
-	const ACESFilmicToneMappingShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'exposure': {
-				value: 1.0
-			}
-		},
-		vertexShader:
+const ACESFilmicToneMappingShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'exposure': {
+      value: 1.0
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -28,7 +27,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -85,8 +84,7 @@
 			gl_FragColor = vec4( ACESFilmicToneMapping( tex.rgb ), tex.a );
 
 		}`
-	};
+};
 
-	THREE.ACESFilmicToneMappingShader = ACESFilmicToneMappingShader;
-
+THREE.ACESFilmicToneMappingShader = ACESFilmicToneMappingShader;
 } )();

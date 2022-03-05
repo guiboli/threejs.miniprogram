@@ -1,16 +1,15 @@
 ( function () {
-
-	/**
+/**
  * Gamma Correction Shader
  * http://en.wikipedia.org/wiki/gamma_correction
  */
-	const GammaCorrectionShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			}
-		},
-		vertexShader:
+const GammaCorrectionShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -22,7 +21,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -37,8 +36,7 @@
 			gl_FragColor = LinearTosRGB( tex );
 
 		}`
-	};
+};
 
-	THREE.GammaCorrectionShader = GammaCorrectionShader;
-
+THREE.GammaCorrectionShader = GammaCorrectionShader;
 } )();

@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
  * Currently contains:
  *
  *	toon1
@@ -9,22 +8,22 @@
  *	dotted
  */
 
-	const ToonShader1 = {
-		uniforms: {
-			'uDirLightPos': {
-				value: new THREE.Vector3()
-			},
-			'uDirLightColor': {
-				value: new THREE.Color( 0xeeeeee )
-			},
-			'uAmbientLightColor': {
-				value: new THREE.Color( 0x050505 )
-			},
-			'uBaseColor': {
-				value: new THREE.Color( 0xffffff )
-			}
-		},
-		vertexShader:
+const ToonShader1 = {
+  uniforms: {
+    'uDirLightPos': {
+      value: new THREE.Vector3()
+    },
+    'uDirLightColor': {
+      value: new THREE.Color(0xeeeeee)
+    },
+    'uAmbientLightColor': {
+      value: new THREE.Color(0x050505)
+    },
+    'uBaseColor': {
+      value: new THREE.Color(0xffffff)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -45,7 +44,7 @@
 			gl_Position = projectionMatrix * mvPosition;
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -83,35 +82,35 @@
 		}
 
 		}`
-	};
-	const ToonShader2 = {
-		uniforms: {
-			'uDirLightPos': {
-				value: new THREE.Vector3()
-			},
-			'uDirLightColor': {
-				value: new THREE.Color( 0xeeeeee )
-			},
-			'uAmbientLightColor': {
-				value: new THREE.Color( 0x050505 )
-			},
-			'uBaseColor': {
-				value: new THREE.Color( 0xeeeeee )
-			},
-			'uLineColor1': {
-				value: new THREE.Color( 0x808080 )
-			},
-			'uLineColor2': {
-				value: new THREE.Color( 0x000000 )
-			},
-			'uLineColor3': {
-				value: new THREE.Color( 0x000000 )
-			},
-			'uLineColor4': {
-				value: new THREE.Color( 0x000000 )
-			}
-		},
-		vertexShader:
+};
+const ToonShader2 = {
+  uniforms: {
+    'uDirLightPos': {
+      value: new THREE.Vector3()
+    },
+    'uDirLightColor': {
+      value: new THREE.Color(0xeeeeee)
+    },
+    'uAmbientLightColor': {
+      value: new THREE.Color(0x050505)
+    },
+    'uBaseColor': {
+      value: new THREE.Color(0xeeeeee)
+    },
+    'uLineColor1': {
+      value: new THREE.Color(0x808080)
+    },
+    'uLineColor2': {
+      value: new THREE.Color(0x000000)
+    },
+    'uLineColor3': {
+      value: new THREE.Color(0x000000)
+    },
+    'uLineColor4': {
+      value: new THREE.Color(0x000000)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -123,7 +122,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -160,35 +159,35 @@
 			}
 
 		}`
-	};
-	const ToonShaderHatching = {
-		uniforms: {
-			'uDirLightPos': {
-				value: new THREE.Vector3()
-			},
-			'uDirLightColor': {
-				value: new THREE.Color( 0xeeeeee )
-			},
-			'uAmbientLightColor': {
-				value: new THREE.Color( 0x050505 )
-			},
-			'uBaseColor': {
-				value: new THREE.Color( 0xffffff )
-			},
-			'uLineColor1': {
-				value: new THREE.Color( 0x000000 )
-			},
-			'uLineColor2': {
-				value: new THREE.Color( 0x000000 )
-			},
-			'uLineColor3': {
-				value: new THREE.Color( 0x000000 )
-			},
-			'uLineColor4': {
-				value: new THREE.Color( 0x000000 )
-			}
-		},
-		vertexShader:
+};
+const ToonShaderHatching = {
+  uniforms: {
+    'uDirLightPos': {
+      value: new THREE.Vector3()
+    },
+    'uDirLightColor': {
+      value: new THREE.Color(0xeeeeee)
+    },
+    'uAmbientLightColor': {
+      value: new THREE.Color(0x050505)
+    },
+    'uBaseColor': {
+      value: new THREE.Color(0xffffff)
+    },
+    'uLineColor1': {
+      value: new THREE.Color(0x000000)
+    },
+    'uLineColor2': {
+      value: new THREE.Color(0x000000)
+    },
+    'uLineColor3': {
+      value: new THREE.Color(0x000000)
+    },
+    'uLineColor4': {
+      value: new THREE.Color(0x000000)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -200,7 +199,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -265,26 +264,26 @@
 			}
 
 		}`
-	};
-	const ToonShaderDotted = {
-		uniforms: {
-			'uDirLightPos': {
-				value: new THREE.Vector3()
-			},
-			'uDirLightColor': {
-				value: new THREE.Color( 0xeeeeee )
-			},
-			'uAmbientLightColor': {
-				value: new THREE.Color( 0x050505 )
-			},
-			'uBaseColor': {
-				value: new THREE.Color( 0xffffff )
-			},
-			'uLineColor1': {
-				value: new THREE.Color( 0x000000 )
-			}
-		},
-		vertexShader:
+};
+const ToonShaderDotted = {
+  uniforms: {
+    'uDirLightPos': {
+      value: new THREE.Vector3()
+    },
+    'uDirLightColor': {
+      value: new THREE.Color(0xeeeeee)
+    },
+    'uAmbientLightColor': {
+      value: new THREE.Color(0x050505)
+    },
+    'uBaseColor': {
+      value: new THREE.Color(0xffffff)
+    },
+    'uLineColor1': {
+      value: new THREE.Color(0x000000)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -296,7 +295,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -341,11 +340,10 @@
 			}
 
 		}`
-	};
+};
 
-	THREE.ToonShader1 = ToonShader1;
-	THREE.ToonShader2 = ToonShader2;
-	THREE.ToonShaderDotted = ToonShaderDotted;
-	THREE.ToonShaderHatching = ToonShaderHatching;
-
+THREE.ToonShader1 = ToonShader1;
+THREE.ToonShader2 = ToonShader2;
+THREE.ToonShaderDotted = ToonShaderDotted;
+THREE.ToonShaderHatching = ToonShaderHatching;
 } )();

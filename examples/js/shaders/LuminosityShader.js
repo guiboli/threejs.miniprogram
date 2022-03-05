@@ -1,16 +1,15 @@
 ( function () {
-
-	/**
+/**
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */
-	const LuminosityShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			}
-		},
-		vertexShader:
+const LuminosityShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -23,7 +22,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -42,8 +41,7 @@
 			gl_FragColor = vec4( l, l, l, texel.w );
 
 		}`
-	};
+};
 
-	THREE.LuminosityShader = LuminosityShader;
-
+THREE.LuminosityShader = LuminosityShader;
 } )();

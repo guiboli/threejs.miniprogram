@@ -1,134 +1,97 @@
 ( function () {
+// https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
 
-	// https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
+class GPUStatsPanel extends Stats.Panel {
+  constructor(context, name = 'GPU MS') {
+    super(name, '#f90', '#210');
+    let isWebGL2 = true;
+    let extension = context.getExtension('EXT_disjoint_timer_query_webgl2');
 
-	class GPUStatsPanel extends Stats.Panel {
+    if (extension === null) {
+      isWebGL2 = false;
+      extension = context.getExtension('EXT_disjoint_timer_query');
 
-		constructor( context, name = 'GPU MS' ) {
+      if (extension === null) {
+        console.warn('GPUStatsPanel: disjoint_time_query extension not available.');
+      }
+    }
 
-			super( name, '#f90', '#210' );
-			let isWebGL2 = true;
-			let extension = context.getExtension( 'EXT_disjoint_timer_query_webgl2' );
+    this.context = context;
+    this.extension = extension;
+    this.maxTime = 30;
+    this.activeQueries = 0;
 
-			if ( extension === null ) {
+    this.startQuery = function () {
+      const gl = this.context;
+      const ext = this.extension;
 
-				isWebGL2 = false;
-				extension = context.getExtension( 'EXT_disjoint_timer_query' );
-
-				if ( extension === null ) {
-
-					console.warn( 'GPUStatsPanel: disjoint_time_query extension not available.' );
-
-				}
-
-			}
-
-			this.context = context;
-			this.extension = extension;
-			this.maxTime = 30;
-			this.activeQueries = 0;
-
-			this.startQuery = function () {
-
-				const gl = this.context;
-				const ext = this.extension;
-
-				if ( ext === null ) {
-
-					return;
-
-				} // create the query object
+      if (ext === null) {
+        return;
+      } // create the query object
 
 
-				let query;
+      let query;
 
-				if ( isWebGL2 ) {
+      if (isWebGL2) {
+        query = gl.createQuery();
+        gl.beginQuery(ext.TIME_ELAPSED_EXT, query);
+      } else {
+        query = ext.createQueryEXT();
+        ext.beginQueryEXT(ext.TIME_ELAPSED_EXT, query);
+      }
 
-					query = gl.createQuery();
-					gl.beginQuery( ext.TIME_ELAPSED_EXT, query );
+      this.activeQueries++;
 
-				} else {
+      const checkQuery = () => {
+        // check if the query is available and valid
+        let available, disjoint, ns;
 
-					query = ext.createQueryEXT();
-					ext.beginQueryEXT( ext.TIME_ELAPSED_EXT, query );
+        if (isWebGL2) {
+          available = gl.getQueryParameter(query, gl.QUERY_RESULT_AVAILABLE);
+          disjoint = gl.getParameter(ext.GPU_DISJOINT_EXT);
+          ns = gl.getQueryParameter(query, gl.QUERY_RESULT);
+        } else {
+          available = ext.getQueryObjectEXT(query, ext.QUERY_RESULT_AVAILABLE_EXT);
+          disjoint = gl.getParameter(ext.GPU_DISJOINT_EXT);
+          ns = ext.getQueryObjectEXT(query, ext.QUERY_RESULT_EXT);
+        }
 
-				}
+        const ms = ns * 1e-6;
 
-				this.activeQueries ++;
+        if (available) {
+          // update the display if it is valid
+          if (!disjoint) {
+            this.update(ms, this.maxTime);
+          }
 
-				const checkQuery = () => {
+          this.activeQueries--;
+        } else {
+          // otherwise try again the next frame
+          requestAnimationFrame(checkQuery);
+        }
+      };
 
-					// check if the query is available and valid
-					let available, disjoint, ns;
+      requestAnimationFrame(checkQuery);
+    };
 
-					if ( isWebGL2 ) {
+    this.endQuery = function () {
+      // finish the query measurement
+      const ext = this.extension;
+      const gl = this.context;
 
-						available = gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE );
-						disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-						ns = gl.getQueryParameter( query, gl.QUERY_RESULT );
+      if (ext === null) {
+        return;
+      }
 
-					} else {
+      if (isWebGL2) {
+        gl.endQuery(ext.TIME_ELAPSED_EXT);
+      } else {
+        ext.endQueryEXT(ext.TIME_ELAPSED_EXT);
+      }
+    };
+  }
 
-						available = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_AVAILABLE_EXT );
-						disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-						ns = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_EXT );
+}
 
-					}
-
-					const ms = ns * 1e-6;
-
-					if ( available ) {
-
-						// update the display if it is valid
-						if ( ! disjoint ) {
-
-							this.update( ms, this.maxTime );
-
-						}
-
-						this.activeQueries --;
-
-					} else {
-
-						// otherwise try again the next frame
-						requestAnimationFrame( checkQuery );
-
-					}
-
-				};
-
-				requestAnimationFrame( checkQuery );
-
-			};
-
-			this.endQuery = function () {
-
-				// finish the query measurement
-				const ext = this.extension;
-				const gl = this.context;
-
-				if ( ext === null ) {
-
-					return;
-
-				}
-
-				if ( isWebGL2 ) {
-
-					gl.endQuery( ext.TIME_ELAPSED_EXT );
-
-				} else {
-
-					ext.endQueryEXT( ext.TIME_ELAPSED_EXT );
-
-				}
-
-			};
-
-		}
-
-	}
-
-	THREE.GPUStatsPanel = GPUStatsPanel;
-
+THREE.GPUStatsPanel = GPUStatsPanel;
 } )();

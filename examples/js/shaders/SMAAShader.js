@@ -1,24 +1,23 @@
 ( function () {
-
-	/**
+/**
  * WebGL port of Subpixel Morphological Antialiasing (SMAA) v2.8
  * Preset: SMAA 1x Medium (with color edge detection)
  * https://github.com/iryoku/smaa/releases/tag/v2.8
  */
 
-	const SMAAEdgesShader = {
-		defines: {
-			'SMAA_THRESHOLD': '0.1'
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
-			}
-		},
-		vertexShader:
+const SMAAEdgesShader = {
+  defines: {
+    'SMAA_THRESHOLD': '0.1'
+  },
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2(1 / 1024, 1 / 512)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -42,7 +41,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -108,29 +107,29 @@
 			gl_FragColor = SMAAColorEdgeDetectionPS( vUv, vOffset, tDiffuse );
 
 		}`
-	};
-	const SMAAWeightsShader = {
-		defines: {
-			'SMAA_MAX_SEARCH_STEPS': '8',
-			'SMAA_AREATEX_MAX_DISTANCE': '16',
-			'SMAA_AREATEX_PIXEL_SIZE': '( 1.0 / vec2( 160.0, 560.0 ) )',
-			'SMAA_AREATEX_SUBTEX_SIZE': '( 1.0 / 7.0 )'
-		},
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tArea': {
-				value: null
-			},
-			'tSearch': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
-			}
-		},
-		vertexShader:
+};
+const SMAAWeightsShader = {
+  defines: {
+    'SMAA_MAX_SEARCH_STEPS': '8',
+    'SMAA_AREATEX_MAX_DISTANCE': '16',
+    'SMAA_AREATEX_PIXEL_SIZE': '( 1.0 / vec2( 160.0, 560.0 ) )',
+    'SMAA_AREATEX_SUBTEX_SIZE': '( 1.0 / 7.0 )'
+  },
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'tArea': {
+      value: null
+    },
+    'tSearch': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2(1 / 1024, 1 / 512)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -161,7 +160,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -364,20 +363,20 @@
 			gl_FragColor = SMAABlendingWeightCalculationPS( vUv, vPixcoord, vOffset, tDiffuse, tArea, tSearch, ivec4( 0.0 ) );
 
 		}`
-	};
-	const SMAABlendShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'tColor': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
-			}
-		},
-		vertexShader:
+};
+const SMAABlendShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'tColor': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2(1 / 1024, 1 / 512)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -400,7 +399,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -457,10 +456,9 @@
 			gl_FragColor = SMAANeighborhoodBlendingPS( vUv, vOffset, tColor, tDiffuse );
 
 		}`
-	};
+};
 
-	THREE.SMAABlendShader = SMAABlendShader;
-	THREE.SMAAEdgesShader = SMAAEdgesShader;
-	THREE.SMAAWeightsShader = SMAAWeightsShader;
-
+THREE.SMAABlendShader = SMAABlendShader;
+THREE.SMAAEdgesShader = SMAAEdgesShader;
+THREE.SMAAWeightsShader = SMAAWeightsShader;
 } )();

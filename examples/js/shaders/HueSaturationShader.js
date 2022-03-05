@@ -1,24 +1,23 @@
 ( function () {
-
-	/**
+/**
  * Hue and saturation adjustment
  * https://github.com/evanw/glfx.js
  * hue: -1 to 1 (-1 is 180 degrees in the negative direction, 0 is no change, etc.
  * saturation: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
  */
-	const HueSaturationShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'hue': {
-				value: 0
-			},
-			'saturation': {
-				value: 0
-			}
-		},
-		vertexShader:
+const HueSaturationShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'hue': {
+      value: 0
+    },
+    'saturation': {
+      value: 0
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -31,7 +30,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -65,8 +64,7 @@
 			}
 
 		}`
-	};
+};
 
-	THREE.HueSaturationShader = HueSaturationShader;
-
+THREE.HueSaturationShader = HueSaturationShader;
 } )();

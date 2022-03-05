@@ -1,30 +1,29 @@
 ( function () {
-
-	/**
+/**
  * Full-screen tone-mapping shader based on http://www.cis.rit.edu/people/faculty/ferwerda/publications/sig02_paper.pdf
  */
-	const ToneMapShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'averageLuminance': {
-				value: 1.0
-			},
-			'luminanceMap': {
-				value: null
-			},
-			'maxLuminance': {
-				value: 16.0
-			},
-			'minLuminance': {
-				value: 0.01
-			},
-			'middleGrey': {
-				value: 0.6
-			}
-		},
-		vertexShader:
+const ToneMapShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'averageLuminance': {
+      value: 1.0
+    },
+    'luminanceMap': {
+      value: null
+    },
+    'maxLuminance': {
+      value: 16.0
+    },
+    'minLuminance': {
+      value: 0.01
+    },
+    'middleGrey': {
+      value: 0.6
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -36,7 +35,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -80,8 +79,7 @@
 			gl_FragColor = vec4( ToneMap( texel.xyz ), texel.w );
 
 		}`
-	};
+};
 
-	THREE.ToneMapShader = ToneMapShader;
-
+THREE.ToneMapShader = ToneMapShader;
 } )();

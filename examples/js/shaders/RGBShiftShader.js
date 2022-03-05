@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
  * RGB Shift Shader
  * Shifts red and blue channels from center in opposite directions
  * Ported from http://kriss.cx/tom/2009/05/rgb-shift/
@@ -9,19 +8,19 @@
  * amount: shift distance (1 is width of input)
  * angle: shift angle in radians
  */
-	const RGBShiftShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'amount': {
-				value: 0.005
-			},
-			'angle': {
-				value: 0.0
-			}
-		},
-		vertexShader:
+const RGBShiftShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'amount': {
+      value: 0.005
+    },
+    'angle': {
+      value: 0.0
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -33,7 +32,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -52,8 +51,7 @@
 			gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
 
 		}`
-	};
+};
 
-	THREE.RGBShiftShader = RGBShiftShader;
-
+THREE.RGBShiftShader = RGBShiftShader;
 } )();

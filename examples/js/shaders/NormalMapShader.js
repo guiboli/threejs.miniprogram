@@ -1,26 +1,25 @@
 ( function () {
-
-	/**
+/**
  * Normal map shader
  * - compute normals from heightmap
  */
 
-	const NormalMapShader = {
-		uniforms: {
-			'heightMap': {
-				value: null
-			},
-			'resolution': {
-				value: new THREE.Vector2( 512, 512 )
-			},
-			'scale': {
-				value: new THREE.Vector2( 1, 1 )
-			},
-			'height': {
-				value: 0.05
-			}
-		},
-		vertexShader:
+const NormalMapShader = {
+  uniforms: {
+    'heightMap': {
+      value: null
+    },
+    'resolution': {
+      value: new THREE.Vector2(512, 512)
+    },
+    'scale': {
+      value: new THREE.Vector2(1, 1)
+    },
+    'height': {
+      value: 0.05
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -32,7 +31,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -52,8 +51,7 @@
 			gl_FragColor = vec4( ( 0.5 * normalize( vec3( val - valU, val - valV, height  ) ) + 0.5 ), 1.0 );
 
 		}`
-	};
+};
 
-	THREE.NormalMapShader = NormalMapShader;
-
+THREE.NormalMapShader = NormalMapShader;
 } )();

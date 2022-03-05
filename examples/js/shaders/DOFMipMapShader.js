@@ -1,26 +1,25 @@
 ( function () {
-
-	/**
+/**
  * Depth-of-field shader using mipmaps
  * - from Matt Handley @applmak
  * - requires power-of-2 sized render target with enabled mipmaps
  */
-	const DOFMipMapShader = {
-		uniforms: {
-			'tColor': {
-				value: null
-			},
-			'tDepth': {
-				value: null
-			},
-			'focus': {
-				value: 1.0
-			},
-			'maxblur': {
-				value: 1.0
-			}
-		},
-		vertexShader:
+const DOFMipMapShader = {
+  uniforms: {
+    'tColor': {
+      value: null
+    },
+    'tDepth': {
+      value: null
+    },
+    'focus': {
+      value: 1.0
+    },
+    'maxblur': {
+      value: 1.0
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -32,7 +31,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -56,8 +55,7 @@
 			gl_FragColor.a = 1.0;
 
 		}`
-	};
+};
 
-	THREE.DOFMipMapShader = DOFMipMapShader;
-
+THREE.DOFMipMapShader = DOFMipMapShader;
 } )();

@@ -1,25 +1,24 @@
 ( function () {
-
-	/**
+/**
  * Color correction
  */
 
-	const ColorCorrectionShader = {
-		uniforms: {
-			'tDiffuse': {
-				value: null
-			},
-			'powRGB': {
-				value: new THREE.Vector3( 2, 2, 2 )
-			},
-			'mulRGB': {
-				value: new THREE.Vector3( 1, 1, 1 )
-			},
-			'addRGB': {
-				value: new THREE.Vector3( 0, 0, 0 )
-			}
-		},
-		vertexShader:
+const ColorCorrectionShader = {
+  uniforms: {
+    'tDiffuse': {
+      value: null
+    },
+    'powRGB': {
+      value: new THREE.Vector3(2, 2, 2)
+    },
+    'mulRGB': {
+      value: new THREE.Vector3(1, 1, 1)
+    },
+    'addRGB': {
+      value: new THREE.Vector3(0, 0, 0)
+    }
+  },
+  vertexShader:
   /* glsl */
   `
 
@@ -32,7 +31,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
+  fragmentShader:
   /* glsl */
   `
 
@@ -49,8 +48,7 @@
 			gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );
 
 		}`
-	};
+};
 
-	THREE.ColorCorrectionShader = ColorCorrectionShader;
-
+THREE.ColorCorrectionShader = ColorCorrectionShader;
 } )();
