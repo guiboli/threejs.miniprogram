@@ -1775,13 +1775,6 @@ function WebGLRenderer( parameters = {} ) {
 		uniforms.rectAreaLights.needsUpdate = value;
 		uniforms.hemisphereLights.needsUpdate = value;
 
-		uniforms.directionalShadowMap.needsUpdate = value;
-		uniforms.directionalShadowMatrix.needsUpdate = value;
-		uniforms.spotShadowMap.needsUpdate = value;
-		uniforms.spotShadowMatrix.needsUpdate = value;
-		uniforms.pointShadowMap.needsUpdate = value;
-		uniforms.pointShadowMatrix.needsUpdate = value;
-
 	}
 
 	function materialNeedsLights( material ) {
@@ -1829,8 +1822,7 @@ function WebGLRenderer( parameters = {} ) {
 				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
 
 					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
-					renderTarget.useRenderToTexture = false;
-					renderTarget.useRenderbuffer = true;
+					renderTargetProperties.__useRenderToTexture = false;
 
 				}
 
