@@ -1,3 +1,5 @@
+
+   
 import {
 	DataTextureLoader,
 	DataUtils,
@@ -370,7 +372,7 @@ class RGBELoader extends DataTextureLoader {
 
 			if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 
-				let data, type;
+				let data, format, type;
 				let numElements;
 
 				switch ( this.type ) {
@@ -418,7 +420,7 @@ class RGBELoader extends DataTextureLoader {
 					header: rgbe_header_info.string,
 					gamma: rgbe_header_info.gamma,
 					exposure: rgbe_header_info.exposure,
-					format: rgbe_header_info.format,
+					format: format,
 					type: type
 				};
 
