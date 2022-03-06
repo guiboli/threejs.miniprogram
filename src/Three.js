@@ -162,15 +162,15 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-if ( typeof window !== 'undefined' ) {
+if ( typeof globalThis !== 'undefined' ) {
 
-	if ( window.__THREE__ ) {
+	if ( globalThis.__THREE__ ) {
 
 		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
 
 	} else {
 
-		window.__THREE__ = REVISION;
+		globalThis.__THREE__ = REVISION;
 
 	}
 

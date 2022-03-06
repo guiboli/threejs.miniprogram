@@ -268,6 +268,8 @@ export default {
 		babelCleanup(),
 		inject({
 			XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+			document: ['miniapp-adapter', 'document'],
+			window: ['miniapp-adapter', '*'],
 		}),
 		terser(),
 		header(),

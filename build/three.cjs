@@ -7,7 +7,27 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var miniappAdapter = require('miniapp-adapter');
+var window = require('miniapp-adapter');
+
+function _interopNamespace(e) {
+	if (e && e.__esModule) return e;
+	var n = Object.create(null);
+	if (e) {
+		Object.keys(e).forEach(function (k) {
+			if (k !== 'default') {
+				var d = Object.getOwnPropertyDescriptor(e, k);
+				Object.defineProperty(n, k, d.get ? d : {
+					enumerable: true,
+					get: function () { return e[k]; }
+				});
+			}
+		});
+	}
+	n["default"] = e;
+	return Object.freeze(n);
+}
+
+var window__namespace = /*#__PURE__*/_interopNamespace(window);
 
 const REVISION = '138';
 const MOUSE = {
@@ -1081,7 +1101,7 @@ function getTypedArray(type, buffer) {
 }
 
 function createElementNS(name) {
-	return document.createElementNS('http://www.w3.org/1999/xhtml', name);
+	return window.document.createElementNS('http://www.w3.org/1999/xhtml', name);
 }
 
 const _colorKeywords = {
@@ -19782,7 +19802,7 @@ function WebGLRenderer(parameters = {}) {
 
 	const animation = new WebGLAnimation();
 	animation.setAnimationLoop(onAnimationFrame);
-	if (typeof window !== 'undefined') animation.setContext(window);
+	if (typeof window__namespace !== 'undefined') animation.setContext(window__namespace);
 
 	this.setAnimationLoop = function (callback) {
 		onAnimationFrameCallback = callback;
@@ -28677,7 +28697,7 @@ class FileLoader extends Loader {
 				onProgress: onProgress,
 				onError: onError
 			});
-			var request = new miniappAdapter.XMLHttpRequest();
+			var request = new window.XMLHttpRequest();
 			request.open('GET', url, true);
 			request.addEventListener('load', function (event) {
 				var response = this.response;
@@ -30937,7 +30957,7 @@ let _context;
 const AudioContext = {
 	getContext: function () {
 		if (_context === undefined) {
-			_context = new (window.AudioContext || window.webkitAudioContext)();
+			_context = new (window__namespace.AudioContext || window__namespace.webkitAudioContext)();
 		}
 
 		return _context;
@@ -36529,11 +36549,11 @@ if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 	}));
 }
 
-if (typeof window !== 'undefined') {
-	if (window.__THREE__) {
+if (typeof globalThis !== 'undefined') {
+	if (globalThis.__THREE__) {
 		console.warn('WARNING: Multiple instances of Three.js being imported.');
 	} else {
-		window.__THREE__ = REVISION;
+		globalThis.__THREE__ = REVISION;
 	}
 }
 

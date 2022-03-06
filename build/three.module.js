@@ -3,7 +3,8 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-import { XMLHttpRequest } from 'miniapp-adapter';
+import * as window from 'miniapp-adapter';
+import { document, XMLHttpRequest } from 'miniapp-adapter';
 
 const REVISION = '138';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
@@ -50762,15 +50763,15 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 }
 
-if ( typeof window !== 'undefined' ) {
+if ( typeof globalThis !== 'undefined' ) {
 
-	if ( window.__THREE__ ) {
+	if ( globalThis.__THREE__ ) {
 
 		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
 
 	} else {
 
-		window.__THREE__ = REVISION;
+		globalThis.__THREE__ = REVISION;
 
 	}
 

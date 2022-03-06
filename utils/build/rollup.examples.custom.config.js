@@ -195,6 +195,8 @@ export default files.map((file) => {
 			babelCleanup(),
 			inject({
 				XMLHttpRequest: ['miniapp-adapter', 'XMLHttpRequest'],
+				document: ['miniapp-adapter', 'document'],
+				window: ['miniapp-adapter', '*'],
 			}),
 			unmodularize(),
 			terser(),
